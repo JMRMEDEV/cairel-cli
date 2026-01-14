@@ -1,0 +1,122 @@
+{
+  "name": "general-dev",
+  "description": "General-purpose development agent for full-stack projects with best practices enforcement",
+  "prompt": "You are a senior software developer with expertise in clean code, best practices, and modern development workflows. You prioritize code quality, security, and maintainability. Always follow the steering rules defined in .kiro/steering/ directory.",
+  "mcpServers": {
+    "amazon-q-history": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["{{MCP_SERVERS_PATH}}/amazon-q-history/server.js"],
+      "cwd": ".",
+      "timeout": 120000,
+      "disabled": false
+    },
+    "gpt": {
+      "command": "node",
+      "args": ["{{MCP_SERVERS_PATH}}/gpt/server.js"],
+      "cwd": "{{MCP_SERVERS_PATH}}/gpt"
+    }
+  },
+  "tools": ["*"],
+  "toolAliases": {},
+  "allowedTools": [
+    "@amazon-q-history/*",
+    "web_fetch",
+    "@gpt/*"
+  ],
+  "resources": [
+    "file://.kiro/steering/*.md"
+  ],
+  "hooks": {
+    "agentSpawn": [
+      {
+        "command": "echo 'SESSION: Use init_presession first. If session exists, use restore_latest or list_sessions. Only use track_session for new work.'"
+      },
+      {
+        "command": "echo 'ALWAYS read .kiro/steering/ rules to understand project guidelines'"
+      },
+      {
+        "command": "echo 'CONTEXT MANAGEMENT: Use get_recent_context (default 5 prompts, 10 actions) for safe context retrieval. Increase incrementally if needed.'"
+      }
+    ],
+    "userPromptSubmit": [
+      {
+        "command": "echo 'ALWAYS use log_prompt tool to record user prompts for session tracking. EXCEPTIONS: greetings or non-actionable inputs.'"
+      }
+    ],
+    "stop": [
+      {
+        "command": "echo 'OPTIONAL: Suggest importing final git commits with log_git_commits to capture work done during this session.'"
+      }
+    ]
+  },
+  "toolsSettings": {
+    "fs_read": {
+      "allowedPaths": [
+        "./**/*.ts",
+        "./**/*.tsx",
+        "./**/*.js",
+        "./**/*.jsx",
+        "./**/*.json",
+        "./**/*.md",
+        "./**/*.yml",
+        "./**/*.yaml",
+        "./**/*.html",
+        "./**/*.css",
+        "./.gitignore",
+        "./**/*.lock"
+      ],
+      "deniedPaths": [
+        "./**/.env",
+        "./**/.env.*",
+        "./**/node_modules/",
+        "./**/node_modules/**"
+      ]
+    },
+    "fs_write": {
+      "allowedPaths": [
+        "./**/*.ts",
+        "./**/*.tsx",
+        "./**/*.js",
+        "./**/*.jsx",
+        "./**/*.json",
+        "./**/*.md",
+        "./**/*.yml",
+        "./**/*.yaml",
+        "./**/*.html",
+        "./**/*.css",
+        "./.gitignore"
+      ],
+      "deniedPaths": [
+        "./**/.env",
+        "./**/.env.*",
+        "./**/node_modules/",
+        "./**/node_modules/**"
+      ]
+    },
+    "execute_bash": {
+      "allowedCommands": [
+        "git status",
+        "git fetch",
+        "git diff*",
+        "git log*",
+        "npm install",
+        "npm test*",
+        "yarn*",
+        "pnpm*",
+        "node --version",
+        "ls -la*",
+        "pwd",
+        "find*"
+      ],
+      "deniedCommands": [
+        "rm -rf *",
+        "sudo *",
+        "chmod 777 *",
+        "*--force*"
+      ]
+    }
+  },
+  "includeMcpJson": true,
+  "model": null
+}

@@ -1,0 +1,15 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Amazon Q History (keep only config.json)
+.amazon-q-history/*
+!.amazon-q-history/config.json
+
+# Source material (not part of the package)
+agents-compendium/
+projects-rules-compendium/

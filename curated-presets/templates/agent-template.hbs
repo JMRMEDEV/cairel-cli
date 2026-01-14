@@ -1,0 +1,121 @@
+{
+  "name": "{{AGENT_NAME}}",
+  "description": "{{AGENT_DESCRIPTION}}",
+  "prompt": "{{AGENT_PROMPT}}",
+  "mcpServers": {
+    {{#each MCP_SERVERS}}
+    "{{this.name}}": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["{{this.path}}/server.js"]{{#if this.cwd}},
+      "cwd": "{{this.cwd}}"{{/if}}{{#if this.timeout}},
+      "timeout": {{this.timeout}}{{/if}}
+    }{{#unless @last}},{{/unless}}
+    {{/each}}
+  },
+  "tools": ["*"],
+  "toolAliases": {},
+  "allowedTools": [
+    {{#each MCP_SERVERS}}
+    "@{{this.name}}/*"{{#unless @last}},{{/unless}}
+    {{/each}}{{#if MCP_SERVERS}},{{/if}}
+    "web_fetch"
+  ],
+  "resources": [
+    "file://{{RULES_PATH}}/*.md"
+  ],
+  "hooks": {
+    "agentSpawn": [
+      {
+        "command": "echo 'SESSION: Use init_presession first. If session exists, use restore_latest or list_sessions. Only use track_session for new work.'"
+      },
+      {
+        "command": "echo 'ALWAYS read {{RULES_PATH}}/ rules to understand project guidelines'"
+      },
+      {
+        "command": "echo 'CONTEXT MANAGEMENT: Use get_recent_context (default 5 prompts, 10 actions) for safe context retrieval.'"
+      }{{#if TYPESCRIPT}},
+      {
+        "command": "echo 'CRITICAL: Run {{PACKAGE_MANAGER_CMD}} tsc --noEmit after every .ts/.tsx file change'"
+      }{{/if}}{{#if USE_ESLINT}},
+      {
+        "command": "echo 'Run {{PACKAGE_MANAGER_CMD}} lint after file changes'"
+      }{{/if}}
+    ],
+    "userPromptSubmit": [
+      {
+        "command": "echo 'ALWAYS use log_prompt tool to record user prompts. EXCEPTIONS: greetings or non-actionable inputs.'"
+      }
+    ]{{#if TYPESCRIPT}},
+    "postToolUse": [
+      {
+        "command": "echo 'After file changes: Run {{PACKAGE_MANAGER_CMD}} tsc --noEmit to verify TypeScript compilation'"
+      }
+    ]{{/if}},
+    "stop": [
+      {
+        "command": "echo 'OPTIONAL: Suggest importing final git commits with log_git_commits.'"
+      }
+    ]
+  },
+  "toolsSettings": {
+    "fs_read": {
+      "allowedPaths": [
+        {{#each ALLOWED_FILE_EXTENSIONS}}
+        "./**/*{{this}}"{{#unless @last}},{{/unless}}
+        {{/each}}{{#if ENV_VARS_ALLOWED}},
+        {{#each ENV_ALLOWED_PATHS}}
+        "{{this}}"{{#unless @last}},{{/unless}}
+        {{/each}}{{/if}}
+      ],
+      "deniedPaths": [
+        "./**/node_modules/",
+        "./**/node_modules/**"{{#if ENV_PROD_PROTECTION}},
+        {{#each ENV_DENIED_PATHS}}
+        "{{this}}"{{#unless @last}},{{/unless}}
+        {{/each}}{{/if}}
+      ]
+    },
+    "fs_write": {
+      "allowedPaths": [
+        {{#each ALLOWED_FILE_EXTENSIONS}}
+        "./**/*{{this}}"{{#unless @last}},{{/unless}}
+        {{/each}}{{#if ENV_VARS_ALLOWED}},
+        {{#each ENV_ALLOWED_PATHS}}
+        "{{this}}"{{#unless @last}},{{/unless}}
+        {{/each}}{{/if}}
+      ],
+      "deniedPaths": [
+        "./**/node_modules/",
+        "./**/node_modules/**"{{#if ENV_PROD_PROTECTION}},
+        {{#each ENV_DENIED_PATHS}}
+        "{{this}}"{{#unless @last}},{{/unless}}
+        {{/each}}{{/if}}
+      ]
+    },
+    "execute_bash": {
+      "allowedCommands": [
+        "ls -la*",
+        "pwd",
+        "find*"{{#if USE_GIT}},
+        "git status",
+        "git fetch",
+        "git diff*",
+        "git log*"{{/if}}{{#if PACKAGE_MANAGER_COMMANDS}},
+        {{#each PACKAGE_MANAGER_COMMANDS}}
+        "{{this}}"{{#unless @last}},{{/unless}}
+        {{/each}}{{/if}}{{#if TYPESCRIPT}},
+        "npx tsc --noEmit"{{/if}}{{#if USE_ESLINT}},
+        "{{PACKAGE_MANAGER_CMD}} lint*"{{/if}}
+      ],
+      "deniedCommands": [
+        "rm -rf *",
+        "sudo *",
+        "chmod 777 *",
+        "*--force*"
+      ]
+    }
+  },
+  "includeMcpJson": true,
+  "model": null
+}

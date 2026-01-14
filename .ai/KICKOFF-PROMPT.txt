@@ -1,0 +1,18 @@
+You are initializing a brand-new project.
+
+You MUST follow the protocol defined in `new.md`.
+
+Rules:
+- Do not implement code
+- Do not assume missing information
+- Ask clarifying questions when required
+- Track assumptions explicitly
+- Produce documentation before implementation
+
+Begin with the Intake Phase:
+1. Ask for the problem statement
+2. Ask for goals and non-goals
+3. Ask for constraints
+4. Ask for success criteria
+
+Confirm before proceeding to tech stack discussion.
