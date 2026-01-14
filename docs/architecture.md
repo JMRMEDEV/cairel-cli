@@ -183,12 +183,19 @@ Mode Selection
 **Technologies**: Handlebars, fs-extra
 
 **Process**:
-1. Load curated rules from `curated-presets/rules/`
-2. Filter rules based on wizard answers
-3. Load agent template from `curated-presets/templates/`
-4. Populate template with variables
-5. Create target directories
-6. Copy rules and write agent JSON
+1. Load rules manifest from `curated-presets/rules-manifest.json`
+2. Match rules based on wizard answers and frontmatter conditions
+3. Include user-selected optional rules (rules without conditions)
+4. Load agent template from `curated-presets/templates/`
+5. Populate template with variables
+6. Create target directories
+7. Copy selected rules and write agent JSON
+
+**Data-Driven Design**:
+- Rules manifest auto-generated from frontmatter on build
+- Conditions stored in rule frontmatter (single source of truth)
+- No hardcoded rule selection logic
+- Script: `scripts/generate-manifest.js` (runs on `npm run build`)
 
 ---
 
@@ -243,11 +250,15 @@ Answers validated
     ↓
 MCP servers detected
     ↓
-Rules selected based on answers
+Optional rules offered (if any unclassified)
+    ↓
+Rules manifest loaded
+    ↓
+Rules selected based on conditions + user choices
     ↓
 Template variables built
     ↓
-Agent JSON generated
+Agent JSON generated from Handlebars template
     ↓
 Directories created
     ↓

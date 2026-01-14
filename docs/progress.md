@@ -161,6 +161,58 @@ Tell kiro-cli where to find ordaiv's `.ai/KICKOFF-PROMPT.txt` so it can guide us
 
 ---
 
+### Stage 4: File Generation System ✅ COMPLETE
+
+**Completed** (2026-01-14):
+- ✅ Rules selector with conditional logic based on wizard answers
+- ✅ Handlebars template created with full conditional MCP/toolsSettings
+- ✅ File generator with directory creation
+- ✅ Rules copying from curated-presets
+- ✅ Agent JSON generation from template
+- ✅ Template variables builder
+- ✅ Support for both kiro-cli and Amazon Q paths
+
+**Exit Criteria Met**:
+- ✅ Rules copied to correct directory
+- ✅ Agent JSON generated correctly
+- ✅ Files have proper permissions
+- ✅ No file conflicts
+
+**Next**: Stage 5 - Validation System
+
+---
+
+### Stage 4: File Generation System ✅ COMPLETE
+
+**Completed** (2026-01-14):
+- ✅ Rules selector with conditional logic based on wizard answers
+- ✅ Handlebars template created with full conditional MCP/toolsSettings
+- ✅ File generator with directory creation
+- ✅ Rules copying from curated-presets
+- ✅ Agent JSON generation from template
+- ✅ Template variables builder
+- ✅ Support for both kiro-cli and Amazon Q paths
+- ✅ **Data-driven rules selection**: Manifest auto-generated from frontmatter
+- ✅ **Manifest generation script**: Reads conditions from rule frontmatter
+- ✅ **All 17 rules updated**: Added conditions to frontmatter
+- ✅ **Build integration**: Manifest regenerates on every build (prebuild hook)
+- ✅ **Tested and verified**: Correct rule selection for different project types
+
+**Exit Criteria Met**:
+- ✅ Rules copied to correct directory
+- ✅ Agent JSON generated correctly
+- ✅ Files have proper permissions
+- ✅ No file conflicts
+- ✅ Rules selection is maintainable and data-driven
+
+**Testing Results**:
+- UI TypeScript React with Git: 12 rules selected ✅
+- Backend Python without Git: 2 rules selected ✅
+
+**Next**: Stage 5 - Validation System
+
+---
+
 ## Next Phase: Phase 2 - Implementation (Original)
 
 **Planned Start**: TBD

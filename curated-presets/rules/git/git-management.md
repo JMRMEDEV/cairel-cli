@@ -8,6 +8,8 @@ meta:
   tags: ["git", "version-control", "commits", "workflow"]
   ai-tools: ["kiro-cli", "amazon-q-developer"]
   last-updated: "2026-01-14"
+  conditions:
+    requires-git: true
 ---
 
 # Git Repository Management

@@ -8,6 +8,9 @@ meta:
   tags: ["gluestack-ui", "react-native", "themed", "components"]
   ai-tools: ["kiro-cli", "amazon-q-developer"]
   last-updated: "2026-01-14"
+  conditions:
+    ui-library:
+      - gluestack-ui
 ---
 
 # GlueStack UI v1 (Themed) Component Patterns

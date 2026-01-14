@@ -8,6 +8,11 @@ meta:
   tags: ["react", "props", "destructuring", "patterns"]
   ai-tools: ["kiro-cli", "amazon-q-developer"]
   last-updated: "2026-01-14"
+  conditions:
+    frameworks:
+      - react
+      - react-native
+      - next-js
 ---
 
 # React Props Destructuring Pattern

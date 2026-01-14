@@ -18,6 +18,7 @@ export interface QuickSetupAnswers {
   useGit: boolean;
   aiTool: AITool;
   mcpServers: string[];
+  additionalRules?: string[];
 }
 
 export interface DetailedSetupAnswers extends QuickSetupAnswers {

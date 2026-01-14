@@ -8,6 +8,7 @@ meta:
   tags: ["workflow", "approval", "decision-making", "communication"]
   ai-tools: ["kiro-cli", "amazon-q-developer"]
   last-updated: "2026-01-14"
+  always-include: true
 ---
 
 # Implementation Approval Protocol

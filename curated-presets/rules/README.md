@@ -34,6 +34,25 @@ meta:
   tags: ["tag1", "tag2"]
   ai-tools: ["kiro-cli", "amazon-q-developer"]
   last-updated: "YYYY-MM-DD"
+  always-include: true  # Optional: always include this rule
+  conditions:           # Optional: conditions for rule selection
+    languages:
+      - typescript
+      - javascript
+    frameworks:
+      - react
+      - next-js
+    project-types:
+      - ui
+      - fullstack
+    ui-library:
+      - chakra-ui
+    linter:
+      - eslint
+    versioning-strategy:
+      - semantic
+    requires-git: true
+    requires-env-vars: true
 ---
 
 # Rule Title
@@ -63,6 +82,22 @@ meta:
 [Decision trees and workflows]
 ```
 
+## Conditions Field
+
+The `conditions` field in frontmatter determines when a rule is included:
+
+- **always-include**: Rule is always included (e.g., context-retrieval, implementation-approval)
+- **languages**: Include if project uses one of these languages
+- **frameworks**: Include if project uses one of these frameworks
+- **project-types**: Include if project is one of these types
+- **ui-library**: Include if project uses one of these UI libraries
+- **linter**: Include if project uses one of these linters
+- **versioning-strategy**: Include if project uses one of these versioning strategies
+- **requires-git**: Include if project uses Git (true) or doesn't (false)
+- **requires-env-vars**: Include if project uses environment variables (true) or doesn't (false)
+
+**Note**: The manifest (`rules-manifest.json`) is auto-generated from frontmatter on build via `npm run generate-manifest`.
+
 ## Validation
 
 Rules are validated against:
@@ -74,7 +109,7 @@ Rules are validated against:
 ## Usage in Ordaiv
 
 These rules are used as templates during `ordaiv init`:
-1. User selects project type and options
-2. Ordaiv filters relevant rules
-3. Rules are copied to `.kiro/steering/` or `.amazonq/rules/`
-4. Handlebars templates customize project-specific details
+1. User answers wizard questions
+2. Ordaiv matches rules based on frontmatter conditions
+3. Selected rules are copied to `.kiro/steering/` or `.amazonq/rules/`
+4. Agent configuration is generated with appropriate settings

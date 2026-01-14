@@ -1,0 +1,174 @@
+{
+  "rules": [
+    {
+      "id": "context-retrieval",
+      "category": "general",
+      "alwaysInclude": true
+    },
+    {
+      "id": "eslint-configuration",
+      "category": "general",
+      "alwaysInclude": false,
+      "conditions": {
+        "linter": [
+          "eslint"
+        ]
+      }
+    },
+    {
+      "id": "implementation-approval",
+      "category": "general",
+      "alwaysInclude": true
+    },
+    {
+      "id": "package-json-management",
+      "category": "general",
+      "alwaysInclude": false,
+      "conditions": {
+        "languages": [
+          "typescript",
+          "javascript"
+        ]
+      }
+    },
+    {
+      "id": "package-manager-safety",
+      "category": "general",
+      "alwaysInclude": false,
+      "conditions": {
+        "languages": [
+          "typescript",
+          "javascript"
+        ]
+      }
+    },
+    {
+      "id": "semantic-versioning",
+      "category": "general",
+      "alwaysInclude": false,
+      "conditions": {
+        "versioningStrategy": [
+          "semantic"
+        ]
+      }
+    },
+    {
+      "id": "absolute-imports",
+      "category": "typescript",
+      "alwaysInclude": false,
+      "conditions": {
+        "languages": [
+          "typescript",
+          "javascript"
+        ]
+      }
+    },
+    {
+      "id": "component-structure",
+      "category": "typescript",
+      "alwaysInclude": false,
+      "conditions": {
+        "languages": [
+          "typescript",
+          "javascript"
+        ],
+        "frameworks": [
+          "react",
+          "react-native",
+          "next-js"
+        ]
+      }
+    },
+    {
+      "id": "react-props-destructuring",
+      "category": "typescript",
+      "alwaysInclude": false,
+      "conditions": {
+        "frameworks": [
+          "react",
+          "react-native",
+          "next-js"
+        ]
+      }
+    },
+    {
+      "id": "typescript-validation",
+      "category": "typescript",
+      "alwaysInclude": false,
+      "conditions": {
+        "languages": [
+          "typescript"
+        ]
+      }
+    },
+    {
+      "id": "git-management",
+      "category": "git",
+      "alwaysInclude": false,
+      "conditions": {
+        "requiresGit": true
+      }
+    },
+    {
+      "id": "chakra-ui-v3-integration",
+      "category": "ui",
+      "alwaysInclude": false,
+      "conditions": {
+        "uiLibrary": [
+          "chakra-ui"
+        ]
+      }
+    },
+    {
+      "id": "gluestack-ui-v1-themed",
+      "category": "ui",
+      "alwaysInclude": false,
+      "conditions": {
+        "uiLibrary": [
+          "gluestack-ui"
+        ]
+      }
+    },
+    {
+      "id": "icon-usage-patterns",
+      "category": "ui",
+      "alwaysInclude": false,
+      "conditions": {
+        "projectTypes": [
+          "ui",
+          "fullstack"
+        ]
+      }
+    },
+    {
+      "id": "mock-data-strategy",
+      "category": "ui",
+      "alwaysInclude": false,
+      "conditions": {
+        "projectTypes": [
+          "ui",
+          "fullstack"
+        ]
+      }
+    },
+    {
+      "id": "visual-verification",
+      "category": "ui",
+      "alwaysInclude": false,
+      "conditions": {
+        "projectTypes": [
+          "ui",
+          "fullstack"
+        ]
+      }
+    },
+    {
+      "id": "multi-environment-management",
+      "category": "backend",
+      "alwaysInclude": false,
+      "conditions": {
+        "requiresEnvVars": true
+      }
+    }
+  ]
+}

@@ -8,6 +8,14 @@ meta:
   tags: ["components", "structure", "organization", "react", "typescript"]
   ai-tools: ["kiro-cli", "amazon-q-developer"]
   last-updated: "2026-01-14"
+  conditions:
+    languages:
+      - typescript
+      - javascript
+    frameworks:
+      - react
+      - react-native
+      - next-js
 ---
 
 # Component Organization & Structure

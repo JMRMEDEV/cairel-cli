@@ -1,8 +1,32 @@
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import ora from 'ora';
+import { promises as fs } from 'fs';
+import { join } from 'path';
 import { WizardMode, QuickSetupAnswers, DetailedSetupAnswers, Framework } from '../types/wizard';
 import { detectMCPServers } from '../utils/mcp-detector';
+
+interface OptionalRule {
+  id: string;
+  title: string;
+  description: string;
+}
+
+async function getOptionalRules(answers: Partial<QuickSetupAnswers>): Promise<OptionalRule[]> {
+  const manifestPath = join(__dirname, '..', '..', 'curated-presets', 'rules-manifest.json');
+  const content = await fs.readFile(manifestPath, 'utf-8');
+  const manifest = JSON.parse(content);
+  
+  const unclassified = manifest.rules.filter((r: any) => !r.alwaysInclude && !r.conditions);
+  
+  // For now, return empty array since all rules are classified
+  // In the future, this will show rules without conditions
+  return unclassified.map((r: any) => ({
+    id: r.id,
+    title: r.id.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()),
+    description: `Additional rule from ${r.category} category`,
+  }));
+}
 
 export async function runWizard(): Promise<QuickSetupAnswers | DetailedSetupAnswers> {
   console.log(chalk.bold.blue('\n🚀 Ordaiv - AI Development Initialization\n'));
@@ -105,13 +129,32 @@ async function runQuickSetup(): Promise<QuickSetupAnswers> {
     },
   ]);
 
-  return {
+  const result = {
     ...answers,
     framework: frameworkAnswer.framework || 'none',
     useGit: gitAnswer.useGit,
     aiTool: aiToolAnswer.aiTool,
     mcpServers: mcpAnswer.mcpServers || [],
   };
+
+  // Offer optional rules
+  const optionalRules = await getOptionalRules(result);
+  if (optionalRules.length > 0) {
+    const optionalAnswer = await inquirer.prompt([
+      {
+        type: 'checkbox',
+        name: 'additionalRules',
+        message: 'Select additional rules (optional):',
+        choices: optionalRules.map(r => ({
+          name: `${r.title} - ${r.description}`,
+          value: r.id,
+        })),
+      },
+    ]);
+    (result as any).additionalRules = optionalAnswer.additionalRules || [];
+  }
+
+  return result;
 }
 
 async function runDetailedSetup(): Promise<DetailedSetupAnswers> {

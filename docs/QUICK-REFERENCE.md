@@ -84,6 +84,13 @@ meta:
   tags: ["tag1", "tag2"]
   ai-tools: ["kiro-cli", "amazon-q-developer"]
   last-updated: "2026-01-14"
+  always-include: true  # Optional: always include
+  conditions:           # Optional: selection conditions
+    languages:
+      - typescript
+    frameworks:
+      - react
+    requires-git: true
 ---
 
 # Rule Title
@@ -97,6 +104,8 @@ meta:
 ## 🚫 Common Mistakes
 ## 🤖 AI Self-Check Protocol
 ```
+
+**Note**: Manifest auto-generated from frontmatter on build.
 
 ---
 

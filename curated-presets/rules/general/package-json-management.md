@@ -8,6 +8,10 @@ meta:
   tags: ["package-json", "dependencies", "npm", "versioning"]
   ai-tools: ["kiro-cli", "amazon-q-developer"]
   last-updated: "2026-01-14"
+  conditions:
+    languages:
+      - typescript
+      - javascript
 ---
 
 # Package.json Management & Dependencies

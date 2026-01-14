@@ -8,6 +8,9 @@ meta:
   tags: ["eslint", "linting", "code-quality", "typescript"]
   ai-tools: ["kiro-cli", "amazon-q-developer"]
   last-updated: "2026-01-14"
+  conditions:
+    linter:
+      - eslint
 ---
 
 # ESLint Configuration & Compliance

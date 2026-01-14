@@ -8,6 +8,10 @@ meta:
   tags: ["icons", "react-icons", "svg", "ui-components"]
   ai-tools: ["kiro-cli", "amazon-q-developer"]
   last-updated: "2026-01-14"
+  conditions:
+    project-types:
+      - ui
+      - fullstack
 ---
 
 # Icon Usage Patterns

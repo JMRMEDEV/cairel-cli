@@ -8,6 +8,9 @@ meta:
   tags: ["versioning", "package.json", "semver"]
   ai-tools: ["kiro-cli", "amazon-q-developer"]
   last-updated: "2026-01-14"
+  conditions:
+    versioning-strategy:
+      - semantic
 ---
 
 # Semantic Versioning for Package Management

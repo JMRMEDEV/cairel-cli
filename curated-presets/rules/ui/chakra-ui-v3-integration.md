@@ -8,6 +8,9 @@ meta:
   tags: ["chakra-ui", "mcp", "ui-library", "components"]
   ai-tools: ["kiro-cli", "amazon-q-developer"]
   last-updated: "2026-01-14"
+  conditions:
+    ui-library:
+      - chakra-ui
 ---
 
 # Chakra UI v3 Integration with MCP Tools

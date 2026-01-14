@@ -119,6 +119,25 @@ meta:
   tags: ["tag1", "tag2"]
   ai-tools: ["kiro-cli", "amazon-q-developer"]
   last-updated: "YYYY-MM-DD"
+  always-include: true  # Optional: always include this rule
+  conditions:           # Optional: conditions for rule selection
+    languages:
+      - typescript
+      - javascript
+    frameworks:
+      - react
+      - next-js
+    project-types:
+      - ui
+      - fullstack
+    ui-library:
+      - chakra-ui
+    linter:
+      - eslint
+    versioning-strategy:
+      - semantic
+    requires-git: true
+    requires-env-vars: true
 ---
 
 # Rule Title
