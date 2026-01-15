@@ -5,6 +5,7 @@ dist/
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
+coverage/
 
 # Amazon Q History (keep only config.json)
 .amazon-q-history/*
