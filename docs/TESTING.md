@@ -6,8 +6,8 @@ Comprehensive test coverage for all wizard scenarios and file generation.
 
 ## Test Statistics
 
-- **Total Tests**: 31
-- **Test Suites**: 3
+- **Total Tests**: 48
+- **Test Suites**: 5
 - **Status**: ✅ All Passing
 
 ## Test Coverage
@@ -62,6 +62,36 @@ Comprehensive test coverage for all wizard scenarios and file generation.
 **File Generation** (2 tests):
 - ✅ Generate files for UI TypeScript React project
 - ✅ Generate files for Amazon Q
+
+### 4. Validator Tests (`tests/validator.test.ts`)
+
+**Rule Validation** (9 tests):
+- ✅ Validate all curated rules
+- ✅ Detect missing frontmatter
+- ✅ Detect missing required fields
+- ✅ Detect invalid version format
+- ✅ Detect invalid category
+- ✅ Detect invalid date format
+- ✅ Validate agent JSON structure
+- ✅ Detect invalid JSON format
+- ✅ Skip README.md files
+
+### 5. Update Command Tests (`tests/update.test.ts`)
+
+**Configuration Detection** (3 tests):
+- ✅ Detect missing configuration
+- ✅ Detect kiro-cli configuration
+- ✅ Detect Amazon Q configuration
+
+**Backup Creation** (2 tests):
+- ✅ Prompt for backup confirmation
+- ✅ Allow user to cancel update
+
+**Rule Management** (1 test):
+- ✅ Show update options prompt
+
+**Update Statistics** (1 test):
+- ✅ Show configuration type in output
 
 ## Running Tests
 

@@ -274,6 +274,29 @@ Tell kiro-cli where to find cairel's `.ai/KICKOFF-PROMPT.txt` so it can guide us
 
 ---
 
+### Stage 6: Update Command ✅ COMPLETE
+
+**Completed** (2026-01-15):
+- ✅ Update command implementation
+- ✅ Detect existing configuration (.kiro/ or .amazonq/)
+- ✅ Create timestamped backups before updates
+- ✅ Selective update (rules only, agents only, or both)
+- ✅ Add new rules without overwriting existing
+- ✅ Preserve custom rules (don't delete)
+- ✅ Update existing rules with user confirmation
+- ✅ Clear summary of changes (added, updated, preserved)
+
+**Exit Criteria Met**:
+- ✅ `cairel update` works
+- ✅ Existing files backed up with timestamp
+- ✅ Updates applied correctly
+- ✅ No data loss (custom rules preserved)
+- ✅ Clear user prompts and confirmations
+
+**Next**: Stage 7 - Testing & Polish
+
+---
+
 ## Next Phase: Phase 2 - Implementation (Original)
 
 **Planned Start**: TBD

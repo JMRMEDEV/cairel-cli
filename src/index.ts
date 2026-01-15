@@ -6,6 +6,7 @@ import chalk from 'chalk';
 import { initCommand } from './commands/init.js';
 import { validateCommand } from './commands/validate.js';
 import { listCommand } from './commands/list.js';
+import { updateCommand } from './commands/update.js';
 
 const program = new Command();
 
@@ -35,13 +36,7 @@ program
     console.log('- Documentation creation (README, dev-plan, architecture, progress, bugs)');
   });
 
-program
-  .command('update')
-  .description('Update existing configuration')
-  .action(() => {
-    console.log(chalk.blue('🔄 Updating configuration...'));
-    console.log(chalk.yellow('⚠️  Not implemented yet'));
-  });
+program.addCommand(updateCommand);
 
 program.addCommand(validateCommand);
 
