@@ -3,11 +3,11 @@ import { join, dirname } from 'path';
 import Handlebars from 'handlebars';
 import chalk from 'chalk';
 import ora from 'ora';
-import { QuickSetupAnswers, DetailedSetupAnswers } from '../types/wizard';
+import { QuickSetupAnswers, DetailedSetupAnswers, CustomModeAnswers } from '../types/wizard';
 import { selectRules, getRuleCategory } from './rules-selector';
 
 export async function generateFiles(
-  answers: QuickSetupAnswers | DetailedSetupAnswers,
+  answers: QuickSetupAnswers | DetailedSetupAnswers | CustomModeAnswers,
   targetDir: string = process.cwd()
 ): Promise<void> {
   const spinner = ora('Generating configuration...').start();
@@ -21,7 +21,9 @@ export async function generateFiles(
     spinner.text = 'Directories created';
 
     // Copy rules
-    const rules = await selectRules(answers);
+    const rules = 'selectedRules' in answers 
+      ? answers.selectedRules 
+      : await selectRules(answers);
     await copyRules(rules, paths.rulesDir);
     spinner.text = `Copied ${rules.length} rules`;
 
@@ -87,7 +89,7 @@ async function copyRules(rules: string[], targetDir: string): Promise<void> {
 }
 
 async function generateAgent(
-  answers: QuickSetupAnswers | DetailedSetupAnswers,
+  answers: QuickSetupAnswers | DetailedSetupAnswers | CustomModeAnswers,
   targetDir: string
 ): Promise<void> {
   const templatePath = join(__dirname, '..', '..', 'curated-presets', 'templates', 'agent-template.hbs');
@@ -101,22 +103,61 @@ async function generateAgent(
   await fs.writeFile(targetPath, agentJson, 'utf-8');
 }
 
-function buildTemplateVars(answers: QuickSetupAnswers | DetailedSetupAnswers): Record<string, any> {
+function buildTemplateVars(answers: QuickSetupAnswers | DetailedSetupAnswers | CustomModeAnswers): Record<string, any> {
+  // Handle custom mode
+  if ('selectedRules' in answers) {
+    return {
+      AGENT_NAME: 'dev-agent',
+      AGENT_DESCRIPTION: 'Custom development agent',
+      AGENT_PROMPT: `You are a developer. You follow best practices and the steering rules defined in ${answers.aiTool === 'amazon-q' ? '.amazonq/rules/' : '.kiro/steering/'} directory.`,
+      
+      // Minimal defaults for custom mode
+      TYPESCRIPT: false,
+      JAVASCRIPT: false,
+      PYTHON: false,
+      LUA: false,
+      REACT: false,
+      REACT_NATIVE: false,
+      NEXT_JS: false,
+      
+      PACKAGE_MANAGER: 'npm',
+      PACKAGE_MANAGER_NPM: true,
+      PACKAGE_MANAGER_YARN: false,
+      PACKAGE_MANAGER_PNPM: false,
+      
+      MCP_SERVERS_PATH: join(require('os').homedir(), 'mcp-servers'),
+      MCP_AMAZON_Q_HISTORY: answers.mcpServers.includes('amazon-q-history'),
+      MCP_GPT: answers.mcpServers.includes('gpt'),
+      MCP_WEB_SCRAPER: answers.mcpServers.includes('web-scraper'),
+      MCP_CYPRESS: answers.mcpServers.includes('cypress'),
+      MCP_CHAKRA_UI: answers.mcpServers.includes('chakra-ui'),
+      
+      USE_GIT: false,
+      USE_ENV_VARS: false,
+      ENV_PROD_PROTECTION: false,
+      USE_TESTING: false,
+      TESTING_FRAMEWORK: 'none',
+      
+      RULES_PATH: answers.aiTool === 'amazon-q' ? '.amazonq/rules' : '.kiro/steering',
+      AGENTS_PATH: answers.aiTool === 'amazon-q' ? '.amazonq/cli-agents' : '.kiro/agents',
+    };
+  }
+  
   const detailed = answers as DetailedSetupAnswers;
   
   return {
     AGENT_NAME: 'dev-agent',
-    AGENT_DESCRIPTION: generateDescription(answers),
-    AGENT_PROMPT: generatePrompt(answers),
+    AGENT_DESCRIPTION: generateDescription(answers as QuickSetupAnswers),
+    AGENT_PROMPT: generatePrompt(answers as QuickSetupAnswers),
     
     // Language & Framework
-    TYPESCRIPT: answers.language === 'typescript',
-    JAVASCRIPT: answers.language === 'javascript',
-    PYTHON: answers.language === 'python',
-    LUA: answers.language === 'lua',
-    REACT: answers.framework === 'react',
-    REACT_NATIVE: answers.framework === 'react-native',
-    NEXT_JS: answers.framework === 'next-js',
+    TYPESCRIPT: (answers as QuickSetupAnswers).language === 'typescript',
+    JAVASCRIPT: (answers as QuickSetupAnswers).language === 'javascript',
+    PYTHON: (answers as QuickSetupAnswers).language === 'python',
+    LUA: (answers as QuickSetupAnswers).language === 'lua',
+    REACT: (answers as QuickSetupAnswers).framework === 'react',
+    REACT_NATIVE: (answers as QuickSetupAnswers).framework === 'react-native',
+    NEXT_JS: (answers as QuickSetupAnswers).framework === 'next-js',
     
     // Package Manager
     PACKAGE_MANAGER: detailed.packageManager || 'npm',
@@ -126,22 +167,22 @@ function buildTemplateVars(answers: QuickSetupAnswers | DetailedSetupAnswers): R
     
     // MCP Servers
     MCP_SERVERS_PATH: join(require('os').homedir(), 'mcp-servers'),
-    MCP_AMAZON_Q_HISTORY: answers.mcpServers.includes('amazon-q-history'),
-    MCP_GPT: answers.mcpServers.includes('gpt'),
-    MCP_WEB_SCRAPER: answers.mcpServers.includes('web-scraper'),
-    MCP_CYPRESS: answers.mcpServers.includes('cypress'),
-    MCP_CHAKRA_UI: answers.mcpServers.includes('chakra-ui'),
+    MCP_AMAZON_Q_HISTORY: (answers as QuickSetupAnswers).mcpServers.includes('amazon-q-history'),
+    MCP_GPT: (answers as QuickSetupAnswers).mcpServers.includes('gpt'),
+    MCP_WEB_SCRAPER: (answers as QuickSetupAnswers).mcpServers.includes('web-scraper'),
+    MCP_CYPRESS: (answers as QuickSetupAnswers).mcpServers.includes('cypress'),
+    MCP_CHAKRA_UI: (answers as QuickSetupAnswers).mcpServers.includes('chakra-ui'),
     
     // Features
-    USE_GIT: answers.useGit,
+    USE_GIT: (answers as QuickSetupAnswers).useGit,
     USE_ENV_VARS: detailed.envVarStrategy !== 'no',
     ENV_PROD_PROTECTION: detailed.envVarStrategy === 'yes-with-prod-protection',
     USE_TESTING: detailed.testingFramework !== 'none',
     TESTING_FRAMEWORK: detailed.testingFramework || 'none',
     
     // Paths
-    RULES_PATH: answers.aiTool === 'amazon-q' ? '.amazonq/rules' : '.kiro/steering',
-    AGENTS_PATH: answers.aiTool === 'amazon-q' ? '.amazonq/cli-agents' : '.kiro/agents',
+    RULES_PATH: (answers as QuickSetupAnswers).aiTool === 'amazon-q' ? '.amazonq/rules' : '.kiro/steering',
+    AGENTS_PATH: (answers as QuickSetupAnswers).aiTool === 'amazon-q' ? '.amazonq/cli-agents' : '.kiro/agents',
   };
 }
 

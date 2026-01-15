@@ -34,3 +34,9 @@ export interface MCPServer {
   name: string;
   path: string;
 }
+
+export interface CustomModeAnswers {
+  aiTool: AITool;
+  selectedRules: string[];
+  mcpServers: string[];
+}

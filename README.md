@@ -89,13 +89,27 @@ cd my-project
 cairel init
 
 # Follow wizard
-? How would you like to configure? Quick Setup
+? How would you like to configure? 
+  ❯ Quick Setup (High-level, recommended)
+    Detailed Setup (Granular control)
+    Custom (Select specific rules)
+
+# Quick Setup example:
 ? Project type? UI
 ? Language? TypeScript
 ? Framework? React
 ? Use Git? Yes
 ? AI tools? kiro-cli
 ? MCP servers? [Select from detected]
+? Would you like to review and customize the rules? (y/N)
+
+# If you choose to review:
+? Select rules to include (uncheck to exclude):
+  ◉ context retrieval - Minimize token usage...
+  ◉ implementation approval - Require explicit approval...
+  ◉ typescript validation - Mandatory compilation...
+  ...
+? Proceed with 11 rule(s)? (Y/n)
 
 # Step 2: Bootstrap project documentation
 cairel bootstrap

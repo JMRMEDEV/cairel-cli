@@ -6,9 +6,10 @@ Comprehensive test coverage for all wizard scenarios and file generation.
 
 ## Test Statistics
 
-- **Total Tests**: 62
-- **Test Suites**: 8
+- **Total Tests**: 74
+- **Test Suites**: 9
 - **Status**: ✅ All Passing
+- **New Tests**: 12 tests for custom mode and review step
 
 ---
 

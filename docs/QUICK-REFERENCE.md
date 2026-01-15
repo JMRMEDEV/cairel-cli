@@ -142,12 +142,23 @@ cairel list              # List available presets
 4. Git
 5. AI tools
 6. MCP servers
+7. **Optional**: Review and customize rules
 
 ### Detailed Setup (12 questions)
 All quick setup + testing, linting, UI library, package manager, versioning, docs
+- **Optional**: Review and customize rules
 
-### Custom
-Guided rule/agent creation wizard
+### Custom (Select specific rules)
+1. AI tools selection
+2. Interactive rule selection (grouped by category)
+3. MCP servers selection
+4. **Optional**: Review and customize final selection
+
+**Review Feature**:
+- Shows all selected rules with descriptions
+- Allows toggling rules on/off with checkboxes
+- Validates minimum selection (at least 1 rule)
+- Can cancel before file generation
 
 ---
 

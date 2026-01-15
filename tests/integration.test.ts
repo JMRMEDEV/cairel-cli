@@ -106,8 +106,9 @@ describe('File Generation Integration', () => {
     // Should NOT have detailed-only rules
     expect(rules).not.toContain('eslint-configuration.md');
     expect(rules).not.toContain('semantic-versioning.md');
+    expect(rules).not.toContain('icon-usage-patterns.md'); // Requires UI library
     
-    expect(rules.length).toBe(12);
+    expect(rules.length).toBe(11); // Updated from 12 (icon-usage-patterns now requires UI library)
 
     // Verify rule content (spot check)
     const tsValidationContent = await fs.readFile(

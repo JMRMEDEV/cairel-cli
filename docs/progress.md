@@ -326,12 +326,62 @@ Tell kiro-cli where to find cairel's `.ai/KICKOFF-PROMPT.txt` so it can guide us
 - ✅ All 62 automated tests passing
 
 **Remaining Work**:
-- ⏳ Implement custom rules mode (Stage 7.5)
-- ⏳ Add review step before file generation (Stage 7.5)
+- ✅ Implement custom rules mode (Stage 7.5)
+- ✅ Add review step before file generation (Stage 7.5)
 - ⏳ Final documentation polish
 - ⏳ Error handling improvements
 
-**Next**: Stage 7.5 - Missing Features
+**Next**: Stage 8 - npm Publication
+
+---
+
+## 2026-01-15 - Stage 7.5: Missing Features ✅ COMPLETE
+
+### Custom Rules Mode
+
+**Completed** (2026-01-15):
+- ✅ Custom mode implementation
+- ✅ Load all rules from manifest
+- ✅ Group rules by category with visual separators
+- ✅ Allow user to select specific rules
+- ✅ Pre-check "always include" rules
+- ✅ Validate at least one rule selected
+- ✅ MCP server selection
+- ✅ Review step for custom configuration
+
+**Features**:
+- Interactive checkbox selection with categories
+- Shows rule descriptions
+- Pre-selects always-include rules (context-retrieval, implementation-approval)
+- Validates minimum selection
+- Generates minimal agent configuration
+
+### Review Step Before Generation
+
+**Completed** (2026-01-15):
+- ✅ Review step for Quick/Detailed modes
+- ✅ Review step for Custom mode
+- ✅ Display configuration summary
+- ✅ Show selected rules with descriptions
+- ✅ Show MCP servers
+- ✅ Confirmation prompt
+- ✅ Cancel option (exits gracefully)
+
+**Features**:
+- Shows all configuration choices
+- Lists rules to be generated
+- Lists MCP servers to be configured
+- Allows user to cancel before file generation
+- Clear visual formatting with colors
+
+**Exit Criteria Met**:
+- ✅ Custom mode creates valid configurations
+- ✅ Review step shows all selections
+- ✅ User can cancel before file generation
+- ✅ All modes work correctly
+- ✅ All 74 tests passing
+
+**Next**: Stage 8 - npm Publication
 
 ---
 

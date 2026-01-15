@@ -36,7 +36,7 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ framework: 'react' })
         .mockResolvedValueOnce({ useGit: true })
         .mockResolvedValueOnce({ aiTool: 'kiro-cli' })
-        .mockResolvedValueOnce({ additionalRules: [] })
+        .mockResolvedValueOnce({}) // No MCP servers
         .mockResolvedValueOnce({
           testingFramework: 'jest',
           linter: 'eslint',
@@ -44,7 +44,8 @@ describe('Detailed Setup Mode', () => {
           packageManager: 'npm',
           envVarStrategy: 'yes-with-prod-protection',
           versioningStrategy: 'semantic',
-        });
+        })
+        .mockResolvedValueOnce({ wantsReview: false });
 
       const result = await runWizard() as DetailedSetupAnswers;
 
@@ -63,7 +64,7 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ framework: 'next-js' })
         .mockResolvedValueOnce({ useGit: true })
         .mockResolvedValueOnce({ aiTool: 'both' })
-        .mockResolvedValueOnce({ additionalRules: [] })
+        .mockResolvedValueOnce({}) // No MCP servers
         .mockResolvedValueOnce({
           testingFramework: 'vitest',
           linter: 'eslint',
@@ -71,7 +72,8 @@ describe('Detailed Setup Mode', () => {
           packageManager: 'pnpm',
           envVarStrategy: 'yes-without-protection',
           versioningStrategy: 'calver',
-        });
+        })
+        .mockResolvedValueOnce({ wantsReview: false });
 
       const result = await runWizard() as DetailedSetupAnswers;
 
@@ -88,14 +90,15 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ framework: 'express' })
         .mockResolvedValueOnce({ useGit: false })
         .mockResolvedValueOnce({ aiTool: 'amazon-q' })
-        .mockResolvedValueOnce({ additionalRules: [] })
+        .mockResolvedValueOnce({}) // No MCP servers
         .mockResolvedValueOnce({
           testingFramework: 'jest',
           linter: 'eslint',
           packageManager: 'yarn',
           envVarStrategy: 'no',
           versioningStrategy: 'none',
-        });
+        })
+        .mockResolvedValueOnce({ wantsReview: false });
 
       const result = await runWizard() as DetailedSetupAnswers;
 
@@ -113,13 +116,14 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ framework: 'fastapi' })
         .mockResolvedValueOnce({ useGit: true })
         .mockResolvedValueOnce({ aiTool: 'kiro-cli' })
-        .mockResolvedValueOnce({ additionalRules: [] })
+        .mockResolvedValueOnce({}) // No MCP servers
         .mockResolvedValueOnce({
           testingFramework: 'pytest',
           linter: 'ruff',
           envVarStrategy: 'yes-with-prod-protection',
           versioningStrategy: 'semantic',
-        });
+        })
+        .mockResolvedValueOnce({ wantsReview: false });
 
       const result = await runWizard() as DetailedSetupAnswers;
 
@@ -135,13 +139,14 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ framework: 'django' })
         .mockResolvedValueOnce({ useGit: false })
         .mockResolvedValueOnce({ aiTool: 'amazon-q' })
-        .mockResolvedValueOnce({ additionalRules: [] })
+        .mockResolvedValueOnce({}) // No MCP servers
         .mockResolvedValueOnce({
           testingFramework: 'none',
           linter: 'none',
           envVarStrategy: 'no',
           versioningStrategy: 'none',
-        });
+        })
+        .mockResolvedValueOnce({ wantsReview: false });
 
       const result = await runWizard() as DetailedSetupAnswers;
 
@@ -158,7 +163,7 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ framework: 'vue' })
         .mockResolvedValueOnce({ useGit: true })
         .mockResolvedValueOnce({ aiTool: 'kiro-cli' })
-        .mockResolvedValueOnce({ additionalRules: [] })
+        .mockResolvedValueOnce({}) // No MCP servers
         .mockResolvedValueOnce({
           testingFramework: 'vitest',
           linter: 'eslint',
@@ -166,7 +171,8 @@ describe('Detailed Setup Mode', () => {
           packageManager: 'pnpm',
           envVarStrategy: 'no',
           versioningStrategy: 'none',
-        });
+        })
+        .mockResolvedValueOnce({ wantsReview: false });
 
       const result = await runWizard() as DetailedSetupAnswers;
 
@@ -180,7 +186,7 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ framework: 'next-js' })
         .mockResolvedValueOnce({ useGit: true })
         .mockResolvedValueOnce({ aiTool: 'both' })
-        .mockResolvedValueOnce({ additionalRules: [] })
+        .mockResolvedValueOnce({}) // No MCP servers
         .mockResolvedValueOnce({
           testingFramework: 'jest',
           linter: 'eslint',
@@ -188,7 +194,8 @@ describe('Detailed Setup Mode', () => {
           packageManager: 'yarn',
           envVarStrategy: 'yes-without-protection',
           versioningStrategy: 'calver',
-        });
+        })
+        .mockResolvedValueOnce({ wantsReview: false });
 
       const result = await runWizard() as DetailedSetupAnswers;
 
@@ -205,14 +212,15 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ framework: 'nestjs' })
         .mockResolvedValueOnce({ useGit: true })
         .mockResolvedValueOnce({ aiTool: 'kiro-cli' })
-        .mockResolvedValueOnce({ additionalRules: [] })
+        .mockResolvedValueOnce({}) // No MCP servers
         .mockResolvedValueOnce({
           testingFramework: 'jest',
           linter: 'eslint',
           packageManager: 'npm',
           envVarStrategy: 'yes-with-prod-protection',
           versioningStrategy: 'semantic',
-        });
+        })
+        .mockResolvedValueOnce({ wantsReview: false });
 
       const result = await runWizard() as DetailedSetupAnswers;
 
@@ -226,14 +234,15 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ framework: 'none' })
         .mockResolvedValueOnce({ useGit: false })
         .mockResolvedValueOnce({ aiTool: 'amazon-q' })
-        .mockResolvedValueOnce({ additionalRules: [] })
+        .mockResolvedValueOnce({}) // No MCP servers
         .mockResolvedValueOnce({
           testingFramework: 'none',
           linter: 'none',
           packageManager: 'npm',
           envVarStrategy: 'yes-without-protection',
           versioningStrategy: 'none',
-        });
+        })
+        .mockResolvedValueOnce({ wantsReview: false });
 
       const result = await runWizard() as DetailedSetupAnswers;
 

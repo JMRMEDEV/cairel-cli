@@ -44,7 +44,7 @@ describe('Wizard Flows with Inquirer Mocking', () => {
         .mockResolvedValueOnce({ useGit: true })
         .mockResolvedValueOnce({ aiTool: 'kiro-cli' })
         .mockResolvedValueOnce({ mcpServers: ['amazon-q-history', 'gpt'] })
-        .mockResolvedValueOnce({ additionalRules: [] });
+        .mockResolvedValueOnce({ wantsReview: false });
 
       const result = await runWizard();
 
@@ -63,7 +63,7 @@ describe('Wizard Flows with Inquirer Mocking', () => {
         .mockResolvedValueOnce({ useGit: true })
         .mockResolvedValueOnce({ aiTool: 'kiro-cli' })
         .mockResolvedValueOnce({ mcpServers: ['amazon-q-history'] })
-        .mockResolvedValueOnce({ additionalRules: [] });
+        .mockResolvedValueOnce({ wantsReview: false });
 
       const result = await runWizard();
 
@@ -80,7 +80,7 @@ describe('Wizard Flows with Inquirer Mocking', () => {
         .mockResolvedValueOnce({ useGit: true })
         .mockResolvedValueOnce({ aiTool: 'both' })
         .mockResolvedValueOnce({ mcpServers: ['amazon-q-history', 'gpt'] })
-        .mockResolvedValueOnce({ additionalRules: [] });
+        .mockResolvedValueOnce({ wantsReview: false });
 
       const result = await runWizard();
 
@@ -100,7 +100,8 @@ describe('Wizard Flows with Inquirer Mocking', () => {
         .mockResolvedValueOnce({ framework: 'react' })
         .mockResolvedValueOnce({ useGit: true })
         .mockResolvedValueOnce({ aiTool: 'kiro-cli' })
-        .mockResolvedValueOnce({ additionalRules: [] });
+        .mockResolvedValueOnce({}) // No MCP servers
+        .mockResolvedValueOnce({ wantsReview: false });
 
       const result = await runWizard();
 
