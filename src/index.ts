@@ -3,7 +3,8 @@
 import { Command } from 'commander';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
-import { initCommand } from './commands/init';
+import { initCommand } from './commands/init.js';
+import { validateCommand } from './commands/validate.js';
 
 const program = new Command();
 
@@ -41,13 +42,7 @@ program
     console.log(chalk.yellow('⚠️  Not implemented yet'));
   });
 
-program
-  .command('validate')
-  .description('Validate rule files')
-  .action(() => {
-    console.log(chalk.blue('✓ Validating rules...'));
-    console.log(chalk.yellow('⚠️  Not implemented yet'));
-  });
+program.addCommand(validateCommand);
 
 program
   .command('list')

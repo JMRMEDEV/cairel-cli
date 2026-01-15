@@ -107,7 +107,10 @@
         "npm --version",
         "ls -la*",
         "pwd",
-        "find*"
+        "find*",
+        "cd",
+        "tail",
+        "mkdir"
       ],
       "deniedCommands": [
         "rm -rf *",
@@ -118,6 +121,5 @@
       ]
     }
   },
-  "includeMcpJson": false,
-  "model": null
+  "includeMcpJson": false
 }

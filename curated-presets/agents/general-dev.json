@@ -12,6 +12,7 @@
       "disabled": false
     },
     "gpt": {
+      "type": "stdio",
       "command": "node",
       "args": ["{{MCP_SERVERS_PATH}}/gpt/server.js"],
       "cwd": "{{MCP_SERVERS_PATH}}/gpt"
@@ -117,6 +118,5 @@
       ]
     }
   },
-  "includeMcpJson": true,
-  "model": null
+  "includeMcpJson": true
 }

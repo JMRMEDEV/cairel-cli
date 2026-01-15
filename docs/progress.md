@@ -213,6 +213,44 @@ Tell kiro-cli where to find cairel's `.ai/KICKOFF-PROMPT.txt` so it can guide us
 
 ---
 
+### Stage 5: Validation System ✅ COMPLETE
+
+**Completed** (2026-01-15):
+- ✅ Zod schema for rule frontmatter validation
+- ✅ AJV schema for agent JSON validation
+- ✅ Validator class with rule and agent validation methods
+- ✅ Validate command with --rules and --agents options
+- ✅ Auto-detect validation (checks .kiro/ and .amazonq/ directories)
+- ✅ Skip README.md files in validation
+- ✅ Clear error and warning messages
+- ✅ Fixed general-dev.json and cairel-dev.json MCP server format
+- ✅ Updated schema to match official specs (all fields optional)
+- ✅ Comprehensive test coverage (9 tests for validation)
+- ✅ Test fixtures for invalid rules and agents
+
+**Test Coverage**:
+- Validates all 17 curated rules successfully
+- Detects missing frontmatter
+- Detects missing required fields (id, tags)
+- Detects invalid version format (non-semver)
+- Detects invalid category (not in enum)
+- Detects invalid date format (not YYYY-MM-DD)
+- Validates agent JSON structure
+- Detects invalid JSON format
+
+**Exit Criteria Met**:
+- ✅ `cairel validate` command works
+- ✅ Rules validated against Zod schema
+- ✅ Agents validated against AJV JSON schema
+- ✅ Clear error messages for validation failures
+- ✅ All 17 curated rules pass validation
+- ✅ Agent templates pass validation
+- ✅ Comprehensive test coverage with edge cases
+
+**Next**: Stage 6 - Update Command
+
+---
+
 ## Next Phase: Phase 2 - Implementation (Original)
 
 **Planned Start**: TBD
