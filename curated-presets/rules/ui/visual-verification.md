@@ -1,17 +1,26 @@
 ---
 meta:
-  id: "visual-verification"
-  title: "Visual Verification for UI Changes"
-  author: "cairel-core"
-  version: "1.0.0"
-  category: "ui"
-  tags: ["ui", "testing", "verification", "screenshots"]
-  ai-tools: ["kiro-cli", "amazon-q-developer"]
-  last-updated: "2026-01-14"
+  id: visual-verification
+  title: Visual Verification for UI Changes
+  author: cairel-core
+  version: 1.0.0
+  category: ui
+  tags:
+    - ui
+    - testing
+    - verification
+    - screenshots
+  ai-tools:
+    - kiro-cli
+    - amazon-q-developer
+  last-updated: '2026-01-14'
   conditions:
     project-types:
       - ui
       - fullstack
+  description: >-
+    Verify UI changes through screenshot analysis and evidence-based validation
+    before completion.
 ---
 
 # Visual Verification for UI Changes

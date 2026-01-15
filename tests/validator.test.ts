@@ -66,6 +66,14 @@ describe('Validator', () => {
       expect(result.valid).toBe(false);
       expect(result.errors.some(e => e.includes('tags'))).toBe(true);
     });
+
+    it('should detect missing description', async () => {
+      const testFile = path.join(__dirname, 'fixtures/invalid-rule-missing-description.md');
+      const result = await validator.validateRule(testFile);
+
+      expect(result.valid).toBe(false);
+      expect(result.errors.some(e => e.includes('description'))).toBe(true);
+    });
   });
 
   describe('Agent Validation', () => {

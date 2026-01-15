@@ -1,17 +1,27 @@
 ---
 meta:
-  id: "package-manager-safety"
-  title: "Package Manager Safety & Standards"
-  author: "cairel-core"
-  version: "1.0.0"
-  category: "general"
-  tags: ["package-manager", "safety", "npm", "yarn", "pnpm"]
-  ai-tools: ["kiro-cli", "amazon-q-developer"]
-  last-updated: "2026-01-14"
+  id: package-manager-safety
+  title: Package Manager Safety & Standards
+  author: cairel-core
+  version: 1.0.0
+  category: general
+  tags:
+    - package-manager
+    - safety
+    - npm
+    - yarn
+    - pnpm
+  ai-tools:
+    - kiro-cli
+    - amazon-q-developer
+  last-updated: '2026-01-14'
   conditions:
     languages:
       - typescript
       - javascript
+  description: >-
+    Prevent destructive package operations by blocking --force flags and
+    requiring human approval.
 ---
 
 # Package Manager Safety & Standards

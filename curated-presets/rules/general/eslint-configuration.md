@@ -1,16 +1,25 @@
 ---
 meta:
-  id: "eslint-configuration"
-  title: "ESLint Configuration & Compliance"
-  author: "cairel-core"
-  version: "1.0.0"
-  category: "general"
-  tags: ["eslint", "linting", "code-quality", "typescript"]
-  ai-tools: ["kiro-cli", "amazon-q-developer"]
-  last-updated: "2026-01-14"
+  id: eslint-configuration
+  title: ESLint Configuration & Compliance
+  author: cairel-core
+  version: 1.0.0
+  category: general
+  tags:
+    - eslint
+    - linting
+    - code-quality
+    - typescript
+  ai-tools:
+    - kiro-cli
+    - amazon-q-developer
+  last-updated: '2026-01-14'
   conditions:
     linter:
       - eslint
+  description: >-
+    Enforce code quality and consistency through ESLint configuration and
+    automatic fixes.
 ---
 
 # ESLint Configuration & Compliance

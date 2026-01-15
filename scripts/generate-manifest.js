@@ -2,6 +2,7 @@
 
 const fs = require('fs').promises;
 const path = require('path');
+const yaml = require('js-yaml');
 
 const RULES_BASE = path.join(__dirname, '..', 'curated-presets', 'rules');
 const MANIFEST_PATH = path.join(__dirname, '..', 'curated-presets', 'rules-manifest.json');
@@ -12,76 +13,30 @@ async function parseRuleFrontmatter(filePath) {
   
   if (!match) return null;
   
-  const frontmatter = match[1];
-  const lines = frontmatter.split('\n');
+  const frontmatter = yaml.load(match[1]);
+  const meta = frontmatter.meta;
   
-  const meta = {
-    id: '',
-    category: '',
-    alwaysInclude: false,
-    conditions: {}
+  if (!meta) return null;
+  
+  const rule = {
+    id: meta.id,
+    title: meta.title,
+    description: meta.description,
+    category: meta.category,
+    alwaysInclude: meta['always-include'] || false
   };
   
-  let inMeta = false;
-  let inConditions = false;
-  let currentArray = null;
-  
-  for (const line of lines) {
-    const trimmed = line.trim();
-    
-    if (trimmed === 'meta:') {
-      inMeta = true;
-      continue;
+  if (meta.conditions) {
+    // Convert kebab-case to camelCase for consistency
+    const conditions = {};
+    for (const [key, value] of Object.entries(meta.conditions)) {
+      const camelKey = key.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+      conditions[camelKey] = value;
     }
-    
-    if (trimmed === 'conditions:') {
-      inConditions = true;
-      continue;
-    }
-    
-    if (inMeta && !inConditions) {
-      if (trimmed.startsWith('id:')) {
-        meta.id = trimmed.split('id:')[1].trim().replace(/['"]/g, '');
-      } else if (trimmed.startsWith('category:')) {
-        meta.category = trimmed.split('category:')[1].trim().replace(/['"]/g, '');
-      } else if (trimmed.startsWith('always-include:')) {
-        meta.alwaysInclude = trimmed.includes('true');
-      }
-    }
-    
-    if (inConditions) {
-      if (trimmed.startsWith('languages:')) {
-        currentArray = 'languages';
-        meta.conditions.languages = [];
-      } else if (trimmed.startsWith('frameworks:')) {
-        currentArray = 'frameworks';
-        meta.conditions.frameworks = [];
-      } else if (trimmed.startsWith('project-types:')) {
-        currentArray = 'projectTypes';
-        meta.conditions.projectTypes = [];
-      } else if (trimmed.startsWith('ui-library:')) {
-        currentArray = 'uiLibrary';
-        meta.conditions.uiLibrary = [];
-      } else if (trimmed.startsWith('linter:')) {
-        currentArray = 'linter';
-        meta.conditions.linter = [];
-      } else if (trimmed.startsWith('versioning-strategy:')) {
-        currentArray = 'versioningStrategy';
-        meta.conditions.versioningStrategy = [];
-      } else if (trimmed.startsWith('requires-git:')) {
-        meta.conditions.requiresGit = trimmed.includes('true');
-        currentArray = null;
-      } else if (trimmed.startsWith('requires-env-vars:')) {
-        meta.conditions.requiresEnvVars = trimmed.includes('true');
-        currentArray = null;
-      } else if (trimmed.startsWith('- ') && currentArray) {
-        const value = trimmed.substring(2).replace(/['"]/g, '');
-        meta.conditions[currentArray].push(value);
-      }
-    }
+    rule.conditions = conditions;
   }
   
-  return meta.id ? meta : null;
+  return rule;
 }
 
 async function scanRules() {
@@ -98,15 +53,10 @@ async function scanRules() {
         if (!file.endsWith('.md') || file === 'README.md') continue;
         
         const filePath = path.join(categoryPath, file);
-        const meta = await parseRuleFrontmatter(filePath);
+        const rule = await parseRuleFrontmatter(filePath);
         
-        if (meta) {
-          // Clean up empty conditions
-          if (Object.keys(meta.conditions).length === 0) {
-            delete meta.conditions;
-          }
-          
-          rules.push(meta);
+        if (rule) {
+          rules.push(rule);
         }
       }
     } catch (error) {
@@ -119,6 +69,7 @@ async function scanRules() {
 
 async function generateManifest() {
   console.log('🔍 Scanning rules...');
+  
   const rules = await scanRules();
   
   console.log(`✓ Found ${rules.length} rules`);

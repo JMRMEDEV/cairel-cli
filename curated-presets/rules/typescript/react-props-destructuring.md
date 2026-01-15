@@ -1,18 +1,27 @@
 ---
 meta:
-  id: "react-props-destructuring"
-  title: "React Props Destructuring Pattern"
-  author: "cairel-core"
-  version: "1.0.0"
-  category: "typescript"
-  tags: ["react", "props", "destructuring", "patterns"]
-  ai-tools: ["kiro-cli", "amazon-q-developer"]
-  last-updated: "2026-01-14"
+  id: react-props-destructuring
+  title: React Props Destructuring Pattern
+  author: cairel-core
+  version: 1.0.0
+  category: typescript
+  tags:
+    - react
+    - props
+    - destructuring
+    - patterns
+  ai-tools:
+    - kiro-cli
+    - amazon-q-developer
+  last-updated: '2026-01-14'
   conditions:
     frameworks:
       - react
       - react-native
       - next-js
+  description: >-
+    Use destructured props in React components for better readability and type
+    safety.
 ---
 
 # React Props Destructuring Pattern

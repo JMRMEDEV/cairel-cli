@@ -1,16 +1,25 @@
 ---
 meta:
-  id: "gluestack-ui-v1-themed"
-  title: "GlueStack UI v1 (Themed) Component Patterns"
-  author: "cairel-core"
-  version: "1.0.0"
-  category: "ui"
-  tags: ["gluestack-ui", "react-native", "themed", "components"]
-  ai-tools: ["kiro-cli", "amazon-q-developer"]
-  last-updated: "2026-01-14"
+  id: gluestack-ui-v1-themed
+  title: GlueStack UI v1 (Themed) Component Patterns
+  author: cairel-core
+  version: 1.0.0
+  category: ui
+  tags:
+    - gluestack-ui
+    - react-native
+    - themed
+    - components
+  ai-tools:
+    - kiro-cli
+    - amazon-q-developer
+  last-updated: '2026-01-14'
   conditions:
     ui-library:
       - gluestack-ui
+  description: >-
+    Use GlueStack UI v1 themed components with proper configuration and
+    consistent patterns.
 ---
 
 # GlueStack UI v1 (Themed) Component Patterns

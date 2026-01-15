@@ -1,16 +1,25 @@
 ---
 meta:
-  id: "chakra-ui-v3-integration"
-  title: "Chakra UI v3 Integration with MCP Tools"
-  author: "cairel-core"
-  version: "1.0.0"
-  category: "ui"
-  tags: ["chakra-ui", "mcp", "ui-library", "components"]
-  ai-tools: ["kiro-cli", "amazon-q-developer"]
-  last-updated: "2026-01-14"
+  id: chakra-ui-v3-integration
+  title: Chakra UI v3 Integration with MCP Tools
+  author: cairel-core
+  version: 1.0.0
+  category: ui
+  tags:
+    - chakra-ui
+    - mcp
+    - ui-library
+    - components
+  ai-tools:
+    - kiro-cli
+    - amazon-q-developer
+  last-updated: '2026-01-14'
   conditions:
     ui-library:
       - chakra-ui
+  description: >-
+    Integrate Chakra UI v3 components using MCP tools for accurate component
+    reference and usage.
 ---
 
 # Chakra UI v3 Integration with MCP Tools

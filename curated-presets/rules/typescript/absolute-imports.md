@@ -1,17 +1,26 @@
 ---
 meta:
-  id: "absolute-imports"
-  title: "Absolute Imports Configuration"
-  author: "cairel-core"
-  version: "1.0.0"
-  category: "typescript"
-  tags: ["imports", "paths", "aliases", "typescript"]
-  ai-tools: ["kiro-cli", "amazon-q-developer"]
-  last-updated: "2026-01-14"
+  id: absolute-imports
+  title: Absolute Imports Configuration
+  author: cairel-core
+  version: 1.0.0
+  category: typescript
+  tags:
+    - imports
+    - paths
+    - aliases
+    - typescript
+  ai-tools:
+    - kiro-cli
+    - amazon-q-developer
+  last-updated: '2026-01-14'
   conditions:
     languages:
       - typescript
       - javascript
+  description: >-
+    Configure and use absolute imports with @ alias for cleaner, more
+    maintainable import statements.
 ---
 
 # Absolute Imports Configuration

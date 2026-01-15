@@ -1,15 +1,24 @@
 ---
 meta:
-  id: "git-management"
-  title: "Git Repository Management"
-  author: "cairel-core"
-  version: "1.0.0"
-  category: "git"
-  tags: ["git", "version-control", "commits", "workflow"]
-  ai-tools: ["kiro-cli", "amazon-q-developer"]
-  last-updated: "2026-01-14"
+  id: git-management
+  title: Git Repository Management
+  author: cairel-core
+  version: 1.0.0
+  category: git
+  tags:
+    - git
+    - version-control
+    - commits
+    - workflow
+  ai-tools:
+    - kiro-cli
+    - amazon-q-developer
+  last-updated: '2026-01-14'
   conditions:
     requires-git: true
+  description: >-
+    Manage git operations safely with human review for commits and protection
+    against destructive commands.
 ---
 
 # Git Repository Management

@@ -2,6 +2,7 @@
 meta:
   id: "invalid-date"
   title: "Invalid Date Format"
+  description: "Test rule with invalid date format for validation testing purposes."
   author: "test"
   version: "1.0.0"
   category: "general"

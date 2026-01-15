@@ -1,14 +1,23 @@
 ---
 meta:
-  id: "implementation-approval"
-  title: "Implementation Approval Protocol"
-  author: "cairel-core"
-  version: "1.0.0"
-  category: "general"
-  tags: ["workflow", "approval", "decision-making", "communication"]
-  ai-tools: ["kiro-cli", "amazon-q-developer"]
-  last-updated: "2026-01-14"
+  id: implementation-approval
+  title: Implementation Approval Protocol
+  author: cairel-core
+  version: 1.0.0
+  category: general
+  tags:
+    - workflow
+    - approval
+    - decision-making
+    - communication
+  ai-tools:
+    - kiro-cli
+    - amazon-q-developer
+  last-updated: '2026-01-14'
   always-include: true
+  description: >-
+    Require explicit human approval before implementing high-level architectural
+    or design decisions.
 ---
 
 # Implementation Approval Protocol

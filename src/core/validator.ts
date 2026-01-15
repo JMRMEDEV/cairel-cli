@@ -8,6 +8,7 @@ import matter from 'gray-matter';
 const RuleMetaSchema = z.object({
   id: z.string().min(1),
   title: z.string().min(1),
+  description: z.string().min(20, 'Description must be at least 20 characters').max(150, 'Description must be at most 150 characters'),
   author: z.string().min(1),
   version: z.string().regex(/^\d+\.\d+\.\d+$/, 'Version must be semver format (e.g., 1.0.0)'),
   category: z.enum(['general', 'typescript', 'javascript', 'python', 'lua', 'git', 'ui', 'backend', 'testing']),

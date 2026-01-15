@@ -1,17 +1,26 @@
 ---
 meta:
-  id: "mock-data-strategy"
-  title: "Mock Data Strategy for Frontend Development"
-  author: "cairel-core"
-  version: "1.0.0"
-  category: "ui"
-  tags: ["mock-data", "frontend", "testing", "development"]
-  ai-tools: ["kiro-cli", "amazon-q-developer"]
-  last-updated: "2026-01-14"
+  id: mock-data-strategy
+  title: Mock Data Strategy for Frontend Development
+  author: cairel-core
+  version: 1.0.0
+  category: ui
+  tags:
+    - mock-data
+    - frontend
+    - testing
+    - development
+  ai-tools:
+    - kiro-cli
+    - amazon-q-developer
+  last-updated: '2026-01-14'
   conditions:
     project-types:
       - ui
       - fullstack
+  description: >-
+    Use realistic mock data in frontend development with clear separation from
+    production data.
 ---
 
 # Mock Data Strategy for Frontend Development

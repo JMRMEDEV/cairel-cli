@@ -1,15 +1,24 @@
 ---
 meta:
-  id: "multi-environment-management"
-  title: "Multi-Environment Management & Protection"
-  author: "cairel-core"
-  version: "1.0.0"
-  category: "backend"
-  tags: ["environment", "security", "env-vars", "production-protection"]
-  ai-tools: ["kiro-cli", "amazon-q-developer"]
-  last-updated: "2026-01-14"
+  id: multi-environment-management
+  title: Multi-Environment Management & Protection
+  author: cairel-core
+  version: 1.0.0
+  category: backend
+  tags:
+    - environment
+    - security
+    - env-vars
+    - production-protection
+  ai-tools:
+    - kiro-cli
+    - amazon-q-developer
+  last-updated: '2026-01-14'
   conditions:
     requires-env-vars: true
+  description: >-
+    Protect production environment files while allowing safe access to dev and
+    QA configurations.
 ---
 
 # Multi-Environment Management & Protection

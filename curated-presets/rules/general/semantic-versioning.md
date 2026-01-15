@@ -1,16 +1,24 @@
 ---
 meta:
-  id: "semantic-versioning"
-  title: "Semantic Versioning for Package Management"
-  author: "cairel-core"
-  version: "1.0.0"
-  category: "general"
-  tags: ["versioning", "package.json", "semver"]
-  ai-tools: ["kiro-cli", "amazon-q-developer"]
-  last-updated: "2026-01-14"
+  id: semantic-versioning
+  title: Semantic Versioning for Package Management
+  author: cairel-core
+  version: 1.0.0
+  category: general
+  tags:
+    - versioning
+    - package.json
+    - semver
+  ai-tools:
+    - kiro-cli
+    - amazon-q-developer
+  last-updated: '2026-01-14'
   conditions:
     versioning-strategy:
       - semantic
+  description: >-
+    Follow semantic versioning standards for package version management and
+    changelog updates.
 ---
 
 # Semantic Versioning for Package Management

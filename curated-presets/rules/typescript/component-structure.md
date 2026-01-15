@@ -1,13 +1,20 @@
 ---
 meta:
-  id: "component-structure"
-  title: "Component Organization & Structure"
-  author: "cairel-core"
-  version: "1.0.0"
-  category: "typescript"
-  tags: ["components", "structure", "organization", "react", "typescript"]
-  ai-tools: ["kiro-cli", "amazon-q-developer"]
-  last-updated: "2026-01-14"
+  id: component-structure
+  title: Component Organization & Structure
+  author: cairel-core
+  version: 1.0.0
+  category: typescript
+  tags:
+    - components
+    - structure
+    - organization
+    - react
+    - typescript
+  ai-tools:
+    - kiro-cli
+    - amazon-q-developer
+  last-updated: '2026-01-14'
   conditions:
     languages:
       - typescript
@@ -16,6 +23,9 @@ meta:
       - react
       - react-native
       - next-js
+  description: >-
+    Organize React/TypeScript components with consistent structure, barrel
+    exports, and clear separation.
 ---
 
 # Component Organization & Structure

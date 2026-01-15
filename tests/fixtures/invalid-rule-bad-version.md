@@ -2,6 +2,7 @@
 meta:
   id: "invalid-version"
   title: "Invalid Version Format"
+  description: "Test rule with invalid semver format for validation testing purposes."
   author: "test"
   version: "1.0"
   category: "general"

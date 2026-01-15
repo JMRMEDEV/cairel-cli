@@ -1,16 +1,25 @@
 ---
 meta:
-  id: "typescript-validation"
-  title: "TypeScript Compilation Validation"
-  author: "cairel-core"
-  version: "1.0.0"
-  category: "typescript"
-  tags: ["typescript", "validation", "compilation", "type-safety"]
-  ai-tools: ["kiro-cli", "amazon-q-developer"]
-  last-updated: "2026-01-14"
+  id: typescript-validation
+  title: TypeScript Compilation Validation
+  author: cairel-core
+  version: 1.0.0
+  category: typescript
+  tags:
+    - typescript
+    - validation
+    - compilation
+    - type-safety
+  ai-tools:
+    - kiro-cli
+    - amazon-q-developer
+  last-updated: '2026-01-14'
   conditions:
     languages:
       - typescript
+  description: >-
+    Mandate TypeScript compilation validation after every file change to catch
+    errors early.
 ---
 
 # TypeScript Compilation Validation

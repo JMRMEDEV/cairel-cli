@@ -1,17 +1,26 @@
 ---
 meta:
-  id: "icon-usage-patterns"
-  title: "Icon Usage Patterns"
-  author: "cairel-core"
-  version: "1.0.0"
-  category: "ui"
-  tags: ["icons", "react-icons", "svg", "ui-components"]
-  ai-tools: ["kiro-cli", "amazon-q-developer"]
-  last-updated: "2026-01-14"
+  id: icon-usage-patterns
+  title: Icon Usage Patterns
+  author: cairel-core
+  version: 1.0.0
+  category: ui
+  tags:
+    - icons
+    - react-icons
+    - svg
+    - ui-components
+  ai-tools:
+    - kiro-cli
+    - amazon-q-developer
+  last-updated: '2026-01-14'
   conditions:
     project-types:
       - ui
       - fullstack
+  description: >-
+    Standardize icon usage across the project with consistent libraries and
+    naming conventions.
 ---
 
 # Icon Usage Patterns

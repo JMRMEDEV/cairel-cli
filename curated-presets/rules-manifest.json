@@ -2,11 +2,15 @@
   "rules": [
     {
       "id": "context-retrieval",
+      "title": "Context Retrieval & Token Optimization",
+      "description": "Minimize token usage through efficient context loading strategies using index files and targeted reads.",
       "category": "general",
       "alwaysInclude": true
     },
     {
       "id": "eslint-configuration",
+      "title": "ESLint Configuration & Compliance",
+      "description": "Enforce code quality and consistency through ESLint configuration and automatic fixes.",
       "category": "general",
       "alwaysInclude": false,
       "conditions": {
@@ -17,11 +21,15 @@
     },
     {
       "id": "implementation-approval",
+      "title": "Implementation Approval Protocol",
+      "description": "Require explicit human approval before implementing high-level architectural or design decisions.",
       "category": "general",
       "alwaysInclude": true
     },
     {
       "id": "package-json-management",
+      "title": "Package.json Management & Dependencies",
+      "description": "Manage package.json dependencies, scripts, and metadata with validation and best practices.",
       "category": "general",
       "alwaysInclude": false,
       "conditions": {
@@ -33,6 +41,8 @@
     },
     {
       "id": "package-manager-safety",
+      "title": "Package Manager Safety & Standards",
+      "description": "Prevent destructive package operations by blocking --force flags and requiring human approval.",
       "category": "general",
       "alwaysInclude": false,
       "conditions": {
@@ -44,6 +54,8 @@
     },
     {
       "id": "semantic-versioning",
+      "title": "Semantic Versioning for Package Management",
+      "description": "Follow semantic versioning standards for package version management and changelog updates.",
       "category": "general",
       "alwaysInclude": false,
       "conditions": {
@@ -54,6 +66,8 @@
     },
     {
       "id": "absolute-imports",
+      "title": "Absolute Imports Configuration",
+      "description": "Configure and use absolute imports with @ alias for cleaner, more maintainable import statements.",
       "category": "typescript",
       "alwaysInclude": false,
       "conditions": {
@@ -65,6 +79,8 @@
     },
     {
       "id": "component-structure",
+      "title": "Component Organization & Structure",
+      "description": "Organize React/TypeScript components with consistent structure, barrel exports, and clear separation.",
       "category": "typescript",
       "alwaysInclude": false,
       "conditions": {
@@ -81,6 +97,8 @@
     },
     {
       "id": "react-props-destructuring",
+      "title": "React Props Destructuring Pattern",
+      "description": "Use destructured props in React components for better readability and type safety.",
       "category": "typescript",
       "alwaysInclude": false,
       "conditions": {
@@ -93,6 +111,8 @@
     },
     {
       "id": "typescript-validation",
+      "title": "TypeScript Compilation Validation",
+      "description": "Mandate TypeScript compilation validation after every file change to catch errors early.",
       "category": "typescript",
       "alwaysInclude": false,
       "conditions": {
@@ -103,6 +123,8 @@
     },
     {
       "id": "git-management",
+      "title": "Git Repository Management",
+      "description": "Manage git operations safely with human review for commits and protection against destructive commands.",
       "category": "git",
       "alwaysInclude": false,
       "conditions": {
@@ -111,6 +133,8 @@
     },
     {
       "id": "chakra-ui-v3-integration",
+      "title": "Chakra UI v3 Integration with MCP Tools",
+      "description": "Integrate Chakra UI v3 components using MCP tools for accurate component reference and usage.",
       "category": "ui",
       "alwaysInclude": false,
       "conditions": {
@@ -121,6 +145,8 @@
     },
     {
       "id": "gluestack-ui-v1-themed",
+      "title": "GlueStack UI v1 (Themed) Component Patterns",
+      "description": "Use GlueStack UI v1 themed components with proper configuration and consistent patterns.",
       "category": "ui",
       "alwaysInclude": false,
       "conditions": {
@@ -131,6 +157,8 @@
     },
     {
       "id": "icon-usage-patterns",
+      "title": "Icon Usage Patterns",
+      "description": "Standardize icon usage across the project with consistent libraries and naming conventions.",
       "category": "ui",
       "alwaysInclude": false,
       "conditions": {
@@ -142,6 +170,8 @@
     },
     {
       "id": "mock-data-strategy",
+      "title": "Mock Data Strategy for Frontend Development",
+      "description": "Use realistic mock data in frontend development with clear separation from production data.",
       "category": "ui",
       "alwaysInclude": false,
       "conditions": {
@@ -153,6 +183,8 @@
     },
     {
       "id": "visual-verification",
+      "title": "Visual Verification for UI Changes",
+      "description": "Verify UI changes through screenshot analysis and evidence-based validation before completion.",
       "category": "ui",
       "alwaysInclude": false,
       "conditions": {
@@ -164,6 +196,8 @@
     },
     {
       "id": "multi-environment-management",
+      "title": "Multi-Environment Management & Protection",
+      "description": "Protect production environment files while allowing safe access to dev and QA configurations.",
       "category": "backend",
       "alwaysInclude": false,
       "conditions": {

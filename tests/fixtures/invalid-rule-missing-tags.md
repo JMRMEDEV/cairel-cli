@@ -2,6 +2,7 @@
 meta:
   id: "missing-tags"
   title: "Missing Tags"
+  description: "Test rule missing tags array for validation testing purposes."
   author: "test"
   version: "1.0.0"
   category: "general"

@@ -1,13 +1,22 @@
 ---
 meta:
-  id: "context-retrieval"
-  title: "Context Retrieval & Token Optimization"
-  author: "cairel-core"
-  version: "1.0.0"
-  category: "general"
-  tags: ["context", "optimization", "efficiency", "token-management"]
-  ai-tools: ["kiro-cli", "amazon-q-developer"]
-  last-updated: "2026-01-14"
+  id: context-retrieval
+  title: Context Retrieval & Token Optimization
+  description: >-
+    Minimize token usage through efficient context loading strategies using
+    index files and targeted reads.
+  author: cairel-core
+  version: 1.0.0
+  category: general
+  tags:
+    - context
+    - optimization
+    - efficiency
+    - token-management
+  ai-tools:
+    - kiro-cli
+    - amazon-q-developer
+  last-updated: '2026-01-14'
   always-include: true
 ---
 

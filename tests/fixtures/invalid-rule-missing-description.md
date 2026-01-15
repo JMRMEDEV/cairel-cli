@@ -1,7 +1,7 @@
 ---
 meta:
-  title: "Missing ID Rule"
-  description: "Test rule missing required id field for validation testing purposes."
+  id: "missing-description"
+  title: "Missing Description"
   author: "test"
   version: "1.0.0"
   category: "general"
@@ -10,9 +10,9 @@ meta:
   last-updated: "2026-01-15"
 ---
 
-# Missing ID Rule
+# Missing Description
 
-**Purpose**: Test rule missing required id field
+**Purpose**: Test rule missing description field
 
 ## Standard Rules
 
