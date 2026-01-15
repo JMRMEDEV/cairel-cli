@@ -5,6 +5,9 @@
   "mcpServers": {
     "amazon-q-history": {
       "command": "amazon-q-history"
+    },
+    "gpt": {
+      "command": "gpt-server"
     }
   },
   "tools": [
@@ -13,7 +16,8 @@
   "toolAliases": {},
   "allowedTools": [
     "@amazon-q-history/*",
-    "web_fetch"
+    "web_fetch",
+    "web_search"
   ],
   "resources": [
     "file://.ai/new.md",
@@ -95,12 +99,16 @@
     },
     "execute_bash": {
       "allowedCommands": [
+        "cd * && npm run *",
+        "cd * && npx tsc*",
+        "cd * && npm test*",
+        "cd * && npm install",
         "git status",
         "git fetch",
         "git diff*",
         "git log*",
-        "npm install",
-        "npm run *",
+        "npm install*",
+        "npm run*",
         "npm test*",
         "npx tsc*",
         "node --version",
@@ -108,7 +116,7 @@
         "ls -la*",
         "pwd",
         "find*",
-        "cd",
+        "cd*",
         "tail",
         "mkdir",
         "cat"

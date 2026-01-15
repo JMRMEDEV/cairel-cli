@@ -6,9 +6,326 @@ Comprehensive test coverage for all wizard scenarios and file generation.
 
 ## Test Statistics
 
-- **Total Tests**: 48
-- **Test Suites**: 5
+- **Total Tests**: 62
+- **Test Suites**: 8
 - **Status**: ✅ All Passing
+
+---
+
+## Testing Interactive CLI Applications
+
+### Challenge
+
+Testing interactive CLI tools built with Inquirer.js presents unique challenges:
+- Timing issues with user input simulation
+- Complex state management across multiple prompts
+- Difficulty reproducing exact user interactions
+
+### Approaches Evaluated
+
+#### ❌ Approach 1: mock-stdin (Not Recommended)
+
+**What we tried:**
+```typescript
+import { stdin } from 'mock-stdin';
+
+const mockStdin = stdin();
+mockStdin.send('\x1B[B'); // DOWN arrow
+mockStdin.send('\r');      // ENTER
+```
+
+**Problems:**
+- Timing issues - delays don't sync with Inquirer's rendering
+- Navigation unreliable - arrow keys don't select correct options
+- Slow tests - requires 200ms+ delays, 25-30s timeouts
+- Brittle - breaks with Inquirer updates
+
+**Verdict:** Avoid for Inquirer.js testing.
+
+#### ✅ Approach 2: Mock Inquirer Directly (Recommended)
+
+**Implementation:**
+```typescript
+import inquirer from 'inquirer';
+
+jest.mock('inquirer');
+const mockPrompt = inquirer.prompt as jest.MockedFunction<typeof inquirer.prompt>;
+
+beforeEach(() => {
+  mockPrompt.mockReset(); // Critical: resets implementation queue
+});
+
+test('wizard flow', async () => {
+  mockPrompt
+    .mockResolvedValueOnce({ mode: 'quick' })
+    .mockResolvedValueOnce({ projectType: 'ui', language: 'typescript' })
+    .mockResolvedValueOnce({ framework: 'react' });
+  
+  const result = await runWizard();
+  expect(result.projectType).toBe('ui');
+});
+```
+
+**Benefits:**
+- Fast - tests run in milliseconds
+- Reliable - no timing issues
+- Clear intent - programmatic responses
+- Maintainable - easy to update
+
+---
+
+## Key Considerations for Interactive Tests
+
+### 1. Mock Reset Strategy
+
+**Critical:** Use `mockReset()` not `mockClear()` or `resetAllMocks()`
+
+```typescript
+beforeEach(() => {
+  mockPrompt.mockReset(); // ✅ Resets implementation queue
+  // mockPrompt.mockClear();  // ❌ Only clears call history
+  // jest.resetAllMocks();    // ❌ Resets ALL mocks (breaks ora, etc.)
+});
+```
+
+**Why:** `mockResolvedValueOnce()` creates a queue. Each test needs a fresh queue.
+
+### 2. Match Prompt Structure
+
+Inquirer prompts can have multiple questions in one array:
+
+```typescript
+// Wizard code
+const answers = await inquirer.prompt([
+  { name: 'projectType', ... },
+  { name: 'language', ... }
+]);
+
+// Test must return BOTH in one object
+mockPrompt.mockResolvedValueOnce({ 
+  projectType: 'ui', 
+  language: 'typescript' 
+});
+```
+
+### 3. Count Sequential Prompts
+
+Map each `await inquirer.prompt()` call to one `mockResolvedValueOnce()`:
+
+```typescript
+// Wizard has 7 prompts:
+const { mode } = await inquirer.prompt([...]);           // 1
+const answers = await inquirer.prompt([...]);            // 2 (returns multiple fields)
+const frameworkAnswer = await inquirer.prompt([...]);    // 3
+const gitAnswer = await inquirer.prompt([...]);          // 4
+const aiToolAnswer = await inquirer.prompt([...]);       // 5
+const mcpAnswer = await inquirer.prompt([...]);          // 6
+const optionalAnswer = await inquirer.prompt([...]);     // 7
+
+// Test needs 7 mocks
+mockPrompt
+  .mockResolvedValueOnce({ mode: 'quick' })
+  .mockResolvedValueOnce({ projectType: 'ui', language: 'typescript' })
+  .mockResolvedValueOnce({ framework: 'react' })
+  .mockResolvedValueOnce({ useGit: true })
+  .mockResolvedValueOnce({ aiTool: 'kiro-cli' })
+  .mockResolvedValueOnce({ mcpServers: [] })
+  .mockResolvedValueOnce({ additionalRules: [] });
+```
+
+### 4. Handle Conditional Prompts
+
+Some prompts have `when` conditions:
+
+```typescript
+{
+  name: 'mcpServers',
+  when: () => mcpChoices.length > 0
+}
+```
+
+**Test must account for this:**
+```typescript
+// If MCP servers detected: 7 mocks
+// If no MCP servers: 6 mocks (skip mcpServers prompt)
+
+const { detectMCPServers } = require('../src/utils/mcp-detector');
+detectMCPServers.mockReturnValueOnce([]); // No servers
+
+mockPrompt
+  .mockResolvedValueOnce({ mode: 'quick' })
+  // ... 5 more (no mcpServers mock)
+```
+
+### 5. Mock Other Dependencies
+
+Don't let `resetAllMocks()` break other mocks:
+
+```typescript
+// ❌ Bad: ora breaks when reset
+jest.mock('ora', () => jest.fn(() => ({ start: jest.fn() })));
+
+// ✅ Good: ora persists across resets
+jest.mock('ora', () => {
+  const mockSpinner = {
+    start: jest.fn().mockReturnThis(),
+    succeed: jest.fn().mockReturnThis(),
+  };
+  return jest.fn(() => mockSpinner);
+});
+```
+
+### 6. Test Edge Cases
+
+Cover scenarios where behavior changes:
+- No MCP servers detected
+- Different project types (affects framework choices)
+- Different languages (affects available frameworks)
+- Detailed vs Quick mode
+
+---
+
+## Testing Patterns
+
+### Pattern 1: Basic Flow Test
+
+```typescript
+test('completes UI TypeScript React flow', async () => {
+  mockPrompt
+    .mockResolvedValueOnce({ mode: 'quick' })
+    .mockResolvedValueOnce({ projectType: 'ui', language: 'typescript' })
+    .mockResolvedValueOnce({ framework: 'react' })
+    .mockResolvedValueOnce({ useGit: true })
+    .mockResolvedValueOnce({ aiTool: 'kiro-cli' })
+    .mockResolvedValueOnce({ mcpServers: ['amazon-q-history'] })
+    .mockResolvedValueOnce({ additionalRules: [] });
+
+  const result = await runWizard();
+
+  expect(result.projectType).toBe('ui');
+  expect(result.language).toBe('typescript');
+  expect(result.framework).toBe('react');
+});
+```
+
+### Pattern 2: Edge Case Test
+
+```typescript
+test('handles no MCP servers', async () => {
+  detectMCPServers.mockReturnValueOnce([]);
+
+  mockPrompt
+    .mockResolvedValueOnce({ mode: 'quick' })
+    .mockResolvedValueOnce({ projectType: 'ui', language: 'typescript' })
+    .mockResolvedValueOnce({ framework: 'react' })
+    .mockResolvedValueOnce({ useGit: true })
+    .mockResolvedValueOnce({ aiTool: 'kiro-cli' })
+    .mockResolvedValueOnce({ additionalRules: [] }); // No mcpServers mock
+
+  const result = await runWizard();
+
+  expect(result.mcpServers).toEqual([]);
+});
+```
+
+### Pattern 3: Smoke Test
+
+```typescript
+test('completes with defaults', async () => {
+  // Accept all defaults
+  mockPrompt
+    .mockResolvedValueOnce({ mode: 'quick' })
+    .mockResolvedValueOnce({ projectType: 'ui', language: 'typescript' })
+    .mockResolvedValueOnce({ framework: 'react' })
+    .mockResolvedValueOnce({ useGit: true })
+    .mockResolvedValueOnce({ aiTool: 'kiro-cli' })
+    .mockResolvedValueOnce({ mcpServers: [] })
+    .mockResolvedValueOnce({ additionalRules: [] });
+
+  const result = await runWizard();
+
+  expect(result).toBeDefined();
+  expect(result.projectType).toBeDefined();
+});
+```
+
+---
+
+## Debugging Tips
+
+### Issue: "Cannot read properties of undefined"
+
+**Cause:** Mock queue exhausted or wrong number of mocks.
+
+**Fix:** Count `await inquirer.prompt()` calls in code, ensure equal mocks.
+
+### Issue: "Expected X, received undefined"
+
+**Cause:** Mock not returning expected field.
+
+**Fix:** Check if prompt returns multiple fields in one object.
+
+### Issue: Tests pass individually but fail together
+
+**Cause:** Mock state carrying over between tests.
+
+**Fix:** Use `mockReset()` in `beforeEach()`.
+
+### Issue: Other mocks break after reset
+
+**Cause:** `resetAllMocks()` or `jest.resetAllMocks()` resets everything.
+
+**Fix:** Only reset specific mock: `mockPrompt.mockReset()`.
+
+---
+
+## Best Practices
+
+1. **One mock per prompt call** - Not per question
+2. **Use mockReset()** - In beforeEach for clean state
+3. **Test edge cases** - Conditional prompts, empty lists
+4. **Keep mocks simple** - Return only required fields
+5. **Document prompt flow** - Comment which mock matches which prompt
+6. **Avoid mock-stdin** - For Inquirer.js, use direct mocking
+
+---
+
+## Example Test File Structure
+
+```typescript
+import inquirer from 'inquirer';
+import { runWizard } from '../src/core/wizard';
+
+jest.mock('../src/utils/mcp-detector');
+jest.mock('ora', () => {
+  const mockSpinner = {
+    start: jest.fn().mockReturnThis(),
+    succeed: jest.fn().mockReturnThis(),
+  };
+  return jest.fn(() => mockSpinner);
+});
+jest.mock('inquirer');
+
+describe('Wizard Tests', () => {
+  const mockPrompt = inquirer.prompt as jest.MockedFunction<typeof inquirer.prompt>;
+
+  beforeEach(() => {
+    mockPrompt.mockReset();
+  });
+
+  describe('Happy Paths', () => {
+    test('UI project', async () => { /* ... */ });
+    test('Backend project', async () => { /* ... */ });
+  });
+
+  describe('Edge Cases', () => {
+    test('No MCP servers', async () => { /* ... */ });
+    test('No framework', async () => { /* ... */ });
+  });
+});
+```
+
+---
 
 ## Test Coverage
 
