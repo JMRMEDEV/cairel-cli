@@ -2,7 +2,7 @@
 meta:
   id: "package-json-management"
   title: "Package.json Management & Dependencies"
-  author: "ordaiv-core"
+  author: "cairel-core"
   version: "1.0.0"
   category: "general"
   tags: ["package-json", "dependencies", "npm", "versioning"]

@@ -1,4 +1,4 @@
-# ordaivrm - AI Rule Manager (Future Vision)
+# carm - AI Rule Manager (Future Vision)
 
 **Status**: Conceptual - Post v1.0  
 **Inspiration**: npm, but for AI development rules and agents
@@ -14,14 +14,14 @@ As AI-driven development matures, developers will need:
 - Update notifications for improved rules
 - Cross-tool compatibility
 
-**Current State**: Manual copy/paste or ordaiv init (one-time setup)  
+**Current State**: Manual copy/paste or cairel init (one-time setup)  
 **Future State**: Dynamic rule ecosystem with package management
 
 ---
 
 ## Vision
 
-### ordaivrm (Ordaiv Rule Manager)
+### carm (Cairel Rule Manager)
 
 A package manager for AI development rules, agents, and configurations that enables:
 - **Discovery**: Search and browse community rules
@@ -39,28 +39,28 @@ A package manager for AI development rules, agents, and configurations that enab
 
 **Central Registry** (similar to npm registry):
 ```
-https://registry.ordaiv.dev/
+https://registry.cairel.dev/
 ```
 
 **Package Structure**:
 ```json
 {
-  "name": "@ordaiv/typescript-rules",
+  "name": "@cairel/typescript-rules",
   "version": "2.1.0",
   "description": "TypeScript development rules",
-  "author": "ordaiv-core",
+  "author": "cairel-core",
   "license": "MIT",
   "keywords": ["typescript", "validation", "best-practices"],
   "ai-tools": ["kiro-cli", "amazon-q-developer"],
   "dependencies": {
-    "@ordaiv/git-rules": "^1.0.0",
-    "@ordaiv/context-rules": "^1.2.0"
+    "@cairel/git-rules": "^1.0.0",
+    "@cairel/context-rules": "^1.2.0"
   },
   "files": [
     "rules/typescript-validation.md",
     "rules/component-structure.md"
   ],
-  "repository": "https://github.com/ordaiv/typescript-rules"
+  "repository": "https://github.com/cairel/typescript-rules"
 }
 ```
 
@@ -68,29 +68,29 @@ https://registry.ordaiv.dev/
 
 **1. Rule Packages**
 ```
-@ordaiv/typescript-rules
-@ordaiv/react-native-rules
+@cairel/typescript-rules
+@cairel/react-native-rules
 @community/nextjs-best-practices
 ```
 
 **2. Agent Packages**
 ```
-@ordaiv/general-dev-agent
-@ordaiv/ui-specialist-agent
+@cairel/general-dev-agent
+@cairel/ui-specialist-agent
 @community/backend-expert-agent
 ```
 
 **3. Bundle Packages**
 ```
-@ordaiv/fullstack-bundle
-@ordaiv/mobile-dev-bundle
+@cairel/fullstack-bundle
+@cairel/mobile-dev-bundle
 @community/enterprise-bundle
 ```
 
 **4. MCP Server Packages**
 ```
-@ordaiv/mcp-amazon-q-history
-@ordaiv/mcp-web-scraper
+@cairel/mcp-amazon-q-history
+@cairel/mcp-web-scraper
 @community/mcp-custom-tool
 ```
 
@@ -102,84 +102,84 @@ https://registry.ordaiv.dev/
 
 ```bash
 # Install rule package
-ordaivrm install @ordaiv/typescript-rules
+carm install @cairel/typescript-rules
 
 # Install specific version
-ordaivrm install @ordaiv/typescript-rules@2.1.0
+carm install @cairel/typescript-rules@2.1.0
 
 # Install with dependencies
-ordaivrm install @ordaiv/fullstack-bundle
+carm install @cairel/fullstack-bundle
 
 # Install globally (user-wide)
-ordaivrm install -g @ordaiv/general-dev-agent
+carm install -g @cairel/general-dev-agent
 
 # Install from GitHub
-ordaivrm install github:username/custom-rules
+carm install github:username/custom-rules
 ```
 
 ### Search & Discovery
 
 ```bash
 # Search for packages
-ordaivrm search "react native"
+carm search "react native"
 
 # Show package info
-ordaivrm info @ordaiv/typescript-rules
+carm info @cairel/typescript-rules
 
 # List installed packages
-ordaivrm list
+carm list
 
 # List outdated packages
-ordaivrm outdated
+carm outdated
 ```
 
 ### Updates
 
 ```bash
 # Update all packages
-ordaivrm update
+carm update
 
 # Update specific package
-ordaivrm update @ordaiv/typescript-rules
+carm update @cairel/typescript-rules
 
 # Update to latest major version
-ordaivrm update @ordaiv/typescript-rules@latest
+carm update @cairel/typescript-rules@latest
 ```
 
 ### Publishing
 
 ```bash
 # Login to registry
-ordaivrm login
+carm login
 
 # Publish package
-ordaivrm publish
+carm publish
 
 # Unpublish package
-ordaivrm unpublish @username/package-name
+carm unpublish @username/package-name
 
 # Deprecate version
-ordaivrm deprecate @username/package-name@1.0.0 "Use 2.0.0 instead"
+carm deprecate @username/package-name@1.0.0 "Use 2.0.0 instead"
 ```
 
 ### Configuration
 
 ```bash
-# Initialize ordaivrm.json
-ordaivrm init
+# Initialize carm.json
+carm init
 
 # Set registry
-ordaivrm config set registry https://custom-registry.com
+carm config set registry https://custom-registry.com
 
 # Set auth token
-ordaivrm config set token <token>
+carm config set token <token>
 ```
 
 ---
 
 ## Configuration File
 
-### ordaivrm.json
+### carm.json
 
 ```json
 {
@@ -187,21 +187,21 @@ ordaivrm config set token <token>
   "version": "1.0.0",
   "ai-tools": ["kiro-cli"],
   "dependencies": {
-    "@ordaiv/typescript-rules": "^2.1.0",
-    "@ordaiv/git-rules": "^1.0.0",
-    "@ordaiv/ui-verification": "^1.5.0",
+    "@cairel/typescript-rules": "^2.1.0",
+    "@cairel/git-rules": "^1.0.0",
+    "@cairel/ui-verification": "^1.5.0",
     "@community/custom-rules": "^0.3.0"
   },
   "devDependencies": {
-    "@ordaiv/testing-rules": "^1.2.0"
+    "@cairel/testing-rules": "^1.2.0"
   },
   "agents": {
-    "general-dev": "@ordaiv/general-dev-agent@^1.0.0",
-    "ui-specialist": "@ordaiv/ui-specialist-agent@^2.0.0"
+    "general-dev": "@cairel/general-dev-agent@^1.0.0",
+    "ui-specialist": "@cairel/ui-specialist-agent@^2.0.0"
   },
   "mcpServers": {
-    "amazon-q-history": "@ordaiv/mcp-amazon-q-history@^1.0.0",
-    "web-scraper": "@ordaiv/mcp-web-scraper@^2.1.0"
+    "amazon-q-history": "@cairel/mcp-amazon-q-history@^1.0.0",
+    "web-scraper": "@cairel/mcp-web-scraper@^2.1.0"
   },
   "config": {
     "rulesPath": ".kiro/steering",
@@ -218,7 +218,7 @@ ordaivrm config set token <token>
 ### Rule Package
 
 ```
-@ordaiv/typescript-rules/
+@cairel/typescript-rules/
 ├── package.json
 ├── README.md
 ├── LICENSE
@@ -235,7 +235,7 @@ ordaivrm config set token <token>
 ### Agent Package
 
 ```
-@ordaiv/ui-specialist-agent/
+@cairel/ui-specialist-agent/
 ├── package.json
 ├── README.md
 ├── LICENSE
@@ -249,7 +249,7 @@ ordaivrm config set token <token>
 ### Bundle Package
 
 ```
-@ordaiv/fullstack-bundle/
+@cairel/fullstack-bundle/
 ├── package.json
 ├── README.md
 ├── LICENSE
@@ -276,7 +276,7 @@ ordaivrm config set token <token>
 
 ```json
 {
-  "@ordaiv/typescript-rules": {
+  "@cairel/typescript-rules": {
     "2.1.0": {
       "kiro-cli": ">=1.0.0",
       "amazon-q-developer": ">=2.0.0"
@@ -292,7 +292,7 @@ ordaivrm config set token <token>
 ### Publishing Guidelines
 
 **1. Namespace Rules**
-- `@ordaiv/*` - Official packages (core team only)
+- `@cairel/*` - Official packages (core team only)
 - `@community/*` - Verified community packages
 - `@username/*` - User packages
 
@@ -315,31 +315,31 @@ ordaivrm config set token <token>
 # 1. Create package
 mkdir my-custom-rules
 cd my-custom-rules
-ordaivrm init
+carm init
 
 # 2. Add rules
 # Create rules following standard format
 
 # 3. Test locally
-ordaivrm validate
+carm validate
 
 # 4. Publish
-ordaivrm login
-ordaivrm publish
+carm login
+carm publish
 ```
 
 ---
 
-## Integration with ordaiv
+## Integration with cairel
 
 ### Backward Compatibility
 
-**ordaiv v1.0** (current):
+**cairel v1.0** (current):
 - One-time initialization
 - Curated presets only
 - No updates after init
 
-**ordaiv v2.0** (with ordaivrm):
+**cairel v2.0** (with carm):
 - Dynamic rule management
 - Community packages
 - Continuous updates
@@ -348,14 +348,14 @@ ordaivrm publish
 ### Migration Path
 
 ```bash
-# Existing project with ordaiv v1.0
-ordaiv init
+# Existing project with cairel v1.0
+cairel init
 
-# Upgrade to ordaivrm
-ordaivrm migrate
+# Upgrade to carm
+carm migrate
 
 # Now can install additional packages
-ordaivrm install @community/custom-rules
+carm install @community/custom-rules
 ```
 
 ---
@@ -438,10 +438,10 @@ class PackageInstaller {
 **1. Publishing**
 - Authenticated users only
 - Email verification required
-- 2FA for @ordaiv namespace
+- 2FA for @cairel namespace
 
 **2. Namespaces**
-- `@ordaiv/*` - Core team only
+- `@cairel/*` - Core team only
 - `@community/*` - Verified contributors
 - `@username/*` - Any authenticated user
 
@@ -478,7 +478,7 @@ class PackageInstaller {
 ### Phase 1: MVP (6 months)
 - [ ] Registry backend
 - [ ] CLI client
-- [ ] Core packages (@ordaiv/*)
+- [ ] Core packages (@cairel/*)
 - [ ] Basic search and install
 - [ ] Documentation
 
@@ -529,10 +529,10 @@ class PackageInstaller {
 
 ## Conclusion
 
-ordaivrm represents the natural evolution of ordaiv from a one-time initialization tool to a dynamic ecosystem for AI-driven development best practices. By enabling community contributions, versioning, and dependency management, we can create a sustainable, growing repository of AI development knowledge.
+carm represents the natural evolution of cairel from a one-time initialization tool to a dynamic ecosystem for AI-driven development best practices. By enabling community contributions, versioning, and dependency management, we can create a sustainable, growing repository of AI development knowledge.
 
 **Next Steps**:
-1. Complete ordaiv v1.0
+1. Complete cairel v1.0
 2. Gather community feedback
 3. Design registry architecture
 4. Build MVP

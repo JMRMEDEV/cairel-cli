@@ -2,7 +2,7 @@
 meta:
   id: "eslint-configuration"
   title: "ESLint Configuration & Compliance"
-  author: "ordaiv-core"
+  author: "cairel-core"
   version: "1.0.0"
   category: "general"
   tags: ["eslint", "linting", "code-quality", "typescript"]

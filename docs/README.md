@@ -1,8 +1,8 @@
-# Ordaiv - AI-Driven Development Initialization Tool
+# Cairel - AI-Driven Development Initialization Tool
 
 ## Overview
 
-Ordaiv is an npm-published CLI tool for initializing AI-driven development projects with standardized rules, agent configurations, and MCP server setups.
+Cairel is an npm-published CLI tool for initializing AI-driven development projects with standardized rules, agent configurations, and MCP server setups.
 
 ## Problem Statement
 
@@ -22,7 +22,7 @@ Developers using AI tools (kiro-cli, Amazon Q Developer) manually copy/paste rul
 
 ## Non-Goals
 
-- Runtime rule enforcement (ordaiv is initialization-only)
+- Runtime rule enforcement (cairel is initialization-only)
 - IDE integration (focus on CLI)
 - AI model training or fine-tuning
 - Project scaffolding beyond AI configuration
@@ -34,7 +34,7 @@ Developers using AI tools (kiro-cli, Amazon Q Developer) manually copy/paste rul
 3. Generated files are valid JSON/Markdown
 4. Rules are project-agnostic (no hardcoded project names/paths)
 5. Can be run multiple times without breaking existing setup
-6. Published to npm and installable via `npx ordaiv init`
+6. Published to npm and installable via `npx cairel init`
 7. Wizard completes in < 2 minutes for quick setup
 8. Generated configurations work with kiro-cli and Amazon Q Developer
 
@@ -85,11 +85,11 @@ See `docs/architecture.md` for detailed architecture.
 
 ```bash
 # Install globally
-npm install -g ordaiv
+npm install -g cairel
 
 # Initialize new project
 cd my-project
-ordaiv init
+cairel init
 
 # Follow interactive wizard
 ```
@@ -105,7 +105,7 @@ npm run build
 
 # Run locally
 npm link
-ordaiv init
+cairel init
 
 # Test
 npm test

@@ -1,4 +1,4 @@
-# Ordaiv - AI-Driven Development Initialization Tool
+# Cairel - AI-Driven Development Initialization Tool
 
 **Version**: 1.0.0  
 **Status**: Phase 1 - Rule Abstraction & Curation ✅
@@ -7,7 +7,7 @@
 
 ## Overview
 
-Ordaiv is an npm-published CLI tool designed to initialize AI-driven development projects with standardized rules, agent configurations, and MCP server setups. It eliminates manual copy/paste workflows and ensures consistency across projects.
+Cairel is an npm-published CLI tool designed to initialize AI-driven development projects with standardized rules, agent configurations, and MCP server setups. It eliminates manual copy/paste workflows and ensures consistency across projects.
 
 ### Supported AI Tools
 - **kiro-cli** (Primary)
@@ -25,7 +25,7 @@ Ordaiv is an npm-published CLI tool designed to initialize AI-driven development
 - Support for kiro-cli and Amazon Q Developer
 
 ### Future Vision
-- **ordaivrm** (Rule Manager) - NPM-like package manager for AI rules
+- **carm** (Rule Manager) - NPM-like package manager for AI rules
 - Community-contributed rules and agents
 - Rule versioning and updates
 - Cross-tool compatibility layer
@@ -37,7 +37,7 @@ Ordaiv is an npm-published CLI tool designed to initialize AI-driven development
 ### Directory Structure
 
 ```
-ordaiv/
+cairel/
 ├── src/
 │   ├── commands/
 │   │   ├── init.ts           # Main initialization command
@@ -70,7 +70,7 @@ ordaiv/
 │   ├── agents/
 │   └── templates/
 ├── docs/
-│   ├── FUTURE.md              # ordaivrm vision
+│   ├── FUTURE.md              # carm vision
 │   └── CONTRIBUTING.md
 ├── package.json
 └── tsconfig.json
@@ -113,7 +113,7 @@ ordaiv/
 meta:
   id: "rule-id"
   title: "Rule Title"
-  author: "ordaiv-core | community"
+  author: "cairel-core | community"
   version: "1.0.0"
   category: "general | typescript | git | ui | backend | testing"
   tags: ["tag1", "tag2"]
@@ -266,7 +266,7 @@ git clone https://github.com/JMRMEDEV/amazon-q-history-mcp-server
 cd amazon-q-history-mcp-server
 npm install
 
-After installation, run 'ordaiv init' again.
+After installation, run 'cairel init' again.
 ```
 
 ---
@@ -326,7 +326,7 @@ After installation, run 'ordaiv init' again.
 
 ## Commands (Planned)
 
-### `ordaiv init`
+### `cairel init`
 Initialize a new project with AI-driven development setup.
 
 **Options:**
@@ -334,7 +334,7 @@ Initialize a new project with AI-driven development setup.
 - `--dry-run` - Show what would be generated
 - `--force` - Overwrite existing files
 
-### `ordaiv update`
+### `cairel update`
 Update existing rules and agents.
 
 **Options:**
@@ -342,14 +342,14 @@ Update existing rules and agents.
 - `--agents` - Update only agents
 - `--mcp` - Update only MCP configs
 
-### `ordaiv validate`
+### `cairel validate`
 Validate rule files against schema.
 
 **Options:**
 - `--path <path>` - Path to validate
 - `--fix` - Auto-fix issues
 
-### `ordaiv list`
+### `cairel list`
 List available presets.
 
 **Options:**
@@ -359,7 +359,7 @@ List available presets.
 
 ---
 
-## Future: ordaivrm (Rule Manager)
+## Future: carm (Rule Manager)
 
 ### Vision
 NPM-like package manager for AI rules and agents.
@@ -373,10 +373,10 @@ NPM-like package manager for AI rules and agents.
 
 ### Commands (Conceptual)
 ```bash
-ordaivrm install typescript-rules@latest
-ordaivrm search "react native"
-ordaivrm publish my-custom-rules
-ordaivrm update
+carm install typescript-rules@latest
+carm search "react native"
+carm publish my-custom-rules
+carm update
 ```
 
 ### Documentation

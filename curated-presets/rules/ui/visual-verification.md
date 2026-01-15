@@ -2,7 +2,7 @@
 meta:
   id: "visual-verification"
   title: "Visual Verification for UI Changes"
-  author: "ordaiv-core"
+  author: "cairel-core"
   version: "1.0.0"
   category: "ui"
   tags: ["ui", "testing", "verification", "screenshots"]

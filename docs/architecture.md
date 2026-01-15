@@ -1,8 +1,8 @@
-# Ordaiv Architecture
+# Cairel Architecture
 
 ## System Overview
 
-Ordaiv is a CLI tool that generates AI-driven development configurations through an interactive wizard.
+Cairel is a CLI tool that generates AI-driven development configurations through an interactive wizard.
 
 ```
 ┌─────────────┐
@@ -98,34 +98,34 @@ Ordaiv is a CLI tool that generates AI-driven development configurations through
 
 **Files**:
 - `init.ts` - Initialize AI configuration (agents + rules)
-- `bootstrap.ts` - Show path to ordaiv's .ai/ for project setup
+- `bootstrap.ts` - Show path to cairel's .ai/ for project setup
 - `update.ts` - Update existing configuration
 - `validate.ts` - Validate rule files
 - `list.ts` - List available presets
 
 **Getting Started Feature**:
-When user runs `ordaiv` without arguments, show interactive menu:
+When user runs `cairel` without arguments, show interactive menu:
 ```
 ? What would you like to do?
-  ❯ Initialize AI configuration (ordaiv init)
-    Bootstrap project documentation (ordaiv bootstrap)
-    Update existing configuration (ordaiv update)
-    Validate rules (ordaiv validate)
-    List available presets (ordaiv list)
-    Show help (ordaiv --help)
+  ❯ Initialize AI configuration (cairel init)
+    Bootstrap project documentation (cairel bootstrap)
+    Update existing configuration (cairel update)
+    Validate rules (cairel validate)
+    List available presets (cairel list)
+    Show help (cairel --help)
 ```
 
 **Bootstrap Command**:
-Shows kiro-cli where to find ordaiv's .ai/ directory for project initialization:
+Shows kiro-cli where to find cairel's .ai/ directory for project initialization:
 ```bash
-ordaiv bootstrap
+cairel bootstrap
 
 # Output:
 ✓ Ready to bootstrap project
 
 Copy this for kiro-cli:
 
-Read /usr/local/lib/node_modules/ordaiv/.ai/KICKOFF-PROMPT.txt
+Read /usr/local/lib/node_modules/cairel/.ai/KICKOFF-PROMPT.txt
 and follow the new.md protocol to initialize this project.
 
 This will guide you through:
@@ -238,7 +238,7 @@ Mode Selection
 ### Initialization Flow
 
 ```
-User runs: ordaiv init
+User runs: cairel init
     ↓
 CLI parses command
     ↓
@@ -272,7 +272,7 @@ Success message displayed
 ### Update Flow
 
 ```
-User runs: ordaiv update
+User runs: cairel update
     ↓
 Detect existing configuration
     ↓
@@ -320,7 +320,7 @@ Success message displayed
 ## File Structure
 
 ```
-ordaiv/
+cairel/
 ├── src/
 │   ├── commands/
 │   │   ├── init.ts
@@ -391,7 +391,7 @@ ordaiv/
 
 ## Future Enhancements
 
-1. **ordaivrm**: Package manager for rules (see docs/FUTURE.md)
+1. **carm**: Package manager for rules (see docs/FUTURE.md)
 2. **Plugin System**: Allow third-party extensions
 3. **Configuration Profiles**: Save and reuse configurations
 4. **Interactive Updates**: Smart merging of updates

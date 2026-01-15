@@ -40,7 +40,7 @@ describe('File Generation Integration', () => {
   let testDir: string;
 
   beforeEach(async () => {
-    testDir = join(tmpdir(), `ordaiv-test-${Date.now()}`);
+    testDir = join(tmpdir(), `cairel-test-${Date.now()}`);
     await fs.mkdir(testDir, { recursive: true });
   });
 

@@ -2,7 +2,7 @@
 meta:
   id: "mock-data-strategy"
   title: "Mock Data Strategy for Frontend Development"
-  author: "ordaiv-core"
+  author: "cairel-core"
   version: "1.0.0"
   category: "ui"
   tags: ["mock-data", "frontend", "testing", "development"]

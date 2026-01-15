@@ -2,7 +2,7 @@
 meta:
   id: "semantic-versioning"
   title: "Semantic Versioning for Package Management"
-  author: "ordaiv-core"
+  author: "cairel-core"
   version: "1.0.0"
   category: "general"
   tags: ["versioning", "package.json", "semver"]

@@ -2,7 +2,7 @@
 meta:
   id: "react-props-destructuring"
   title: "React Props Destructuring Pattern"
-  author: "ordaiv-core"
+  author: "cairel-core"
   version: "1.0.0"
   category: "typescript"
   tags: ["react", "props", "destructuring", "patterns"]

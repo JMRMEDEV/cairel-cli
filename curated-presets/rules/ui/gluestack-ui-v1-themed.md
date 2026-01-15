@@ -2,7 +2,7 @@
 meta:
   id: "gluestack-ui-v1-themed"
   title: "GlueStack UI v1 (Themed) Component Patterns"
-  author: "ordaiv-core"
+  author: "cairel-core"
   version: "1.0.0"
   category: "ui"
   tags: ["gluestack-ui", "react-native", "themed", "components"]

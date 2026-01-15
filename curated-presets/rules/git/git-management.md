@@ -2,7 +2,7 @@
 meta:
   id: "git-management"
   title: "Git Repository Management"
-  author: "ordaiv-core"
+  author: "cairel-core"
   version: "1.0.0"
   category: "git"
   tags: ["git", "version-control", "commits", "workflow"]

@@ -29,7 +29,7 @@ async function getOptionalRules(answers: Partial<QuickSetupAnswers>): Promise<Op
 }
 
 export async function runWizard(): Promise<QuickSetupAnswers | DetailedSetupAnswers> {
-  console.log(chalk.bold.blue('\n🚀 Ordaiv - AI Development Initialization\n'));
+  console.log(chalk.bold.blue('\n🚀 Cairel - AI Development Initialization\n'));
 
   const { mode } = await inquirer.prompt<{ mode: WizardMode }>([
     {

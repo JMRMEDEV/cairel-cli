@@ -1,4 +1,4 @@
-# Ordaiv - Phase 1 Complete ✅
+# Cairel - Phase 1 Complete ✅
 
 ## What We've Accomplished
 
@@ -33,7 +33,7 @@ Created a comprehensive rule format with:
 
 Designed complete project structure:
 ```
-ordaiv/
+cairel/
 ├── src/                    # TypeScript source
 │   ├── commands/           # CLI commands (init, update, validate)
 │   ├── core/               # Wizard, generator, validator
@@ -76,7 +76,7 @@ Created:
 
 Comprehensive documentation:
 - **PROJECT-SPEC.md** - Complete project specification
-- **docs/FUTURE.md** - ordaivrm vision (rule package manager)
+- **docs/FUTURE.md** - carm vision (rule package manager)
 - **curated-presets/rules/README.md** - Rule format guide
 
 ---
@@ -131,7 +131,7 @@ Comprehensive documentation:
 5. **High-level + Granular modes** - Flexibility for users
 6. **MCP server detection** - Auto-detect + custom paths
 7. **Update command** - Post-initialization rule management
-8. **Future: ordaivrm** - Rule package manager vision documented
+8. **Future: carm** - Rule package manager vision documented
 
 ### 📋 Pending Decisions (for Phase 2)
 
@@ -148,7 +148,7 @@ Comprehensive documentation:
 ### Created Files
 
 ```
-/home/jmrmedev/repos/ordaiv/
+/home/jmrmedev/repos/cairel/
 ├── curated-presets/
 │   ├── rules/
 │   │   ├── general/
@@ -176,7 +176,7 @@ Comprehensive documentation:
 ### Existing Files (Reference)
 
 ```
-/home/jmrmedev/repos/ordaiv/
+/home/jmrmedev/repos/cairel/
 ├── .ai/
 │   └── KICKOFF-PROMPT.txt
 ├── agents-compendium/          # Source material
@@ -211,7 +211,7 @@ Comprehensive documentation:
 
 ```bash
 # Navigate to project
-cd /home/jmrmedev/repos/ordaiv
+cd /home/jmrmedev/repos/cairel
 
 # Initialize npm project
 npm init -y
@@ -299,11 +299,11 @@ const detectMcpServers = (basePaths: string[]): DetectedServer[] => {
 
 Before starting implementation, consider:
 
-1. **CLI binary name**: `ordaiv` or `ordaiv-cli`?
+1. **CLI binary name**: `cairel` or `cairel-cli`?
 2. **Default MCP path**: `/home/user/mcp-servers/` or `~/.mcp-servers/`?
 3. **Rule file naming**: Keep original names or generate from IDs?
 4. **Agent file naming**: User-provided or auto-generated?
-5. **Backup strategy**: `.bak` files or `.ordaiv-backup/` directory?
+5. **Backup strategy**: `.bak` files or `.cairel-backup/` directory?
 
 ---
 
@@ -316,7 +316,7 @@ Phase 1 is complete! We have:
 - ✅ Documented complete project architecture
 - ✅ Defined tech stack
 - ✅ Designed wizard flows
-- ✅ Documented future vision (ordaivrm)
+- ✅ Documented future vision (carm)
 
 **Ready to proceed to Phase 2: Project Setup and Implementation**
 

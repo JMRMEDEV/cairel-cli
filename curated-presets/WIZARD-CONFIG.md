@@ -1,4 +1,4 @@
-# Ordaiv Wizard Configuration
+# Cairel Wizard Configuration
 
 This document defines all wizard questions and their impact on generated configurations.
 

@@ -2,7 +2,7 @@
 meta:
   id: "context-retrieval"
   title: "Context Retrieval & Token Optimization"
-  author: "ordaiv-core"
+  author: "cairel-core"
   version: "1.0.0"
   category: "general"
   tags: ["context", "optimization", "efficiency", "token-management"]

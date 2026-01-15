@@ -2,7 +2,7 @@
 meta:
   id: "absolute-imports"
   title: "Absolute Imports Configuration"
-  author: "ordaiv-core"
+  author: "cairel-core"
   version: "1.0.0"
   category: "typescript"
   tags: ["imports", "paths", "aliases", "typescript"]

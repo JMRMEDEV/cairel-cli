@@ -1,4 +1,4 @@
-# Ordaiv Curated Rules
+# Cairel Curated Rules
 
 This directory contains standardized, project-agnostic rules for AI-driven development.
 
@@ -28,7 +28,7 @@ All rules follow this standardized format:
 meta:
   id: "rule-id"
   title: "Rule Title"
-  author: "ordaiv-core"
+  author: "cairel-core"
   version: "1.0.0"
   category: "category-name"
   tags: ["tag1", "tag2"]
@@ -106,10 +106,10 @@ Rules are validated against:
 - Character limits
 - Valid categories and tags
 
-## Usage in Ordaiv
+## Usage in Cairel
 
-These rules are used as templates during `ordaiv init`:
+These rules are used as templates during `cairel init`:
 1. User answers wizard questions
-2. Ordaiv matches rules based on frontmatter conditions
+2. Cairel matches rules based on frontmatter conditions
 3. Selected rules are copied to `.kiro/steering/` or `.amazonq/rules/`
 4. Agent configuration is generated with appropriate settings

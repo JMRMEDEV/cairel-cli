@@ -2,7 +2,7 @@
 meta:
   id: "icon-usage-patterns"
   title: "Icon Usage Patterns"
-  author: "ordaiv-core"
+  author: "cairel-core"
   version: "1.0.0"
   category: "ui"
   tags: ["icons", "react-icons", "svg", "ui-components"]

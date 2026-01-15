@@ -1,4 +1,4 @@
-# Ordaiv Development Progress
+# Cairel Development Progress
 
 ## 2026-01-14 - Phase 1: Rule Abstraction & Curation ✅ COMPLETE
 
@@ -12,7 +12,7 @@
 - ✅ Designed complete project architecture
 - ✅ Selected tech stack (TypeScript + Commander + Inquirer + Handlebars + Zod)
 - ✅ Designed three-mode wizard (Quick/Detailed/Custom)
-- ✅ Documented future vision (ordaivrm package manager)
+- ✅ Documented future vision (carm package manager)
 
 **Rules Created (Initial 7)**:
 1. context-retrieval.md - Token optimization
@@ -28,7 +28,7 @@
 - PHASE-1-SUMMARY.md - Phase 1 details
 - QUICK-REFERENCE.md - Quick guide
 - README.md - Main overview
-- docs/FUTURE.md - ordaivrm vision
+- docs/FUTURE.md - carm vision
 
 ---
 
@@ -73,7 +73,7 @@
 ### Session 3: Bootstrap Command & Final Clarifications
 
 **Added**:
-- ✅ `ordaiv bootstrap` command - Shows path to ordaiv's .ai/ for project initialization
+- ✅ `cairel bootstrap` command - Shows path to cairel's .ai/ for project initialization
 - ✅ Clarified `.ai/` directory is NOT copied to user projects
 - ✅ Documented workflow: init → bootstrap → kiro-cli creates docs
 - ✅ Updated all documentation with bootstrap command
@@ -85,7 +85,7 @@
 - .ai/README.md - Added bootstrap workflow example
 
 **Bootstrap Command Purpose**:
-Tell kiro-cli where to find ordaiv's `.ai/KICKOFF-PROMPT.txt` so it can guide users through the `new.md` protocol to create proper project documentation (README, dev-plan, architecture, progress, bugs).
+Tell kiro-cli where to find cairel's `.ai/KICKOFF-PROMPT.txt` so it can guide users through the `new.md` protocol to create proper project documentation (README, dev-plan, architecture, progress, bugs).
 
 ---
 
@@ -128,10 +128,10 @@ Tell kiro-cli where to find ordaiv's `.ai/KICKOFF-PROMPT.txt` so it can guide us
 - ✅ .gitignore configured (excludes source material)
 
 **Exit Criteria Met**:
-- ✅ `ordaiv --help` works
-- ✅ `ordaiv --version` works
-- ✅ `ordaiv` (no args) shows getting started menu
-- ✅ `ordaiv bootstrap` shows path to .ai/ for kiro-cli
+- ✅ `cairel --help` works
+- ✅ `cairel --version` works
+- ✅ `cairel` (no args) shows getting started menu
+- ✅ `cairel bootstrap` shows path to .ai/ for kiro-cli
 - ✅ Command structure in place
 - ✅ Can be run with `npm link`
 
@@ -271,7 +271,7 @@ Tell kiro-cli where to find ordaiv's `.ai/KICKOFF-PROMPT.txt` so it can guide us
 - Community outreach
 - Initial user feedback
 
-### Future: ordaivrm
+### Future: carm
 - Package manager for rules
 - Community contributions
 - Versioning and updates

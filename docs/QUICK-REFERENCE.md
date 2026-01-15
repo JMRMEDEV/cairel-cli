@@ -1,4 +1,4 @@
-# Ordaiv Quick Reference
+# Cairel Quick Reference
 
 ## Project Status
 
@@ -7,7 +7,7 @@
 
 ---
 
-## What is Ordaiv?
+## What is Cairel?
 
 An npm-published CLI tool for initializing AI-driven development projects with:
 - Standardized rules for AI assistants (kiro-cli, Amazon Q Developer)
@@ -21,11 +21,11 @@ An npm-published CLI tool for initializing AI-driven development projects with:
 
 ```bash
 # Install globally
-npm install -g ordaiv
+npm install -g cairel
 
 # Initialize new project
 cd my-project
-ordaiv init
+cairel init
 
 # Follow interactive wizard
 ? How would you like to configure? Quick Setup
@@ -78,7 +78,7 @@ my-project/
 meta:
   id: "rule-id"
   title: "Rule Title"
-  author: "ordaiv-core"
+  author: "cairel-core"
   version: "1.0.0"
   category: "general"
   tags: ["tag1", "tag2"]
@@ -122,13 +122,13 @@ meta:
 ## Commands (Planned)
 
 ```bash
-ordaiv init              # Initialize project
-ordaiv init --mode quick # Quick setup
-ordaiv init --dry-run    # Preview changes
+cairel init              # Initialize project
+cairel init --mode quick # Quick setup
+cairel init --dry-run    # Preview changes
 
-ordaiv update            # Update rules/agents
-ordaiv validate          # Validate rule files
-ordaiv list              # List available presets
+cairel update            # Update rules/agents
+cairel validate          # Validate rule files
+cairel list              # List available presets
 ```
 
 ---
@@ -164,7 +164,7 @@ Guided rule/agent creation wizard
 ## Directory Structure
 
 ```
-ordaiv/
+cairel/
 ├── src/
 │   ├── commands/        # init, update, validate
 │   ├── core/            # wizard, generator, validator
@@ -176,20 +176,20 @@ ordaiv/
 │   ├── agents/          # Agent templates
 │   └── templates/       # Handlebars templates
 └── docs/
-    └── FUTURE.md        # ordaivrm vision
+    └── FUTURE.md        # carm vision
 ```
 
 ---
 
-## Future: ordaivrm
+## Future: carm
 
 **Vision**: npm-like package manager for AI rules
 
 ```bash
-ordaivrm install @ordaiv/typescript-rules
-ordaivrm search "react native"
-ordaivrm publish my-custom-rules
-ordaivrm update
+carm install @cairel/typescript-rules
+carm search "react native"
+carm publish my-custom-rules
+carm update
 ```
 
 See `docs/FUTURE.md` for complete vision.
@@ -200,7 +200,7 @@ See `docs/FUTURE.md` for complete vision.
 
 ### Curated Rules
 ```
-/home/jmrmedev/repos/ordaiv/curated-presets/rules/
+/home/jmrmedev/repos/cairel/curated-presets/rules/
 ├── general/
 │   ├── context-retrieval.md
 │   ├── implementation-approval.md
@@ -216,7 +216,7 @@ See `docs/FUTURE.md` for complete vision.
 
 ### Agent Templates
 ```
-/home/jmrmedev/repos/ordaiv/curated-presets/
+/home/jmrmedev/repos/cairel/curated-presets/
 ├── agents/
 │   └── general-dev.json
 └── templates/
@@ -225,12 +225,12 @@ See `docs/FUTURE.md` for complete vision.
 
 ### Documentation
 ```
-/home/jmrmedev/repos/ordaiv/
+/home/jmrmedev/repos/cairel/
 ├── PROJECT-SPEC.md          # Complete specification
 ├── PHASE-1-SUMMARY.md       # Phase 1 completion
 ├── QUICK-REFERENCE.md       # This file
 └── docs/
-    └── FUTURE.md            # ordaivrm vision
+    └── FUTURE.md            # carm vision
 ```
 
 ---

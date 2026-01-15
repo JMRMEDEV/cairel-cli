@@ -1,10 +1,10 @@
 {
-  "name": "ordaiv",
+  "name": "cairel",
   "version": "1.0.0",
   "description": "CLI tool for initializing AI-driven development projects with standardized rules and agent configurations",
   "main": "dist/index.js",
   "bin": {
-    "ordaiv": "dist/index.js"
+    "cairel": "dist/index.js"
   },
   "scripts": {
     "build": "tsc",

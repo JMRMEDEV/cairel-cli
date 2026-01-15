@@ -1,4 +1,4 @@
-# Ordaiv - AI-Driven Development Initialization Tool
+# Cairel - AI-Driven Development Initialization Tool
 
 **Status**: Phase 1 Complete ✅ | Ready for Phase 2 Implementation
 
@@ -6,7 +6,7 @@
 
 ## Overview
 
-Ordaiv is an npm-published CLI tool for initializing AI-driven development projects with standardized rules, agent configurations, and MCP server setups.
+Cairel is an npm-published CLI tool for initializing AI-driven development projects with standardized rules, agent configurations, and MCP server setups.
 
 ### Problem
 
@@ -41,13 +41,13 @@ Interactive CLI tool that generates AI configurations through a wizard, with:
 - Complete architecture design
 - Stage-based development plan
 - Wizard configuration specification
-- Future vision (ordaivrm package manager)
+- Future vision (carm package manager)
 
 ---
 
-## What Ordaiv Generates
+## What Cairel Generates
 
-When you run `ordaiv init`, it creates:
+When you run `cairel init`, it creates:
 
 **For kiro-cli:**
 ```
@@ -72,9 +72,9 @@ When you run `ordaiv init`, it creates:
 ```
 
 **What is NOT generated:**
-- `.ai/` directory (that's ordaiv-specific, not for user projects)
+- `.ai/` directory (that's cairel-specific, not for user projects)
 - `docs/` directory (user creates their own)
-- Source code (ordaiv only generates AI configurations)
+- Source code (cairel only generates AI configurations)
 
 ---
 
@@ -82,11 +82,11 @@ When you run `ordaiv init`, it creates:
 
 ```bash
 # Install globally
-npm install -g ordaiv
+npm install -g cairel
 
 # Step 1: Initialize AI configuration
 cd my-project
-ordaiv init
+cairel init
 
 # Follow wizard
 ? How would you like to configure? Quick Setup
@@ -98,10 +98,10 @@ ordaiv init
 ? MCP servers? [Select from detected]
 
 # Step 2: Bootstrap project documentation
-ordaiv bootstrap
+cairel bootstrap
 
 # Copy the output and paste into kiro-cli:
-# Read /usr/local/lib/node_modules/ordaiv/.ai/KICKOFF-PROMPT.txt
+# Read /usr/local/lib/node_modules/cairel/.ai/KICKOFF-PROMPT.txt
 # and follow the new.md protocol to initialize this project.
 
 # Step 3: Use kiro-cli
@@ -128,14 +128,14 @@ All documentation in `docs/` directory:
 - **progress.md** - Development progress log
 - **WIZARD-CONFIG.md** - Wizard specification (in curated-presets/)
 - **QUICK-REFERENCE.md** - Quick reference guide
-- **FUTURE.md** - ordaivrm vision
+- **FUTURE.md** - carm vision
 
 ---
 
 ## Project Structure
 
 ```
-ordaiv/
+cairel/
 ├── src/                    # TypeScript source (Phase 2)
 ├── curated-presets/
 │   ├── rules/              # 17 curated rules
@@ -143,7 +143,7 @@ ordaiv/
 │   ├── templates/          # Handlebars templates
 │   └── WIZARD-CONFIG.md    # Wizard specification
 ├── docs/                   # All documentation
-├── .ai/                    # Ordaiv's own AI config
+├── .ai/                    # Cairel's own AI config
 ├── README.md               # This file
 └── package.json            # (Phase 2)
 ```
@@ -174,14 +174,14 @@ ordaiv/
 
 ---
 
-## Future: ordaivrm
+## Future: carm
 
 npm-like package manager for AI rules:
 
 ```bash
-ordaivrm install @ordaiv/typescript-rules
-ordaivrm search "react native"
-ordaivrm publish my-custom-rules
+carm install @cairel/typescript-rules
+carm search "react native"
+carm publish my-custom-rules
 ```
 
 See `docs/FUTURE.md` for complete vision.

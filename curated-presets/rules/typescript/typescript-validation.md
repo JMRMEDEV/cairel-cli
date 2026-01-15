@@ -2,7 +2,7 @@
 meta:
   id: "typescript-validation"
   title: "TypeScript Compilation Validation"
-  author: "ordaiv-core"
+  author: "cairel-core"
   version: "1.0.0"
   category: "typescript"
   tags: ["typescript", "validation", "compilation", "type-safety"]

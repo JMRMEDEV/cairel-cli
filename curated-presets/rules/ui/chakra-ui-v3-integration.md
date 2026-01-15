@@ -2,7 +2,7 @@
 meta:
   id: "chakra-ui-v3-integration"
   title: "Chakra UI v3 Integration with MCP Tools"
-  author: "ordaiv-core"
+  author: "cairel-core"
   version: "1.0.0"
   category: "ui"
   tags: ["chakra-ui", "mcp", "ui-library", "components"]

@@ -2,7 +2,7 @@
 meta:
   id: "component-structure"
   title: "Component Organization & Structure"
-  author: "ordaiv-core"
+  author: "cairel-core"
   version: "1.0.0"
   category: "typescript"
   tags: ["components", "structure", "organization", "react", "typescript"]

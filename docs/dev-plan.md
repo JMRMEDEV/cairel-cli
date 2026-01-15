@@ -1,4 +1,4 @@
-# Ordaiv Development Plan
+# Cairel Development Plan
 
 ## Stage 1: Project Setup ✅ COMPLETE
 
@@ -29,39 +29,39 @@
 - Commander.js setup
 - Command structure (init, bootstrap, update, validate, list)
 - Help and version commands
-- **Getting started tool**: `ordaiv` (no args) shows interactive menu
+- **Getting started tool**: `cairel` (no args) shows interactive menu
 
 **Exit Criteria**:
-- `ordaiv --help` works
-- `ordaiv --version` works
-- `ordaiv` (no args) shows getting started menu
-- `ordaiv bootstrap` shows path to .ai/ for kiro-cli
+- `cairel --help` works
+- `cairel --version` works
+- `cairel` (no args) shows getting started menu
+- `cairel bootstrap` shows path to .ai/ for kiro-cli
 - Command structure in place
 - Can be run with `npm link`
 
 **Dependencies**: Stage 1
 
-**Note**: When user runs `ordaiv` without arguments, show interactive menu:
+**Note**: When user runs `cairel` without arguments, show interactive menu:
 ```
 ? What would you like to do?
-  ❯ Initialize AI configuration (ordaiv init)
-    Bootstrap project documentation (ordaiv bootstrap)
-    Update existing configuration (ordaiv update)
-    Validate rules (ordaiv validate)
-    List available presets (ordaiv list)
-    Show help (ordaiv --help)
+  ❯ Initialize AI configuration (cairel init)
+    Bootstrap project documentation (cairel bootstrap)
+    Update existing configuration (cairel update)
+    Validate rules (cairel validate)
+    List available presets (cairel list)
+    Show help (cairel --help)
 ```
 
-**Bootstrap Command**: Shows kiro-cli where to find ordaiv's .ai/ directory:
+**Bootstrap Command**: Shows kiro-cli where to find cairel's .ai/ directory:
 ```bash
-ordaiv bootstrap
+cairel bootstrap
 
 # Output:
 ✓ Ready to bootstrap project
 
 Copy this for kiro-cli:
 
-Read /usr/local/lib/node_modules/ordaiv/.ai/KICKOFF-PROMPT.txt
+Read /usr/local/lib/node_modules/cairel/.ai/KICKOFF-PROMPT.txt
 and follow the new.md protocol to initialize this project.
 ```
 
@@ -120,7 +120,7 @@ and follow the new.md protocol to initialize this project.
 - Error reporting
 
 **Exit Criteria**:
-- `ordaiv validate` works
+- `cairel validate` works
 - Rules validated against schema
 - Agents validated against JSON schema
 - Clear error messages
@@ -140,7 +140,7 @@ and follow the new.md protocol to initialize this project.
 - Backup existing files
 
 **Exit Criteria**:
-- `ordaiv update` works
+- `cairel update` works
 - Existing files backed up
 - Updates applied correctly
 - No data loss
@@ -183,8 +183,8 @@ and follow the new.md protocol to initialize this project.
 
 **Exit Criteria**:
 - Published to npm
-- Installable via `npm install -g ordaiv`
-- Works via `npx ordaiv init`
+- Installable via `npm install -g cairel`
+- Works via `npx cairel init`
 - GitHub repository created
 
 **Dependencies**: Stage 7

@@ -2,7 +2,7 @@
 meta:
   id: "multi-environment-management"
   title: "Multi-Environment Management & Protection"
-  author: "ordaiv-core"
+  author: "cairel-core"
   version: "1.0.0"
   category: "backend"
   tags: ["environment", "security", "env-vars", "production-protection"]

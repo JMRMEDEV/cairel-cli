@@ -2,7 +2,7 @@
 meta:
   id: "implementation-approval"
   title: "Implementation Approval Protocol"
-  author: "ordaiv-core"
+  author: "cairel-core"
   version: "1.0.0"
   category: "general"
   tags: ["workflow", "approval", "decision-making", "communication"]

@@ -7,6 +7,12 @@ yarn.lock
 pnpm-lock.yaml
 coverage/
 
+# Compiled test files
+tests/**/*.js
+tests/**/*.d.ts
+tests/**/*.js.map
+tests/**/*.d.ts.map
+
 # Amazon Q History (keep only config.json)
 .amazon-q-history/*
 !.amazon-q-history/config.json
