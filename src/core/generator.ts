@@ -27,7 +27,7 @@ export async function generateFiles(
 
     // Generate agent configuration
     await generateAgent(answers, paths.agentsDir);
-    spinner.succeed(chalk.green('✓ Configuration generated successfully!'));
+    spinner.succeed(chalk.green('Configuration generated successfully!'));
 
     // Show summary
     console.log(chalk.bold('\n📁 Generated files:'));

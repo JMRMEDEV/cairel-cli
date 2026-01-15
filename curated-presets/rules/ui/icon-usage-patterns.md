@@ -18,6 +18,9 @@ meta:
     project-types:
       - ui
       - fullstack
+    ui-library:
+      - chakra-ui
+      - gluestack-ui
   description: >-
     Standardize icon usage across the project with consistent libraries and
     naming conventions.

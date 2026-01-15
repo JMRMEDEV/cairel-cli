@@ -297,6 +297,44 @@ Tell kiro-cli where to find cairel's `.ai/KICKOFF-PROMPT.txt` so it can guide us
 
 ---
 
+## 2026-01-15 - Stage 7: Testing & Polish 🚧 IN PROGRESS
+
+### Manual Testing & Bug Fixes
+
+**Issues Found**:
+1. ❌ Double checkmark in success message (spinner.succeed adds one automatically)
+2. ❌ icon-usage-patterns rule included without UI library selection
+3. ❌ Extra line breaks in agent.json arrays (template formatting issue)
+4. ❌ Validate command didn't support individual files
+5. ⚠️ Custom rules mode not implemented
+6. ⚠️ No review step before file generation
+
+**Fixes Applied** (2026-01-15):
+- ✅ Removed duplicate checkmark from generator success message
+- ✅ Added UI library condition to icon-usage-patterns rule (requires chakra-ui or gluestack-ui)
+- ✅ Rewrote agent template with proper Handlebars formatting (no empty lines)
+- ✅ Enhanced validate command to support:
+  - Individual file validation
+  - Auto-detection of .kiro/ and .amazonq/ directories
+  - Smart file type detection (.md for rules, .json for agents)
+
+**Test Results**:
+- ✅ UI TypeScript Next.js flow works correctly
+- ✅ Backend JavaScript Express flow works correctly
+- ✅ CLI Lua flow works correctly (Lua is valid for CLI tools)
+- ✅ Amazon Q Developer configuration generates correctly
+- ✅ All 62 automated tests passing
+
+**Remaining Work**:
+- ⏳ Implement custom rules mode (Stage 7.5)
+- ⏳ Add review step before file generation (Stage 7.5)
+- ⏳ Final documentation polish
+- ⏳ Error handling improvements
+
+**Next**: Stage 7.5 - Missing Features
+
+---
+
 ## Next Phase: Phase 2 - Implementation (Original)
 
 **Planned Start**: TBD

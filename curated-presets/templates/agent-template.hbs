@@ -42,12 +42,12 @@
   },
   {{/if}}
   "tools": ["*"],
-  "allowedTools": [
-    {{#if MCP_AMAZON_Q_HISTORY}}"@amazon-q-history/*",{{/if}}
-    {{#if MCP_GPT}}"@gpt/*",{{/if}}
-    {{#if MCP_WEB_SCRAPER}}"@web-scraper/*",{{/if}}
-    {{#if MCP_CYPRESS}}"@cypress/*",{{/if}}
-    {{#if MCP_CHAKRA_UI}}"@chakra-ui/*",{{/if}}
+  "allowedTools": [{{#if MCP_AMAZON_Q_HISTORY}}
+    "@amazon-q-history/*",{{/if}}{{#if MCP_GPT}}
+    "@gpt/*",{{/if}}{{#if MCP_WEB_SCRAPER}}
+    "@web-scraper/*",{{/if}}{{#if MCP_CYPRESS}}
+    "@cypress/*",{{/if}}{{#if MCP_CHAKRA_UI}}
+    "@chakra-ui/*",{{/if}}
     "web_fetch"
   ],
   "resources": ["file://{{RULES_PATH}}/*.md"],
@@ -58,12 +58,13 @@
         "./**/*.md",
         "./**/*.yml",
         "./**/*.yaml",
-        "./.gitignore"
-        {{#if TYPESCRIPT}},"./**/*.ts", "./**/*.tsx"{{/if}}
-        {{#if JAVASCRIPT}},"./**/*.js", "./**/*.jsx"{{/if}}
-        {{#if PYTHON}},"./**/*.py"{{/if}}
-        {{#if LUA}},"./**/*.lua"{{/if}}
-        {{#if USE_ENV_VARS}}{{#if ENV_PROD_PROTECTION}},
+        "./.gitignore"{{#if TYPESCRIPT}},
+        "./**/*.ts",
+        "./**/*.tsx"{{/if}}{{#if JAVASCRIPT}},
+        "./**/*.js",
+        "./**/*.jsx"{{/if}}{{#if PYTHON}},
+        "./**/*.py"{{/if}}{{#if LUA}},
+        "./**/*.lua"{{/if}}{{#if USE_ENV_VARS}}{{#if ENV_PROD_PROTECTION}},
         "./**/*.env.dev",
         "./**/*.env.qa",
         "./**/dev.env",
@@ -72,8 +73,7 @@
       ],
       "deniedPaths": [
         "./**/node_modules/",
-        "./**/node_modules/**"
-        {{#if USE_ENV_VARS}}{{#if ENV_PROD_PROTECTION}},
+        "./**/node_modules/**"{{#if USE_ENV_VARS}}{{#if ENV_PROD_PROTECTION}},
         "./**/.env",
         "./**/.env.prod",
         "./**/.env.production",
@@ -87,12 +87,13 @@
         "./**/*.md",
         "./**/*.yml",
         "./**/*.yaml",
-        "./.gitignore"
-        {{#if TYPESCRIPT}},"./**/*.ts", "./**/*.tsx"{{/if}}
-        {{#if JAVASCRIPT}},"./**/*.js", "./**/*.jsx"{{/if}}
-        {{#if PYTHON}},"./**/*.py"{{/if}}
-        {{#if LUA}},"./**/*.lua"{{/if}}
-        {{#if USE_ENV_VARS}}{{#if ENV_PROD_PROTECTION}},
+        "./.gitignore"{{#if TYPESCRIPT}},
+        "./**/*.ts",
+        "./**/*.tsx"{{/if}}{{#if JAVASCRIPT}},
+        "./**/*.js",
+        "./**/*.jsx"{{/if}}{{#if PYTHON}},
+        "./**/*.py"{{/if}}{{#if LUA}},
+        "./**/*.lua"{{/if}}{{#if USE_ENV_VARS}}{{#if ENV_PROD_PROTECTION}},
         "./**/*.env.dev",
         "./**/*.env.qa",
         "./**/dev.env",
@@ -101,8 +102,7 @@
       ],
       "deniedPaths": [
         "./**/node_modules/",
-        "./**/node_modules/**"
-        {{#if USE_ENV_VARS}}{{#if ENV_PROD_PROTECTION}},
+        "./**/node_modules/**"{{#if USE_ENV_VARS}}{{#if ENV_PROD_PROTECTION}},
         "./**/.env",
         "./**/.env.prod",
         "./**/.env.production",
@@ -114,20 +114,15 @@
       "allowedCommands": [
         "ls -la*",
         "pwd",
-        "find*"
-        {{#if USE_GIT}},
+        "find*"{{#if USE_GIT}},
         "git status",
         "git fetch",
         "git diff*",
-        "git log*"{{/if}}
-        {{#if PACKAGE_MANAGER_NPM}},
+        "git log*"{{/if}}{{#if PACKAGE_MANAGER_NPM}},
         "npm install",
-        "npm test*"{{/if}}
-        {{#if PACKAGE_MANAGER_YARN}},
-        "yarn*"{{/if}}
-        {{#if PACKAGE_MANAGER_PNPM}},
-        "pnpm*"{{/if}}
-        {{#if TYPESCRIPT}},
+        "npm test*"{{/if}}{{#if PACKAGE_MANAGER_YARN}},
+        "yarn*"{{/if}}{{#if PACKAGE_MANAGER_PNPM}},
+        "pnpm*"{{/if}}{{#if TYPESCRIPT}},
         "npx tsc --noEmit"{{/if}}
       ],
       "deniedCommands": [

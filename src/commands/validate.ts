@@ -6,18 +6,81 @@ import { Validator } from '../core/validator.js';
 
 export const validateCommand = new Command('validate')
   .description('Validate rule and agent configuration files')
-  .option('-r, --rules <path>', 'Path to rules directory')
-  .option('-a, --agents <path>', 'Path to agents directory')
+  .argument('[path]', 'Path to file or directory to validate')
+  .option('-r, --rules', 'Validate as rules (default: auto-detect)')
+  .option('-a, --agents', 'Validate as agents (default: auto-detect)')
   .option('--fix', 'Attempt to auto-fix issues (not implemented yet)')
-  .action(async (options) => {
+  .action(async (targetPath, options) => {
     const validator = new Validator();
     let hasErrors = false;
+
+    // If no path provided, auto-detect
+    if (!targetPath) {
+      const cwd = process.cwd();
+      const kiroRules = path.join(cwd, '.kiro', 'steering');
+      const kiroAgents = path.join(cwd, '.kiro', 'agents');
+      const amazonqRules = path.join(cwd, '.amazonq', 'rules');
+      const amazonqAgents = path.join(cwd, '.amazonq', 'cli-agents');
+
+      const fs = await import('fs');
+      
+      if (fs.existsSync(kiroRules)) {
+        options.rules = kiroRules;
+      } else if (fs.existsSync(amazonqRules)) {
+        options.rules = amazonqRules;
+      }
+
+      if (fs.existsSync(kiroAgents)) {
+        options.agents = kiroAgents;
+      } else if (fs.existsSync(amazonqAgents)) {
+        options.agents = amazonqAgents;
+      }
+
+      if (!options.rules && !options.agents) {
+        console.log(chalk.yellow('\n⚠ No configuration found. Use --rules or --agents to specify a path.'));
+        process.exit(1);
+      }
+    } else {
+      // Check if path is file or directory
+      const fs = await import('fs');
+      const stats = fs.statSync(targetPath);
+      
+      if (stats.isFile()) {
+        // Validate single file
+        const ext = path.extname(targetPath);
+        if (ext === '.md') {
+          options.rules = targetPath;
+        } else if (ext === '.json') {
+          options.agents = targetPath;
+        } else {
+          console.log(chalk.red(`\n✗ Unsupported file type: ${ext}`));
+          process.exit(1);
+        }
+      } else {
+        // Auto-detect directory type
+        if (!options.rules && !options.agents) {
+          options.rules = targetPath;
+        }
+      }
+    }
 
     // Validate rules
     if (options.rules) {
       const spinner = ora('Validating rules...').start();
-      const rulesPath = path.resolve(process.cwd(), options.rules);
-      const results = await validator.validateRulesDirectory(rulesPath);
+      const rulesPath = typeof options.rules === 'string' ? path.resolve(process.cwd(), options.rules) : options.rules;
+      
+      const fs = await import('fs');
+      const stats = fs.statSync(rulesPath);
+      
+      let results;
+      if (stats.isFile()) {
+        // Validate single file
+        const result = await validator.validateRule(rulesPath);
+        results = new Map([[path.basename(rulesPath), result]]);
+      } else {
+        // Validate directory
+        results = await validator.validateRulesDirectory(rulesPath);
+      }
 
       spinner.stop();
 

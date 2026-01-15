@@ -194,6 +194,47 @@ and follow the new.md protocol to initialize this project.
 
 **Dependencies**: Stage 6
 
+**Status**: 🚧 IN PROGRESS (2026-01-15)
+
+**Completed**:
+- ✅ Manual testing performed
+- ✅ Fixed double checkmark in success message
+- ✅ Fixed icon-usage-patterns rule condition (requires UI library)
+- ✅ Fixed agent template formatting (no empty lines in arrays)
+- ✅ Enhanced validate command (supports individual files + auto-detection)
+- ✅ Comprehensive test coverage (62 tests, all passing)
+
+**Remaining**:
+- ⏳ Implement custom rules mode
+- ⏳ Add review step before file generation
+- ⏳ Final documentation polish
+- ⏳ Error handling improvements
+
+---
+
+## Stage 7.5: Missing Features (Identified during testing)
+
+**Objective**: Implement features identified during manual testing
+
+**Scope**:
+1. **Custom Rules Mode**
+   - Interactive rule creator wizard
+   - Custom rule template generation
+   - Validation of custom rules
+
+2. **Review Step Before Generation**
+   - Show list of rules and agents to be generated
+   - Display descriptions
+   - Allow user to toggle/deselect items
+   - Confirm before writing files
+
+**Exit Criteria**:
+- Custom mode creates valid rules
+- Review step allows rule selection
+- User can cancel before file generation
+
+**Dependencies**: Stage 7
+
 ---
 
 ## Stage 8: npm Publication
