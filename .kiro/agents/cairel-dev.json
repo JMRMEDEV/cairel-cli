@@ -110,7 +110,8 @@
         "find*",
         "cd",
         "tail",
-        "mkdir"
+        "mkdir",
+        "cat"
       ],
       "deniedCommands": [
         "rm -rf *",

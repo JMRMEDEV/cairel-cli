@@ -5,6 +5,7 @@ import inquirer from 'inquirer';
 import chalk from 'chalk';
 import { initCommand } from './commands/init.js';
 import { validateCommand } from './commands/validate.js';
+import { listCommand } from './commands/list.js';
 
 const program = new Command();
 
@@ -44,13 +45,7 @@ program
 
 program.addCommand(validateCommand);
 
-program
-  .command('list')
-  .description('List available presets')
-  .action(() => {
-    console.log(chalk.blue('📋 Available presets:'));
-    console.log(chalk.yellow('⚠️  Not implemented yet'));
-  });
+program.addCommand(listCommand);
 
 // Getting started menu when no command provided
 if (process.argv.length === 2) {

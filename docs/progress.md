@@ -251,6 +251,29 @@ Tell kiro-cli where to find cairel's `.ai/KICKOFF-PROMPT.txt` so it can guide us
 
 ---
 
+### Stage 5.5: List Command ✅ COMPLETE
+
+**Completed** (2026-01-15):
+- ✅ List command implementation
+- ✅ Display all rules grouped by category
+- ✅ Show rule descriptions and conditions
+- ✅ Support --rules filter (rules only)
+- ✅ Support --agents filter (agents only)
+- ✅ Support --category filter (filter by category)
+- ✅ Visual formatting with emojis and separators
+- ✅ Handle boolean and array conditions
+
+**Exit Criteria Met**:
+- ✅ `cairel list` shows all rules
+- ✅ `cairel list --rules` shows only rules
+- ✅ `cairel list --agents` shows only agents
+- ✅ `cairel list --category typescript` filters by category
+- ✅ Clear, formatted output with descriptions
+
+**Next**: Stage 6 - Update Command
+
+---
+
 ## Next Phase: Phase 2 - Implementation (Original)
 
 **Planned Start**: TBD

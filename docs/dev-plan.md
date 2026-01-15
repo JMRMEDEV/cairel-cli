@@ -129,6 +129,30 @@ and follow the new.md protocol to initialize this project.
 
 ---
 
+## Stage 5.5: List Command
+
+**Objective**: Implement list command to display available rules and agents
+
+**Scope**:
+- List command implementation
+- Display rules grouped by category
+- Show descriptions and conditions
+- Filter options (--rules, --agents, --category)
+- Visual formatting with emojis
+
+**Exit Criteria**:
+- `cairel list` shows all rules
+- `cairel list --rules` shows only rules
+- `cairel list --agents` shows only agents
+- `cairel list --category <category>` filters by category
+- Clear, formatted output
+
+**Dependencies**: Stage 4 (rules manifest)
+
+**Status**: ✅ Complete (2026-01-15)
+
+---
+
 ## Stage 6: Update Command
 
 **Objective**: Implement update functionality
