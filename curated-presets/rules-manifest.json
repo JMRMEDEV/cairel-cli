@@ -8,6 +8,22 @@
       "alwaysInclude": true
     },
     {
+      "id": "development-workflow-meta",
+      "title": "Development Workflow and Rule Application",
+      "description": "Systematic rule application based on development context for consistent code quality.",
+      "category": "general",
+      "alwaysInclude": false,
+      "conditions": {
+        "projectTypes": [
+          "ui",
+          "backend",
+          "cli",
+          "library",
+          "fullstack"
+        ]
+      }
+    },
+    {
       "id": "eslint-configuration",
       "title": "ESLint Configuration & Compliance",
       "description": "Enforce code quality and consistency through ESLint configuration and automatic fixes.",
@@ -25,6 +41,22 @@
       "description": "Require explicit human approval before implementing high-level architectural or design decisions.",
       "category": "general",
       "alwaysInclude": true
+    },
+    {
+      "id": "markdown-maintenance",
+      "title": "Markdown Maintenance for AI Context",
+      "description": "Maintain accurate line numbers and navigation in markdown files for efficient AI context retrieval.",
+      "category": "general",
+      "alwaysInclude": false,
+      "conditions": {
+        "projectTypes": [
+          "ui",
+          "backend",
+          "cli",
+          "library",
+          "fullstack"
+        ]
+      }
     },
     {
       "id": "package-json-management",
@@ -186,6 +218,21 @@
       }
     },
     {
+      "id": "react-native-component-patterns",
+      "title": "React Native Component Patterns (GlueStack UI v1)",
+      "description": "Strict patterns for React Native component creation with GlueStack UI v1 themed components.",
+      "category": "ui",
+      "alwaysInclude": false,
+      "conditions": {
+        "frameworks": [
+          "react-native"
+        ],
+        "uiLibrary": [
+          "gluestack-ui"
+        ]
+      }
+    },
+    {
       "id": "visual-verification",
       "title": "Visual Verification for UI Changes",
       "description": "Verify UI changes through screenshot analysis and evidence-based validation before completion.",
@@ -206,6 +253,35 @@
       "alwaysInclude": false,
       "conditions": {
         "requiresEnvVars": true
+      }
+    },
+    {
+      "id": "lua-semantic-versioning",
+      "title": "Lua Library Semantic Versioning",
+      "description": "Maintain proper semantic versioning for Lua libraries through metadata file updates.",
+      "category": "lua",
+      "alwaysInclude": false,
+      "conditions": {
+        "languages": [
+          "lua"
+        ],
+        "projectTypes": [
+          "library",
+          "cli"
+        ]
+      }
+    },
+    {
+      "id": "test-cleanup-protocol",
+      "title": "Temporary Test File Cleanup Protocol",
+      "description": "Manage temporary test files created for validation without polluting the repository.",
+      "category": "testing",
+      "alwaysInclude": false,
+      "conditions": {
+        "projectTypes": [
+          "library",
+          "cli"
+        ]
       }
     }
   ]

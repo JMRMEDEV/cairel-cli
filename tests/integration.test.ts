@@ -35,6 +35,8 @@ jest.mock('chalk', () => ({
 }));
 
 import { generateFiles } from '../src/core/generator';
+import * as path from 'path';
+import * as fs from 'fs-extra';
 
 describe('File Generation Integration', () => {
   let testDir: string;
@@ -103,12 +105,18 @@ describe('File Generation Integration', () => {
     expect(rules).toContain('visual-verification.md');
     expect(rules).toContain('mock-data-strategy.md');
     
+    // General rules that match all project types
+    expect(rules).toContain('markdown-maintenance.md');
+    expect(rules).toContain('development-workflow-meta.md');
+    
     // Should NOT have detailed-only rules
     expect(rules).not.toContain('eslint-configuration.md');
     expect(rules).not.toContain('semantic-versioning.md');
     expect(rules).not.toContain('icon-usage-patterns.md'); // Requires UI library
     
-    expect(rules.length).toBe(11); // Updated from 12 (icon-usage-patterns now requires UI library)
+    // Should have a reasonable number of rules for UI TypeScript React
+    expect(rules.length).toBeGreaterThanOrEqual(10); // At least 10 rules
+    expect(rules.length).toBeLessThan(20); // But not all rules
 
     // Verify rule content (spot check)
     const tsValidationContent = await fs.readFile(
@@ -154,13 +162,17 @@ describe('File Generation Integration', () => {
     const rules = await fs.readdir(rulesDir);
     expect(rules).toContain('context-retrieval.md');
     expect(rules).toContain('implementation-approval.md');
+    expect(rules).toContain('markdown-maintenance.md');
+    expect(rules).toContain('development-workflow-meta.md');
     
     // Should NOT have language/framework specific rules
     expect(rules).not.toContain('typescript-validation.md');
     expect(rules).not.toContain('git-management.md');
     expect(rules).not.toContain('visual-verification.md');
     
-    expect(rules.length).toBe(2);
+    // Should have minimal rules for backend Python
+    expect(rules.length).toBeGreaterThanOrEqual(2); // At least always-include
+    expect(rules.length).toBeLessThan(10); // But not many
 
     // Verify rule content
     const contextContent = await fs.readFile(

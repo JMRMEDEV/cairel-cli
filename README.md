@@ -1,227 +1,360 @@
-# Cairel - AI-Driven Development Initialization Tool
+# Cairel - AI Development Configuration Tool
 
-**Status**: Phase 1 Complete ✅ | Ready for Phase 2 Implementation
+**Standardize your AI-driven development workflow in minutes.**
 
----
+Cairel generates consistent, project-specific configurations for AI coding assistants like [kiro-cli](https://kiro.dev) and [Amazon Q Developer](https://aws.amazon.com/q/developer/), eliminating manual setup and ensuring best practices across your projects.
 
-## Overview
-
-Cairel is an npm-published CLI tool for initializing AI-driven development projects with standardized rules, agent configurations, and MCP server setups.
-
-### Problem
-
-Developers using AI tools (kiro-cli, Amazon Q Developer) manually copy/paste rules and agent configurations between projects, leading to inconsistency, wasted time, and no standardization.
-
-### Solution
-
-Interactive CLI tool that generates AI configurations through a wizard, with:
-- 17 curated, project-agnostic rules
-- Wizard-driven agent generation
-- MCP server auto-detection
-- Support for kiro-cli and Amazon Q Developer
+[![npm version](https://img.shields.io/npm/v/cairel.svg)](https://www.npmjs.com/package/cairel)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
 
-## Phase 1 Complete ✅
+## Why Cairel?
 
-### Deliverables
+**The Problem**: Developers manually copy/paste AI assistant rules and configurations between projects, leading to:
+- ❌ Inconsistent AI behavior across projects
+- ❌ Time wasted on repetitive setup
+- ❌ Outdated or incomplete rule sets
+- ❌ No standardization across teams
 
-**17 Curated Rules**:
-- **General** (6): context-retrieval, implementation-approval, package-manager-safety, semantic-versioning, eslint-configuration, package-json-management
-- **TypeScript** (4): typescript-validation, component-structure, react-props-destructuring, absolute-imports
-- **Git** (1): git-management
-- **UI** (5): visual-verification, mock-data-strategy, icon-usage-patterns, chakra-ui-v3-integration, gluestack-ui-v1-themed
-- **Backend** (1): multi-environment-management
-
-**Templates**:
-- Wizard-driven agent template (Handlebars)
-- General development agent preset
-
-**Documentation**:
-- Complete architecture design
-- Stage-based development plan
-- Wizard configuration specification
-- Future vision (carm package manager)
+**The Solution**: Cairel provides:
+- ✅ **17 curated, battle-tested rules** for AI assistants
+- ✅ **Interactive wizard** for project-specific configuration
+- ✅ **Automatic MCP server detection** and setup
+- ✅ **Support for multiple AI tools** (kiro-cli, Amazon Q Developer)
+- ✅ **Customizable rule selection** with review step
 
 ---
 
-## What Cairel Generates
+## Quick Start
 
-When you run `cairel init`, it creates:
+### Installation
+
+```bash
+npm install -g cairel
+```
+
+### Initialize Your Project
+
+```bash
+cd your-project
+cairel init
+```
+
+### Follow the Interactive Wizard
+
+```
+🚀 Cairel - AI Development Initialization
+
+? How would you like to configure your project?
+  ❯ Quick Setup (High-level, recommended)
+    Detailed Setup (Granular control)
+    Custom (Select specific rules)
+
+? What type of project is this? UI (Frontend)
+? Primary language? TypeScript
+? Framework? React
+? Use Git for version control? Yes
+? Which AI tool(s) will you use? kiro-cli
+✔ Found 5 MCP server(s)
+? Select MCP servers to configure: 
+  ◉ amazon-q-history (/home/user/mcp-servers/amazon-q-history)
+  ◉ gpt (/home/user/mcp-servers/gpt)
+  ◯ web-scraper (/home/user/mcp-servers/web-scraper)
+
+? Would you like to review and customize the rules? (y/N)
+```
+
+### What Gets Generated
+
+Cairel creates a complete AI configuration in your project:
 
 **For kiro-cli:**
 ```
 .kiro/
 ├── agents/
-│   └── dev-agent.json          # Generated agent configuration
+│   └── agent.json          # AI agent configuration
 └── steering/
-    ├── context-retrieval.md    # Selected rules based on wizard
+    ├── context-retrieval.md
     ├── implementation-approval.md
-    └── ... (other selected rules)
+    ├── typescript-validation.md
+    ├── component-structure.md
+    ├── git-management.md
+    └── ... (more rules based on your project)
 ```
 
 **For Amazon Q Developer:**
 ```
 .amazonq/
 ├── cli-agents/
-│   └── dev-agent.json          # Generated agent configuration
+│   └── agent.json
 └── rules/
-    ├── context-retrieval.md    # Selected rules based on wizard
-    ├── implementation-approval.md
-    └── ... (other selected rules)
+    └── ... (same rules as above)
 ```
-
-**What is NOT generated:**
-- `.ai/` directory (that's cairel-specific, not for user projects)
-- `docs/` directory (user creates their own)
-- Source code (cairel only generates AI configurations)
 
 ---
 
-## Quick Start (After Implementation)
+## Features
+
+### 🎯 Three Configuration Modes
+
+**Quick Setup** (Recommended)
+- 6 simple questions
+- Automatic rule selection based on your stack
+- Perfect for most projects
+
+**Detailed Setup**
+- 12 questions for fine-grained control
+- Configure testing, linting, UI libraries, package managers
+- Ideal for complex projects
+
+**Custom Mode**
+- Select specific rules from all 17 available
+- Full control over your configuration
+- Great for specialized workflows
+
+### 📋 Optional Review Step
+
+Before generating files, optionally review and customize:
+- See all selected rules with descriptions
+- Toggle rules on/off with checkboxes
+- Ensure you get exactly what you need
+
+### 🔌 Automatic MCP Server Detection
+
+Cairel automatically detects installed MCP servers:
+- amazon-q-history (session tracking)
+- gpt (ChatGPT integration)
+- web-scraper (web testing)
+- cypress (E2E testing)
+- chakra-ui (component reference)
+
+### 📦 17 Curated Rules
+
+**General** (6 rules)
+- Context retrieval & token optimization
+- Implementation approval protocol
+- Package manager safety
+- Semantic versioning
+- ESLint configuration
+- Package.json management
+
+**TypeScript** (4 rules)
+- TypeScript validation
+- Component structure
+- React props destructuring
+- Absolute imports
+
+**Git** (1 rule)
+- Git management & commit standards
+
+**UI** (5 rules)
+- Visual verification
+- Mock data strategy
+- Icon usage patterns
+- Chakra UI v3 integration
+- GlueStack UI v1 integration
+
+**Backend** (1 rule)
+- Multi-environment management
+
+---
+
+## Usage Examples
+
+### Example 1: React TypeScript Frontend
 
 ```bash
-# Install globally
-npm install -g cairel
-
-# Step 1: Initialize AI configuration
-cd my-project
 cairel init
-
-# Follow wizard
-? How would you like to configure? 
-  ❯ Quick Setup (High-level, recommended)
-    Detailed Setup (Granular control)
-    Custom (Select specific rules)
-
-# Quick Setup example:
-? Project type? UI
-? Language? TypeScript
-? Framework? React
-? Use Git? Yes
-? AI tools? kiro-cli
-? MCP servers? [Select from detected]
-? Would you like to review and customize the rules? (y/N)
-
-# If you choose to review:
-? Select rules to include (uncheck to exclude):
-  ◉ context retrieval - Minimize token usage...
-  ◉ implementation approval - Require explicit approval...
-  ◉ typescript validation - Mandatory compilation...
-  ...
-? Proceed with 11 rule(s)? (Y/n)
-
-# Step 2: Bootstrap project documentation
-cairel bootstrap
-
-# Copy the output and paste into kiro-cli:
-# Read /usr/local/lib/node_modules/cairel/.ai/KICKOFF-PROMPT.txt
-# and follow the new.md protocol to initialize this project.
-
-# Step 3: Use kiro-cli
-kiro chat --agent dev-agent
-# Paste the bootstrap instructions
-# Kiro will guide you through creating:
-# - README.md
-# - docs/dev-plan.md
-# - docs/architecture.md
-# - docs/progress.md
-# - docs/bugs.md
+# Select: Quick Setup → UI → TypeScript → React → Yes (Git) → kiro-cli
 ```
 
----
+**Generated rules**: context-retrieval, implementation-approval, typescript-validation, component-structure, react-props-destructuring, git-management, visual-verification, mock-data-strategy, package-manager-safety, package-json-management, absolute-imports
 
-## Documentation
-
-All documentation in `docs/` directory:
-
-- **README.md** - Project overview
-- **PROJECT-SPEC.md** - Complete specification
-- **architecture.md** - System architecture
-- **dev-plan.md** - Stage-based development plan
-- **progress.md** - Development progress log
-- **WIZARD-CONFIG.md** - Wizard specification (in curated-presets/)
-- **QUICK-REFERENCE.md** - Quick reference guide
-- **FUTURE.md** - carm vision
-
----
-
-## Project Structure
-
-```
-cairel/
-├── src/                    # TypeScript source (Phase 2)
-├── curated-presets/
-│   ├── rules/              # 17 curated rules
-│   ├── agents/             # Agent presets
-│   ├── templates/          # Handlebars templates
-│   └── WIZARD-CONFIG.md    # Wizard specification
-├── docs/                   # All documentation
-├── .ai/                    # Cairel's own AI config
-├── README.md               # This file
-└── package.json            # (Phase 2)
-```
-
----
-
-## Tech Stack
-
-- **Language**: TypeScript
-- **CLI**: Commander.js + Inquirer.js
-- **Templating**: Handlebars
-- **Validation**: Zod + AJV
-- **Utilities**: fs-extra, glob, chalk, ora
-
----
-
-## Next Steps: Phase 2
-
-1. Initialize TypeScript project
-2. Implement CLI framework
-3. Implement wizard
-4. Implement file generation
-5. Implement validation
-6. Testing and polish
-7. npm publication
-
-**Estimated**: 17-24 hours
-
----
-
-## Future: carm
-
-npm-like package manager for AI rules:
+### Example 2: Python Backend API
 
 ```bash
-carm install @cairel/typescript-rules
-carm search "react native"
-carm publish my-custom-rules
+cairel init
+# Select: Quick Setup → Backend → Python → FastAPI → Yes (Git) → Amazon Q
 ```
 
-See `docs/FUTURE.md` for complete vision.
+**Generated rules**: context-retrieval, implementation-approval, git-management
+
+### Example 3: Custom Configuration
+
+```bash
+cairel init
+# Select: Custom → Select specific rules → Choose only what you need
+```
+
+---
+
+## Commands
+
+### `cairel init`
+Initialize AI configuration for your project.
+
+**Options:**
+- Interactive wizard guides you through setup
+- Generates agent configuration and rules
+- Detects and configures MCP servers
+
+### `cairel bootstrap`
+Show path to Cairel's project initialization template.
+
+Use this with kiro-cli to set up comprehensive project documentation:
+```bash
+cairel bootstrap
+# Copy the output and paste into kiro-cli
+```
+
+### `cairel update`
+Update existing configuration with new rules or settings.
+
+**Features:**
+- Backs up existing files
+- Preserves custom rules
+- Selective updates (rules only, agents only, or both)
+
+### `cairel validate`
+Validate rule files and agent configurations.
+
+```bash
+cairel validate                    # Validate all
+cairel validate path/to/rule.md    # Validate specific file
+cairel validate --rules            # Validate rules only
+cairel validate --agents           # Validate agents only
+```
+
+### `cairel list`
+List all available rules and their descriptions.
+
+```bash
+cairel list                        # Show all
+cairel list --rules                # Rules only
+cairel list --category typescript  # Filter by category
+```
+
+---
+
+## Configuration
+
+### Supported AI Tools
+
+- **kiro-cli**: Creates `.kiro/` directory structure
+- **Amazon Q Developer**: Creates `.amazonq/` directory structure
+- **Both**: Creates both directory structures
+
+### Supported Languages
+
+- TypeScript
+- JavaScript
+- Python
+- Lua
+
+### Supported Frameworks
+
+**Frontend:**
+- React
+- React Native
+- Next.js
+- Vue
+
+**Backend:**
+- Express
+- Fastify
+- NestJS
+- Flask
+- Django
+- FastAPI
+
+---
+
+## Best Practices
+
+### 1. Start with Quick Setup
+Most projects work great with Quick Setup. You can always run `cairel update` later.
+
+### 2. Review Your Rules
+Use the optional review step to understand what rules will be applied.
+
+### 3. Customize as Needed
+Don't hesitate to use Custom mode for specialized projects.
+
+### 4. Keep Rules Updated
+Run `cairel update` periodically to get improved rules.
+
+### 5. Version Control Your Configuration
+Commit the generated `.kiro/` or `.amazonq/` directories to your repository.
+
+---
+
+## Troubleshooting
+
+### MCP Servers Not Detected
+
+Cairel looks for MCP servers in:
+- `/home/user/mcp-servers/`
+- `~/.mcp-servers/`
+- `./node_modules/@mcp/`
+
+If your servers aren't detected, you can still configure them manually in the generated `agent.json`.
+
+### Rules Not Working as Expected
+
+1. Validate your configuration: `cairel validate`
+2. Check rule descriptions: `cairel list`
+3. Review the generated files in `.kiro/steering/` or `.amazonq/rules/`
+
+### Need to Change Configuration
+
+Run `cairel update` to modify your existing setup without losing custom changes.
+
+---
+
+## Technical Documentation
+
+For developers and advanced users:
+
+- **[Architecture](docs/architecture.md)** - System design and components
+- **[Development Plan](docs/dev-plan.md)** - Stage-based implementation
+- **[Progress](docs/progress.md)** - Development history and status
+- **[Testing](docs/TESTING.md)** - Test suite and coverage
+- **[Quick Reference](docs/QUICK-REFERENCE.md)** - Technical quick reference
+- **[Future Vision](docs/FUTURE.md)** - carm package manager concept
 
 ---
 
 ## Contributing
 
-Phase 1 complete. Phase 2 (implementation) coming soon.
+Contributions are welcome! Please see our [contributing guidelines](CONTRIBUTING.md) for details.
 
-Contribution guidelines will be available after Phase 2.
+### Ways to Contribute
+
+- **Submit new rules** - Share your AI assistant best practices
+- **Report bugs** - Help us improve reliability
+- **Suggest features** - Tell us what you need
+- **Improve documentation** - Make Cairel easier to use
 
 ---
 
 ## License
 
-MIT
+MIT © [JMRMEDEV](https://github.com/JMRMEDEV)
 
 ---
 
-## Author
+## Support
 
-JMRMEDEV
+- **Issues**: [GitHub Issues](https://github.com/JMRMEDEV/cairel-cli/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/JMRMEDEV/cairel-cli/discussions)
 
 ---
 
-**Last Updated**: 2026-01-14  
-**Phase**: 1 (Complete)  
-**Next**: Phase 2 - Implementation
+## Acknowledgments
+
+Rules and patterns abstracted from real-world AI-driven development projects using kiro-cli and Amazon Q Developer.
+
+---
+
+**Made with ❤️ for the AI-driven development community**

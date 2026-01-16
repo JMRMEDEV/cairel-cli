@@ -131,6 +131,75 @@ fs_read({
 - Visual comparison tools
 - Accessibility checkers
 
+### Test ID Strategy
+
+**For testable components, add data-testid attributes:**
+
+**Naming Convention:**
+- Root component: `<component-name>`
+- Subcomponents: `<component-name>-<subcomponent-name>`
+- Use kebab-case for all test ID values
+
+**React Props Convention:**
+```typescript
+interface IButtonProps extends ButtonProps {
+  dataTestId?: string;  // camelCase prop
+}
+
+export const Button: React.FC<IButtonProps> = ({
+  dataTestId = 'button',
+  ...rest
+}) => {
+  return (
+    <ChakraButton data-testid={dataTestId} {...rest}>
+      {children}
+    </ChakraButton>
+  );
+};
+```
+
+**Usage:**
+```typescript
+<Button dataTestId="button-primary">Primary</Button>
+<Avatar dataTestId="avatar-profile" />
+<Input dataTestId="input-email" />
+```
+
+### Element Inspection
+
+**Use element inspection tools to verify components:**
+
+```bash
+# Inspect by test ID (recommended)
+inspect_element --selector '[data-testid="landing-section"]' --url http://localhost:3000
+
+# Inspect by CSS class (fallback)
+inspect_element --selector '.chakra-stack' --url http://localhost:3000
+
+# Inspect specific CSS properties
+inspect_element --selector '[data-testid="button"]' --url http://localhost:3000 --properties '["background-color", "color"]'
+```
+
+**Selector Priority:**
+1. Test ID selectors: `[data-testid="component-name"]` (most reliable)
+2. CSS class selectors: `.chakra-component` (framework-specific)
+3. ID selectors: `#element-id` (traditional)
+4. Element selectors: `button`, `input` (least specific)
+
+### Dev Server Management
+
+**Keep dev server running in background:**
+```bash
+# Start server in background
+nohup yarn dev > dev.log 2>&1 &
+
+# Restart only when necessary (compilation errors, major changes)
+pkill -f "yarn dev" && nohup yarn dev > dev.log 2>&1 &
+
+# Wait for hot reload after changes
+sleep 3
+```
+
 ---
 
 ## ✅ Checklist

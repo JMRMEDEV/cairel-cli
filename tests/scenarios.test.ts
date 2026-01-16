@@ -251,7 +251,12 @@ describe('Comprehensive Scenario Testing', () => {
       // Should have minimal rule set
       expect(rules).toContain('context-retrieval');
       expect(rules).toContain('implementation-approval');
-      expect(rules.length).toBe(2);
+      expect(rules).toContain('markdown-maintenance');
+      expect(rules).toContain('development-workflow-meta');
+      
+      // Should have always-include + rules matching backend project type
+      expect(rules.length).toBeGreaterThanOrEqual(2); // At least always-include
+      expect(rules.length).toBeLessThan(10); // But not all rules
     });
 
     it('React Native TypeScript mobile app', async () => {

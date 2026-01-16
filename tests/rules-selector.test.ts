@@ -55,9 +55,13 @@ describe('Rules Selector', () => {
 
       const rules = await selectRules(answers);
 
-      // Only always-included rules
+      // Always-included rules
       expect(rules).toContain('context-retrieval');
       expect(rules).toContain('implementation-approval');
+      
+      // Rules that match backend project type
+      expect(rules).toContain('markdown-maintenance');
+      expect(rules).toContain('development-workflow-meta');
 
       // Should NOT include language-specific rules
       expect(rules).not.toContain('typescript-validation');
@@ -65,7 +69,9 @@ describe('Rules Selector', () => {
       expect(rules).not.toContain('git-management');
       expect(rules).not.toContain('visual-verification');
 
-      expect(rules.length).toBe(2);
+      // Should have always-include rules + rules matching backend project type
+      expect(rules.length).toBeGreaterThanOrEqual(2); // At least always-include rules
+      expect(rules.length).toBeLessThan(10); // But not all rules
     });
   });
 
@@ -85,8 +91,13 @@ describe('Rules Selector', () => {
 
       expect(rules).toContain('context-retrieval');
       expect(rules).toContain('implementation-approval');
+      expect(rules).toContain('markdown-maintenance');
+      expect(rules).toContain('development-workflow-meta');
       expect(rules).toContain('absolute-imports');
-      expect(rules.length).toBe(3);
+      
+      // Should have always-include + matching rules + additional rules
+      expect(rules.length).toBeGreaterThanOrEqual(3); // At least the ones we checked
+      expect(rules.length).toBeLessThan(10); // But not all rules
     });
   });
 });

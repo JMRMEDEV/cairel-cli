@@ -6,6 +6,7 @@ const yaml = require('js-yaml');
 
 const RULES_BASE = path.join(__dirname, '..', 'curated-presets', 'rules');
 const MANIFEST_PATH = path.join(__dirname, '..', 'curated-presets', 'rules-manifest.json');
+const CATEGORIES_PATH = path.join(__dirname, '..', 'curated-presets', 'categories.json');
 
 async function parseRuleFrontmatter(filePath) {
   const content = await fs.readFile(filePath, 'utf-8');
@@ -40,7 +41,9 @@ async function parseRuleFrontmatter(filePath) {
 }
 
 async function scanRules() {
-  const categories = ['general', 'typescript', 'git', 'ui', 'backend'];
+  // Load categories from config file
+  const categoriesConfig = JSON.parse(await fs.readFile(CATEGORIES_PATH, 'utf-8'));
+  const categories = categoriesConfig.categories;
   const rules = [];
   
   for (const category of categories) {
