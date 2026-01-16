@@ -5,6 +5,8 @@
 Cairel generates consistent, project-specific configurations for AI coding assistants like [kiro-cli](https://kiro.dev) and [Amazon Q Developer](https://aws.amazon.com/q/developer/), eliminating manual setup and ensuring best practices across your projects.
 
 [![npm version](https://img.shields.io/npm/v/cairel.svg)](https://www.npmjs.com/package/cairel)
+[![npm downloads](https://img.shields.io/npm/dm/cairel.svg)](https://www.npmjs.com/package/cairel)
+[![Node.js Version](https://img.shields.io/node/v/cairel.svg)](https://nodejs.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ---
