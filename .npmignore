@@ -1,0 +1,34 @@
+# Source material (not needed in published package)
+agents-compendium/
+projects-rules-compendium/
+standard-useful-mcp-servers.md
+
+# Development files
+src/
+tests/
+.kiro/
+.amazon-q-history/
+*.test.ts
+jest.config.js
+tsconfig.json
+
+# Documentation (keep only essential)
+docs/PHASE-1-SUMMARY.md
+docs/PHASE-1-REVISION.md
+docs/PROJECT-SPEC.md
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db

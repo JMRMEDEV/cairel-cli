@@ -27,6 +27,14 @@
   ],
   "author": "JMRMEDEV",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JMRMEDEV/cairel-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/JMRMEDEV/cairel-cli/issues"
+  },
+  "homepage": "https://github.com/JMRMEDEV/cairel-cli#readme",
   "files": [
     "dist",
     "curated-presets",
