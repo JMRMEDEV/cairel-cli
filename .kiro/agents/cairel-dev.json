@@ -20,19 +20,13 @@
     "web_search"
   ],
   "resources": [
-    "file://.ai/new.md",
-    "file://.ai/KICKOFF-PROMPT.txt",
     "file://.kiro/steering/*.md",
-    "file://docs/*.md",
-    "file://curated-presets/WIZARD-CONFIG.md"
+    "file://docs/*.md"
   ],
   "hooks": {
     "agentSpawn": [
       {
         "command": "echo 'SESSION: Use init_presession first. If session exists, use restore_latest or list_sessions. Only use track_session for new work.'"
-      },
-      {
-        "command": "echo 'ORDAIV DEVELOPMENT: Read .ai/new.md for project initialization protocol'"
       },
       {
         "command": "echo 'CONTEXT MANAGEMENT: Use get_recent_context (default 5 prompts, 10 actions) for safe context retrieval.'"

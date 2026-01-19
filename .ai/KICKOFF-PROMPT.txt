@@ -15,4 +15,11 @@ Begin with the Intake Phase:
 3. Ask for constraints
 4. Ask for success criteria
 
-Confirm before proceeding to tech stack discussion.
+After approval, create the required documentation structure:
+- README.md
+- docs/dev-plan.md (stage-based, no specific dates)
+- docs/architecture.md
+- docs/progress.md
+- docs/bugs.md
+
+Confirm before proceeding to implementation.

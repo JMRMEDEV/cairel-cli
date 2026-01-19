@@ -2,44 +2,8 @@
   "name": "{{AGENT_NAME}}",
   "description": "{{AGENT_DESCRIPTION}}",
   "prompt": "{{AGENT_PROMPT}}",
-  {{#if MCP_AMAZON_Q_HISTORY}}
-  "mcpServers": {
-    {{#if MCP_AMAZON_Q_HISTORY}}
-    "amazon-q-history": {
-      "type": "stdio",
-      "command": "node",
-      "args": ["{{MCP_SERVERS_PATH}}/amazon-q-history/server.js"]
-    }{{#if MCP_GPT}},{{/if}}
-    {{/if}}
-    {{#if MCP_GPT}}
-    "gpt": {
-      "type": "stdio",
-      "command": "node",
-      "args": ["{{MCP_SERVERS_PATH}}/gpt/server.js"]
-    }{{#if MCP_WEB_SCRAPER}},{{/if}}
-    {{/if}}
-    {{#if MCP_WEB_SCRAPER}}
-    "web-scraper": {
-      "type": "stdio",
-      "command": "node",
-      "args": ["{{MCP_SERVERS_PATH}}/web-scraper/server.js"]
-    }{{#if MCP_CYPRESS}},{{/if}}
-    {{/if}}
-    {{#if MCP_CYPRESS}}
-    "cypress": {
-      "type": "stdio",
-      "command": "node",
-      "args": ["{{MCP_SERVERS_PATH}}/cypress/server.js"]
-    }{{#if MCP_CHAKRA_UI}},{{/if}}
-    {{/if}}
-    {{#if MCP_CHAKRA_UI}}
-    "chakra-ui": {
-      "type": "stdio",
-      "command": "node",
-      "args": ["{{MCP_SERVERS_PATH}}/chakra-ui/server.js"]
-    }
-    {{/if}}
-  },
+  {{#if HAS_MCP_SERVERS}}
+  "mcpServers": {{{MCP_SERVERS_JSON}}},
   {{/if}}
   "tools": ["*"],
   "allowedTools": [{{#if MCP_AMAZON_Q_HISTORY}}

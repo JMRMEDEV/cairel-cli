@@ -20,7 +20,7 @@ Cairel generates consistent, project-specific configurations for AI coding assis
 - ❌ No standardization across teams
 
 **The Solution**: Cairel provides:
-- ✅ **17 curated, battle-tested rules** for AI assistants
+- ✅ **22 curated, battle-tested rules** for AI assistants
 - ✅ **Interactive wizard** for project-specific configuration
 - ✅ **Automatic MCP server detection** and setup
 - ✅ **Support for multiple AI tools** (kiro-cli, Amazon Q Developer)
@@ -75,7 +75,7 @@ Cairel creates a complete AI configuration in your project:
 ```
 .kiro/
 ├── agents/
-│   └── agent.json          # AI agent configuration
+│   └── dev-agent.json      # AI agent configuration
 └── steering/
     ├── context-retrieval.md
     ├── implementation-approval.md
@@ -89,7 +89,7 @@ Cairel creates a complete AI configuration in your project:
 ```
 .amazonq/
 ├── cli-agents/
-│   └── agent.json
+│   └── dev-agent.json
 └── rules/
     └── ... (same rules as above)
 ```
@@ -300,7 +300,7 @@ Cairel looks for MCP servers in:
 - `~/.mcp-servers/`
 - `./node_modules/@mcp/`
 
-If your servers aren't detected, you can still configure them manually in the generated `agent.json`.
+If your servers aren't detected, you can still configure them manually in the generated `dev-agent.json`.
 
 ### Rules Not Working as Expected
 

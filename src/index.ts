@@ -3,17 +3,21 @@
 import { Command } from 'commander';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { initCommand } from './commands/init.js';
 import { validateCommand } from './commands/validate.js';
 import { listCommand } from './commands/list.js';
 import { updateCommand } from './commands/update.js';
+
+const packageJson = JSON.parse(readFileSync(join(__dirname, '..', 'package.json'), 'utf-8'));
 
 const program = new Command();
 
 program
   .name('cairel')
   .description('CLI tool for initializing AI-driven development projects')
-  .version('1.0.0');
+  .version(packageJson.version);
 
 program
   .command('init')

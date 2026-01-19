@@ -466,14 +466,81 @@ The package is ready to be published to npm. Follow steps in PUBLISH.md:
 
 **Publication Status**: ✅ **PUBLISHED** (2026-01-16)
 - npm: https://www.npmjs.com/package/cairel
-- Version: 1.0.0
+- Version: 1.0.1
 - GitHub: https://github.com/JMRMEDEV/cairel-cli
 
 **Next**: Monitor issues, gather feedback, plan v1.1.0 features
 
 ---
 
-## Next Phase: Phase 2 - Implementation (Original)
+## 2026-01-19 - v1.0.1 Bug Fix Release ✅ COMPLETE
+
+### Issues Fixed
+
+**1. MCP Servers JSON Generation**
+- Fixed missing commas between MCP server entries
+- Fixed HTML entities (`&quot;`) in generated JSON
+- Changed to triple braces in Handlebars template
+- Updated `buildMcpServersJson()` to return complete JSON object
+
+**2. Agent Filename Mismatch**
+- Agent file now named `dev-agent.json` (matches JSON name property)
+- `generateAgent()` returns agent name for display
+- Summary shows actual filename
+
+**3. Version Management**
+- Version now read dynamically from `package.json`
+- Removed hardcoded version from `src/index.ts`
+- Future updates only require changing `package.json`
+
+**4. Update Command Behavior**
+- Changed to rule manager (checked = keep, unchecked = remove)
+- Renamed option to "Manage rules (add/remove/update)"
+- Added removal tracking and summary display
+- More intuitive user experience
+
+**5. Bootstrap Documentation**
+- KICKOFF-PROMPT.txt explicitly mentions `docs/` directory
+- Dev-plan template emphasizes stage-based approach
+- Clarified sequential stages without specific dates
+
+**6. README Rule Count**
+- Updated from 17 to 22 rules
+
+### Testing
+
+**Test Results**:
+- Test Suites: 10 passed, 10 total
+- Tests: 78 passed, 78 total (74 original + 4 new)
+
+**New Tests Added**:
+- `tests/mcp-json.test.ts` - 4 tests for MCP JSON generation
+  - Validates no HTML entities
+  - Tests single/multiple/no MCP servers
+  - Tests proper comma formatting
+
+**Tests Updated**:
+- `tests/integration.test.ts` - Updated agent filename references
+
+### Files Changed
+
+1. `curated-presets/templates/agent-template.hbs` - MCP JSON generation
+2. `src/core/generator.ts` - Agent filename + MCP JSON builder
+3. `src/commands/update.ts` - Rule manager behavior
+4. `src/index.ts` - Dynamic version reading
+5. `README.md` - Rule count update
+6. `.ai/KICKOFF-PROMPT.txt` - Bootstrap clarity
+7. `.ai/docs-dev-plan-TEMPLATE.md` - Stage-based emphasis
+8. `tests/integration.test.ts` - Agent filename
+9. `tests/mcp-json.test.ts` - New tests
+10. `package.json` - Version bump to 1.0.1
+11. `docs/CHANGELOG.md` - v1.0.1 entry
+
+**Publication Status**: ✅ **READY FOR PUBLICATION**
+
+---
+
+## Next Phase: v1.1.0 Planning
 
 **Planned Start**: TBD
 

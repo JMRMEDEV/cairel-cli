@@ -6,10 +6,10 @@ Comprehensive test coverage for all wizard scenarios and file generation.
 
 ## Test Statistics
 
-- **Total Tests**: 74
-- **Test Suites**: 9
+- **Total Tests**: 78
+- **Test Suites**: 10
 - **Status**: ✅ All Passing
-- **New Tests**: 12 tests for custom mode and review step
+- **Latest Update**: v1.0.1 (2026-01-19)
 
 ---
 
@@ -411,6 +411,14 @@ describe('Wizard Tests', () => {
 **Update Statistics** (1 test):
 - ✅ Show configuration type in output
 
+### 6. MCP JSON Generation Tests (`tests/mcp-json.test.ts`)
+
+**JSON Validation** (4 tests):
+- ✅ Generate valid JSON without HTML entities
+- ✅ Handle single MCP server
+- ✅ Handle no MCP servers
+- ✅ Properly format multiple MCP servers with commas
+
 ## Running Tests
 
 ```bash
@@ -442,7 +450,8 @@ npm run test:coverage
 ✅ **Optional features**: Git, ESLint, UI libraries, versioning, env vars  
 ✅ **AI tools**: kiro-cli, Amazon Q  
 ✅ **File generation**: Directories, rules, agent JSON  
-✅ **Rule selection logic**: Conditions, always-include, additional rules
+✅ **Rule selection logic**: Conditions, always-include, additional rules  
+✅ **MCP server JSON**: Valid JSON, no HTML entities, proper formatting
 
 ## Adding New Tests
 
