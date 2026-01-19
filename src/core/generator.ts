@@ -28,7 +28,7 @@ export async function generateFiles(
     spinner.text = `Copied ${rules.length} rules`;
 
     // Generate agent configuration
-    await generateAgent(answers, paths.agentsDir);
+    const agentName = await generateAgent(answers, paths.agentsDir);
     spinner.succeed(chalk.green('Configuration generated successfully!'));
 
     // Show summary
@@ -36,7 +36,7 @@ export async function generateFiles(
     console.log(chalk.cyan(`  ${paths.rulesDir}/`));
     rules.forEach(rule => console.log(chalk.gray(`    - ${rule}.md`)));
     console.log(chalk.cyan(`  ${paths.agentsDir}/`));
-    console.log(chalk.gray(`    - agent.json`));
+    console.log(chalk.gray(`    - ${agentName}.json`));
   } catch (error) {
     spinner.fail(chalk.red('Failed to generate configuration'));
     throw error;
@@ -91,7 +91,7 @@ async function copyRules(rules: string[], targetDir: string): Promise<void> {
 async function generateAgent(
   answers: QuickSetupAnswers | DetailedSetupAnswers | CustomModeAnswers,
   targetDir: string
-): Promise<void> {
+): Promise<string> {
   const templatePath = join(__dirname, '..', '..', 'curated-presets', 'templates', 'agent-template.hbs');
   const templateContent = await fs.readFile(templatePath, 'utf-8');
   const template = Handlebars.compile(templateContent);
@@ -99,13 +99,19 @@ async function generateAgent(
   const templateVars = buildTemplateVars(answers);
   const agentJson = template(templateVars);
 
-  const targetPath = join(targetDir, 'agent.json');
+  // Use agent name from template vars for filename
+  const agentName = templateVars.AGENT_NAME || 'agent';
+  const targetPath = join(targetDir, `${agentName}.json`);
   await fs.writeFile(targetPath, agentJson, 'utf-8');
+  
+  return agentName;
 }
 
 function buildTemplateVars(answers: QuickSetupAnswers | DetailedSetupAnswers | CustomModeAnswers): Record<string, any> {
   // Handle custom mode
   if ('selectedRules' in answers) {
+    const mcpServersJson = buildMcpServersJson(answers.mcpServers);
+    
     return {
       AGENT_NAME: 'dev-agent',
       AGENT_DESCRIPTION: 'Custom development agent',
@@ -125,12 +131,9 @@ function buildTemplateVars(answers: QuickSetupAnswers | DetailedSetupAnswers | C
       PACKAGE_MANAGER_YARN: false,
       PACKAGE_MANAGER_PNPM: false,
       
+      HAS_MCP_SERVERS: answers.mcpServers.length > 0,
+      MCP_SERVERS_JSON: mcpServersJson,
       MCP_SERVERS_PATH: join(require('os').homedir(), 'mcp-servers'),
-      MCP_AMAZON_Q_HISTORY: answers.mcpServers.includes('amazon-q-history'),
-      MCP_GPT: answers.mcpServers.includes('gpt'),
-      MCP_WEB_SCRAPER: answers.mcpServers.includes('web-scraper'),
-      MCP_CYPRESS: answers.mcpServers.includes('cypress'),
-      MCP_CHAKRA_UI: answers.mcpServers.includes('chakra-ui'),
       
       USE_GIT: false,
       USE_ENV_VARS: false,
@@ -144,6 +147,7 @@ function buildTemplateVars(answers: QuickSetupAnswers | DetailedSetupAnswers | C
   }
   
   const detailed = answers as DetailedSetupAnswers;
+  const mcpServersJson = buildMcpServersJson((answers as QuickSetupAnswers).mcpServers);
   
   return {
     AGENT_NAME: 'dev-agent',
@@ -166,12 +170,9 @@ function buildTemplateVars(answers: QuickSetupAnswers | DetailedSetupAnswers | C
     PACKAGE_MANAGER_PNPM: detailed.packageManager === 'pnpm',
     
     // MCP Servers
+    HAS_MCP_SERVERS: (answers as QuickSetupAnswers).mcpServers.length > 0,
+    MCP_SERVERS_JSON: mcpServersJson,
     MCP_SERVERS_PATH: join(require('os').homedir(), 'mcp-servers'),
-    MCP_AMAZON_Q_HISTORY: (answers as QuickSetupAnswers).mcpServers.includes('amazon-q-history'),
-    MCP_GPT: (answers as QuickSetupAnswers).mcpServers.includes('gpt'),
-    MCP_WEB_SCRAPER: (answers as QuickSetupAnswers).mcpServers.includes('web-scraper'),
-    MCP_CYPRESS: (answers as QuickSetupAnswers).mcpServers.includes('cypress'),
-    MCP_CHAKRA_UI: (answers as QuickSetupAnswers).mcpServers.includes('chakra-ui'),
     
     // Features
     USE_GIT: (answers as QuickSetupAnswers).useGit,
@@ -184,6 +185,22 @@ function buildTemplateVars(answers: QuickSetupAnswers | DetailedSetupAnswers | C
     RULES_PATH: (answers as QuickSetupAnswers).aiTool === 'amazon-q' ? '.amazonq/rules' : '.kiro/steering',
     AGENTS_PATH: (answers as QuickSetupAnswers).aiTool === 'amazon-q' ? '.amazonq/cli-agents' : '.kiro/agents',
   };
+}
+
+function buildMcpServersJson(mcpServers: string[]): string {
+  if (mcpServers.length === 0) return '';
+  
+  const mcpPath = join(require('os').homedir(), 'mcp-servers');
+  const servers = mcpServers.map((server, index) => {
+    const isLast = index === mcpServers.length - 1;
+    return `"${server}": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["${mcpPath}/${server}/server.js"]
+    }${isLast ? '' : ','}`;
+  }).join('\n    ');
+  
+  return `{\n    ${servers}\n  }`;
 }
 
 function generateDescription(answers: QuickSetupAnswers): string {

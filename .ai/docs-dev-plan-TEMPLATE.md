@@ -43,13 +43,33 @@ What this stage accomplishes.
 - [ ] Criterion 1
 - [ ] Criterion 2
 
+**Dependencies**: None (or list previous stages)
+
 **Risks**:
 - Risk description + mitigation
 
 ---
 
 ### Stage 2 – <Name>
-(repeat structure)
+**Objective**:  
+What this stage accomplishes.
+
+**Scope**:
+- Included:
+- Excluded:
+
+**Exit Criteria**:
+- [ ] Criterion 1
+- [ ] Criterion 2
+
+**Dependencies**: Stage 1
+
+**Risks**:
+- Risk description + mitigation
+
+---
+
+(Continue with additional stages as needed)
 
 ---
 
@@ -62,3 +82,7 @@ What this stage accomplishes.
 
 ## 6. Non-Goals
 Explicitly restate what will not be built.
+
+---
+
+**Note**: Stages are sequential and should not include specific dates. Each stage must be completed before moving to the next.

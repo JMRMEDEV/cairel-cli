@@ -1,6 +1,6 @@
 {
   "name": "cairel",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "CLI tool for initializing AI-driven development projects with standardized rules and agent configurations",
   "main": "dist/index.js",
   "bin": {

@@ -2,12 +2,13 @@ import { Command } from 'commander';
 import inquirer from 'inquirer';
 import chalk from 'chalk';
 import ora from 'ora';
-import { existsSync, readdirSync, copyFileSync, mkdirSync, readFileSync } from 'fs';
+import { existsSync, readdirSync, copyFileSync, mkdirSync, readFileSync, unlinkSync } from 'fs';
 import { join } from 'path';
 
 interface UpdateStats {
   added: number;
   updated: number;
+  removed: number;
   preserved: number;
   agentUpdated: boolean;
 }
@@ -103,13 +104,14 @@ export const updateCommand = new Command('update')
     const stats: UpdateStats = {
       added: 0,
       updated: 0,
+      removed: 0,
       preserved: 0,
       agentUpdated: false,
     };
 
     // Update rules
     if (updateType === 'rules' || updateType === 'both') {
-      spinner.start('Updating rules...');
+      spinner.start('Loading available rules...');
       
       const manifestPath = join(__dirname, '../../curated-presets/rules-manifest.json');
       const manifest = JSON.parse(readFileSync(manifestPath, 'utf-8'));
@@ -120,35 +122,113 @@ export const updateCommand = new Command('update')
         .filter(f => f.endsWith('.md') && f !== 'README.md')
         .map(f => f.replace('.md', ''));
 
-      for (const rule of manifest.rules) {
-        const ruleFile = `${rule.id}.md`;
-        const sourcePath = join(curatedRulesPath, rule.category, ruleFile);
-        const targetPath = join(rulesPath, ruleFile);
+      spinner.stop();
 
-        if (!existsSync(sourcePath)) {
-          continue;
-        }
+      // Ask user which rules to update
+      const { ruleUpdateMode } = await inquirer.prompt([
+        {
+          type: 'list',
+          name: 'ruleUpdateMode',
+          message: 'How would you like to update rules?',
+          choices: [
+            { name: 'Update all existing rules', value: 'update-all' },
+            { name: 'Add new rules only', value: 'add-new' },
+            { name: 'Manage rules (add/remove/update)', value: 'manage' },
+          ],
+        },
+      ]);
 
-        if (existingRuleIds.includes(rule.id)) {
-          // Update existing rule
-          copyFileSync(sourcePath, targetPath);
-          stats.updated++;
-        } else {
-          // Add new rule
-          copyFileSync(sourcePath, targetPath);
-          stats.added++;
-        }
+      let rulesToProcess: string[] = [];
+      let rulesToRemove: string[] = [];
+
+      if (ruleUpdateMode === 'update-all') {
+        // Update all existing rules
+        rulesToProcess = existingRuleIds;
+      } else if (ruleUpdateMode === 'add-new') {
+        // Only add rules that don't exist
+        rulesToProcess = manifest.rules
+          .map((r: any) => r.id)
+          .filter((id: string) => !existingRuleIds.includes(id));
+      } else {
+        // Let user select which rules to keep
+        const ruleChoices = manifest.rules.map((rule: any) => ({
+          name: `${rule.id} - ${rule.description} ${existingRuleIds.includes(rule.id) ? '(existing)' : '(new)'}`,
+          value: rule.id,
+          checked: existingRuleIds.includes(rule.id), // Pre-check existing rules
+        }));
+
+        const { selectedRules } = await inquirer.prompt([
+          {
+            type: 'checkbox',
+            name: 'selectedRules',
+            message: 'Select rules to keep (unchecked rules will be removed):',
+            choices: ruleChoices,
+            pageSize: 15,
+            validate: (answer) => {
+              if (answer.length === 0) {
+                return 'You must select at least one rule';
+              }
+              return true;
+            },
+          },
+        ]);
+
+        rulesToProcess = selectedRules;
+        // Rules to remove = existing rules that weren't selected
+        rulesToRemove = existingRuleIds.filter(id => !selectedRules.includes(id));
       }
 
-      // Count preserved custom rules
-      for (const existingRule of existingRuleIds) {
-        const isCustom = !manifest.rules.some((r: any) => r.id === existingRule);
-        if (isCustom) {
-          stats.preserved++;
-        }
-      }
+      if (rulesToProcess.length === 0 && rulesToRemove.length === 0) {
+        spinner.info('No rules to update');
+      } else {
+        spinner.start(`Processing ${rulesToProcess.length} rule(s)...`);
 
-      spinner.succeed('Rules updated');
+        // Remove unchecked rules
+        for (const ruleId of rulesToRemove) {
+          const ruleFile = `${ruleId}.md`;
+          const targetPath = join(rulesPath, ruleFile);
+          
+          if (existsSync(targetPath)) {
+            unlinkSync(targetPath);
+            stats.removed++;
+          }
+        }
+
+        // Add/update selected rules
+        for (const ruleId of rulesToProcess) {
+          const rule = manifest.rules.find((r: any) => r.id === ruleId);
+          if (!rule) continue;
+
+          const ruleFile = `${rule.id}.md`;
+          const sourcePath = join(curatedRulesPath, rule.category, ruleFile);
+          const targetPath = join(rulesPath, ruleFile);
+
+          if (!existsSync(sourcePath)) {
+            continue;
+          }
+
+          if (existingRuleIds.includes(rule.id)) {
+            // Update existing rule
+            copyFileSync(sourcePath, targetPath);
+            stats.updated++;
+          } else {
+            // Add new rule
+            copyFileSync(sourcePath, targetPath);
+            stats.added++;
+          }
+        }
+
+        // Count preserved custom rules (not in manifest)
+        for (const existingRule of existingRuleIds) {
+          const isCustom = !manifest.rules.some((r: any) => r.id === existingRule);
+          const wasRemoved = rulesToRemove.includes(existingRule);
+          if (isCustom && !wasRemoved) {
+            stats.preserved++;
+          }
+        }
+
+        spinner.succeed('Rules updated');
+      }
     }
 
     // Update agents
@@ -171,6 +251,9 @@ export const updateCommand = new Command('update')
       }
       if (stats.updated > 0) {
         console.log(chalk.blue(`  ✓ Updated ${stats.updated} existing rule${stats.updated > 1 ? 's' : ''}`));
+      }
+      if (stats.removed > 0) {
+        console.log(chalk.yellow(`  ✓ Removed ${stats.removed} rule${stats.removed > 1 ? 's' : ''}`));
       }
       if (stats.preserved > 0) {
         console.log(chalk.cyan(`  ✓ Preserved ${stats.preserved} custom rule${stats.preserved > 1 ? 's' : ''}`));

@@ -70,7 +70,7 @@ describe('File Generation Integration', () => {
     expect(await fs.stat(agentsDir)).toBeTruthy();
 
     // Check agent file exists and has correct content
-    const agentFile = join(agentsDir, 'agent.json');
+    const agentFile = join(agentsDir, 'dev-agent.json');
     expect(await fs.stat(agentFile)).toBeTruthy();
 
     const agentContent = await fs.readFile(agentFile, 'utf-8');
@@ -147,7 +147,7 @@ describe('File Generation Integration', () => {
     expect(await fs.stat(agentsDir)).toBeTruthy();
 
     // Check agent content
-    const agentFile = join(agentsDir, 'agent.json');
+    const agentFile = join(agentsDir, 'dev-agent.json');
     const agentContent = await fs.readFile(agentFile, 'utf-8');
     const agent = JSON.parse(agentContent);
 
