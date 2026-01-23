@@ -92,7 +92,7 @@ async function runQuickSetup(): Promise<QuickSetupAnswers> {
       type: 'list',
       name: 'language',
       message: 'Primary language?',
-      choices: ['TypeScript', 'JavaScript', 'Python', 'Lua'],
+      choices: ['TypeScript', 'JavaScript', 'Python', 'Go', 'Lua'],
       filter: (val: string) => val.toLowerCase(),
     },
   ]);
@@ -245,6 +245,9 @@ function getFrameworkChoices(projectType: string, language: string): string[] {
   if (projectType === 'backend' && language === 'python') {
     return ['Flask', 'Django', 'FastAPI', 'None'];
   }
+  if (projectType === 'backend' && language === 'go') {
+    return ['Gin', 'Echo', 'Fiber', 'Chi', 'None'];
+  }
   return ['None'];
 }
 
@@ -254,6 +257,9 @@ function getTestingFrameworkChoices(language: string): string[] {
   }
   if (language === 'python') {
     return ['pytest', 'None'];
+  }
+  if (language === 'go') {
+    return ['testing (built-in)', 'testify', 'None'];
   }
   return ['None'];
 }
@@ -267,6 +273,9 @@ function getLinterChoices(language: string): string[] {
   }
   if (language === 'lua') {
     return ['Luacheck', 'None'];
+  }
+  if (language === 'go') {
+    return ['golangci-lint', 'None'];
   }
   return ['None'];
 }

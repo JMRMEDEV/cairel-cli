@@ -6,6 +6,7 @@
     "ui",
     "backend",
     "lua",
-    "testing"
+    "testing",
+    "golang"
   ]
 }
