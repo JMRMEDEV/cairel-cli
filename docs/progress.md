@@ -609,3 +609,56 @@ The package is ready to be published to npm. Follow steps in PUBLISH.md:
 **Last Updated**: 2026-01-16
 **Phase**: 2 - Stage 7.5 (Complete)
 **Next Phase**: Stage 8 - npm Publication
+
+
+---
+
+## 2026-01-23 - Go Language Support Added ✅ COMPLETE
+
+### New Language & Rule
+
+**Completed** (2026-01-23):
+- ✅ Added Go as supported language
+- ✅ Created comprehensive `go-style-conventions.md` rule
+- ✅ Added `golang` category to categories.json
+- ✅ Updated validator schema with golang category
+- ✅ Added Go to wizard language choices
+- ✅ Added Go frameworks (Gin, Echo, Fiber, Chi)
+- ✅ Added Go testing frameworks (testing, testify)
+- ✅ Added Go linter (golangci-lint)
+- ✅ Created tests for Go support (2 new tests)
+- ✅ Updated README with Go support
+
+**Rule Details**:
+- **File**: `curated-presets/rules/golang/go-style-conventions.md`
+- **Category**: golang
+- **Conditions**: `languages: [go]`, `always-include: true`
+- **Coverage**: Formatting (gofmt), naming conventions, error handling, project structure, context/concurrency, documentation, testing
+
+**Test Results**:
+- Test Suites: 11 passed, 11 total
+- Tests: 80 passed, 80 total (78 original + 2 new Go tests)
+
+**Statistics**:
+- **Total Rules**: 23 (was 22)
+- **Categories**: 8 (was 7)
+- **Supported Languages**: 5 (TypeScript, JavaScript, Python, Go, Lua)
+- **Go Frameworks**: 4 (Gin, Echo, Fiber, Chi)
+
+**Files Changed**:
+1. `curated-presets/categories.json` - Added golang category
+2. `curated-presets/rules/golang/go-style-conventions.md` - New comprehensive rule
+3. `src/core/validator.ts` - Added golang to category enum
+4. `src/core/wizard.ts` - Added Go language, frameworks, testing, linter
+5. `tests/go-support.test.ts` - New test suite
+6. `README.md` - Updated language and framework lists
+7. `docs/progress.md` - This entry
+
+**Exit Criteria Met**:
+- ✅ Rule follows standardized format
+- ✅ All tests passing
+- ✅ Validation successful
+- ✅ Manifest regenerated
+- ✅ Documentation updated
+
+**Next**: Ready for v1.1.0 release with Go support

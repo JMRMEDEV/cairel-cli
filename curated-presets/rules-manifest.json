@@ -283,6 +283,18 @@
           "cli"
         ]
       }
+    },
+    {
+      "id": "go-style-conventions",
+      "title": "Go Style & Best Practices",
+      "description": "Idiomatic Go style, formatting, naming, and error handling conventions",
+      "category": "golang",
+      "alwaysInclude": true,
+      "conditions": {
+        "languages": [
+          "go"
+        ]
+      }
     }
   ]
 }

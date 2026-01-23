@@ -20,7 +20,7 @@ Cairel generates consistent, project-specific configurations for AI coding assis
 - ❌ No standardization across teams
 
 **The Solution**: Cairel provides:
-- ✅ **22 curated, battle-tested rules** for AI assistants
+- ✅ **23 curated, battle-tested rules** for AI assistants
 - ✅ **Interactive wizard** for project-specific configuration
 - ✅ **Automatic MCP server detection** and setup
 - ✅ **Support for multiple AI tools** (kiro-cli, Amazon Q Developer)
@@ -252,6 +252,7 @@ cairel list --category typescript  # Filter by category
 - TypeScript
 - JavaScript
 - Python
+- Go
 - Lua
 
 ### Supported Frameworks
@@ -269,6 +270,10 @@ cairel list --category typescript  # Filter by category
 - Flask
 - Django
 - FastAPI
+- Gin
+- Echo
+- Fiber
+- Chi
 
 ---
 
