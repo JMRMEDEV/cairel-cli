@@ -39,7 +39,10 @@ function matchesConditions(
   rule: RuleDefinition,
   answers: QuickSetupAnswers | DetailedSetupAnswers
 ): boolean {
-  if (rule.alwaysInclude) return true;
+  // Rules with always-include but no conditions are truly universal
+  if (rule.alwaysInclude && !rule.conditions) return true;
+  
+  // Rules without conditions are never auto-included
   if (!rule.conditions) return false;
 
   const detailed = answers as DetailedSetupAnswers;
