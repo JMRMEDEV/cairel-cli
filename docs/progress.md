@@ -764,3 +764,17 @@ The package is ready to be published to npm. Follow steps in PUBLISH.md:
 - ✅ All 80 tests passing
 
 **Next**: Stage 5 - Validation System Update
+
+### Stage 5: Validation System Update ✅ COMPLETE
+
+**Completed**:
+- ✅ Added `SkillFrontmatterSchema` (Zod) for skills spec validation (name, description, metadata.cairel-*)
+- ✅ Added `validateSkill()` method — validates SKILL.md frontmatter, name format, directory name match
+- ✅ Added `validateSkillsDirectory()` method — scans skill folders
+- ✅ Updated `cairel validate` to detect `.kiro/skills/`, `.claude/skills/`, `.github/skills/`
+- ✅ Auto-detects skill folders vs flat rules when given a directory path
+- ✅ All 23 curated skills pass validation
+- ✅ Legacy rule validation preserved for backward compatibility
+- ✅ All 80 tests passing
+
+**Next**: Stage 6 - Update & List Commands
