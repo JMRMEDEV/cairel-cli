@@ -751,3 +751,16 @@ The package is ready to be published to npm. Follow steps in PUBLISH.md:
 **Test Results**: 11 suites, 80 tests, all passing
 
 **Next**: Stage 4 - Wizard & Template Updates
+
+### Stage 4: Wizard & Template Updates ✅ COMPLETE
+
+**Completed**:
+- ✅ Updated Handlebars template `resources` field to use `RESOURCES_PATH` variable
+- ✅ Kiro agents use `skill://.kiro/skills/*/SKILL.md` (native skill discovery)
+- ✅ Amazon Q agents use `file://.amazonq/rules/*.md` (backward compat)
+- ✅ Updated `buildTemplateVars()` with platform-aware `getResourcesPath()` and `getSkillsDir()`
+- ✅ Updated `generatePrompt()` to be platform-agnostic
+- ✅ Agent JSON generated correctly for both Kiro and Amazon Q
+- ✅ All 80 tests passing
+
+**Next**: Stage 5 - Validation System Update

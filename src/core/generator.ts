@@ -131,7 +131,7 @@ async function generateAgent(
   const templateContent = await fs.readFile(templatePath, 'utf-8');
   const template = Handlebars.compile(templateContent);
 
-  const templateVars = buildTemplateVars(answers);
+  const templateVars = buildTemplateVars(answers, platform);
   const agentJson = template(templateVars);
 
   // Use agent name from template vars for filename
@@ -142,7 +142,24 @@ async function generateAgent(
   return agentName;
 }
 
-function buildTemplateVars(answers: QuickSetupAnswers | DetailedSetupAnswers | CustomModeAnswers): Record<string, any> {
+function getResourcesPath(platform: Platform): string {
+  switch (platform) {
+    case 'kiro': return 'skill://.kiro/skills/*/SKILL.md';
+    case 'amazon-q': return 'file://.amazonq/rules/*.md';
+    default: return '';
+  }
+}
+
+function getSkillsDir(platform: Platform): string {
+  switch (platform) {
+    case 'kiro': return '.kiro/skills';
+    case 'claude-code': return '.claude/skills';
+    case 'github-copilot': return '.github/skills';
+    case 'amazon-q': return '.amazonq/rules';
+  }
+}
+
+function buildTemplateVars(answers: QuickSetupAnswers | DetailedSetupAnswers | CustomModeAnswers, platform: Platform = 'kiro'): Record<string, any> {
   // Handle custom mode
   if ('selectedRules' in answers) {
     const mcpServersJson = buildMcpServersJson(answers.mcpServers);
@@ -150,34 +167,24 @@ function buildTemplateVars(answers: QuickSetupAnswers | DetailedSetupAnswers | C
     return {
       AGENT_NAME: 'dev-agent',
       AGENT_DESCRIPTION: 'Custom development agent',
-      AGENT_PROMPT: `You are a developer. You follow best practices and the steering rules defined in ${answers.aiTool === 'amazon-q' ? '.amazonq/rules/' : '.kiro/steering/'} directory.`,
+      AGENT_PROMPT: `You are a developer. You follow best practices and the skills defined in ${getSkillsDir(platform)}/ directory.`,
       
-      // Minimal defaults for custom mode
-      TYPESCRIPT: false,
-      JAVASCRIPT: false,
-      PYTHON: false,
-      LUA: false,
-      REACT: false,
-      REACT_NATIVE: false,
-      NEXT_JS: false,
+      TYPESCRIPT: false, JAVASCRIPT: false, PYTHON: false, LUA: false,
+      REACT: false, REACT_NATIVE: false, NEXT_JS: false,
       
       PACKAGE_MANAGER: 'npm',
-      PACKAGE_MANAGER_NPM: true,
-      PACKAGE_MANAGER_YARN: false,
-      PACKAGE_MANAGER_PNPM: false,
+      PACKAGE_MANAGER_NPM: true, PACKAGE_MANAGER_YARN: false, PACKAGE_MANAGER_PNPM: false,
       
       HAS_MCP_SERVERS: answers.mcpServers.length > 0,
       MCP_SERVERS_JSON: mcpServersJson,
       MCP_SERVERS_PATH: join(require('os').homedir(), 'mcp-servers'),
       
-      USE_GIT: false,
-      USE_ENV_VARS: false,
-      ENV_PROD_PROTECTION: false,
-      USE_TESTING: false,
-      TESTING_FRAMEWORK: 'none',
+      USE_GIT: false, USE_ENV_VARS: false, ENV_PROD_PROTECTION: false,
+      USE_TESTING: false, TESTING_FRAMEWORK: 'none',
       
-      RULES_PATH: answers.aiTool === 'amazon-q' ? '.amazonq/rules' : '.kiro/steering',
-      AGENTS_PATH: answers.aiTool === 'amazon-q' ? '.amazonq/cli-agents' : '.kiro/agents',
+      RESOURCES_PATH: getResourcesPath(platform),
+      RULES_PATH: getSkillsDir(platform),
+      AGENTS_PATH: platform === 'amazon-q' ? '.amazonq/cli-agents' : '.kiro/agents',
     };
   }
   
@@ -217,8 +224,9 @@ function buildTemplateVars(answers: QuickSetupAnswers | DetailedSetupAnswers | C
     TESTING_FRAMEWORK: detailed.testingFramework || 'none',
     
     // Paths
-    RULES_PATH: (answers as QuickSetupAnswers).aiTool === 'amazon-q' ? '.amazonq/rules' : '.kiro/steering',
-    AGENTS_PATH: (answers as QuickSetupAnswers).aiTool === 'amazon-q' ? '.amazonq/cli-agents' : '.kiro/agents',
+    RESOURCES_PATH: getResourcesPath(platform),
+    RULES_PATH: getSkillsDir(platform),
+    AGENTS_PATH: platform === 'amazon-q' ? '.amazonq/cli-agents' : '.kiro/agents',
   };
 }
 
@@ -257,7 +265,6 @@ function generatePrompt(answers: QuickSetupAnswers): string {
   
   const lang = answers.language;
   const framework = answers.framework !== 'none' ? ` and ${answers.framework}` : '';
-  const rulesPath = answers.aiTool === 'amazon-q' ? '.amazonq/rules/' : '.kiro/steering/';
   
-  return `You are a ${type} specializing in ${lang}${framework}. You follow best practices and the steering rules defined in ${rulesPath} directory.`;
+  return `You are a ${type} specializing in ${lang}${framework}. You follow best practices and the skills available in your workspace.`;
 }
