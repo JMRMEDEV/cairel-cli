@@ -2,6 +2,7 @@
 name: package-manager-safety
 description: Prevent destructive package operations by blocking --force flags and requiring human approval. Use when running npm, yarn, or pnpm commands, installing packages, or executing tests. Enforces non-interactive test execution and lock file safety.
 metadata:
+  cairel-title: "Package Manager Safety & Standards"
   cairel-category: general
   cairel-version: "1.0.0"
   cairel-tags:

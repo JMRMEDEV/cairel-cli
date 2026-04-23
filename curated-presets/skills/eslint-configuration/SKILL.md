@@ -2,6 +2,7 @@
 name: eslint-configuration
 description: Enforce code quality through ESLint compliance. Use when creating or modifying JavaScript/TypeScript files, before committing code, or when linting issues arise. Covers running ESLint, auto-fixing, and avoiding eslint-disable.
 metadata:
+  cairel-title: "ESLint Configuration & Compliance"
   cairel-category: general
   cairel-version: "1.0.0"
   cairel-tags:

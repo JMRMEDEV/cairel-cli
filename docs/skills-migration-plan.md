@@ -15,7 +15,7 @@ Cairel's internal selection logic (conditions, categories, tags) is preserved in
 **Objective**: Convert all 23 curated rules into Agent Skills format
 
 **Scope**:
-- Define cairel metadata schema (`cairel-category`, `cairel-version`, `cairel-conditions`, `cairel-tags`, `cairel-always-include`)
+- Define cairel metadata schema (`cairel-title`, `cairel-category`, `cairel-version`, `cairel-conditions`, `cairel-tags`, `cairel-always-include`)
 - Create skill folder structure for each rule (`skill-name/SKILL.md`)
 - Map current rule frontmatter to skills frontmatter + cairel metadata
 - Move lengthy examples or reference material into `references/` subdirectories where appropriate

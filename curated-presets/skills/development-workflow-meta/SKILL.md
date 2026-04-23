@@ -2,6 +2,7 @@
 name: development-workflow-meta
 description: Systematic rule application based on development context for consistent code quality. Use when starting any development task to identify which rules and skills apply to the current work context (UI, services, testing, documentation).
 metadata:
+  cairel-title: "Development Workflow and Rule Application"
   cairel-category: general
   cairel-version: "1.0.0"
   cairel-tags:

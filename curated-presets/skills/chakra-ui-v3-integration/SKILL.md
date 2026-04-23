@@ -2,6 +2,7 @@
 name: chakra-ui-v3-integration
 description: Integrate Chakra UI v3 components using MCP tools for accurate component reference. Use when implementing any Chakra UI component. Mandates checking component props and examples via MCP before implementation.
 metadata:
+  cairel-title: "Chakra UI v3 Integration with MCP Tools"
   cairel-category: ui
   cairel-version: "1.0.0"
   cairel-tags:

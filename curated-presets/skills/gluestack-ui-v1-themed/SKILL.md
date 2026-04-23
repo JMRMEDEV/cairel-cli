@@ -2,6 +2,7 @@
 name: gluestack-ui-v1-themed
 description: Use GlueStack UI v1 themed components with proper prop extension and rest props pattern. Use when creating React Native components with @gluestack-ui/themed. Covers ComponentProps extension and styling compatibility.
 metadata:
+  cairel-title: "GlueStack UI v1 (Themed) Component Patterns"
   cairel-category: ui
   cairel-version: "1.0.0"
   cairel-tags:

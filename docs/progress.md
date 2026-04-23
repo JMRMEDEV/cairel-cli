@@ -677,7 +677,7 @@ The package is ready to be published to npm. Follow steps in PUBLISH.md:
 ### Stage 1: Skills Format Design & Rule Conversion ✅ COMPLETE
 
 **Completed**:
-- ✅ Defined cairel metadata schema (`cairel-category`, `cairel-version`, `cairel-conditions`, `cairel-tags`, `cairel-always-include`)
+- ✅ Defined cairel metadata schema (`cairel-title`, `cairel-category`, `cairel-version`, `cairel-conditions`, `cairel-tags`, `cairel-always-include`)
 - ✅ Created 23 skill folders in `curated-presets/skills/`
 - ✅ Converted all 23 rules to Agent Skills format (`skill-name/SKILL.md`)
 - ✅ Mapped old frontmatter to skills frontmatter + cairel metadata
@@ -711,3 +711,20 @@ The package is ready to be published to npm. Follow steps in PUBLISH.md:
 - Both work independently — no conflict
 
 **Next**: Stage 2 - Manifest & Selection Logic Update
+
+### Stage 2: Manifest & Selection Logic Update ✅ COMPLETE
+
+**Completed**:
+- ✅ Updated `scripts/generate-manifest.js` to read from `skills/*/SKILL.md` instead of `rules/{category}/*.md`
+- ✅ Manifest reads `metadata.cairel-*` fields from skills frontmatter
+- ✅ Updated `src/core/generator.ts` `copyRules()` to source from skills folders
+- ✅ Removed `getRuleCategory` dependency (category now in metadata, not folder structure)
+- ✅ Manifest output format unchanged (backward compatible with selector logic)
+- ✅ Build passes, all 80 tests pass
+
+**Verification**:
+- Manifest correctly generates 23 skills with all conditions preserved
+- Rule selection logic produces correct results (no changes needed to `rules-selector.ts`)
+- `npm run build` regenerates manifest from skills on every build
+
+**Next**: Stage 3 - Multi-Platform Output Generation

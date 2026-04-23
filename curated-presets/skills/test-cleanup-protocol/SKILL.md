@@ -2,6 +2,7 @@
 name: test-cleanup-protocol
 description: Manage temporary test files created for validation without polluting the repository. Use when creating ad-hoc test scripts, validating fixes, or running one-off validation. Covers cleanup of test files and reverting path modifications.
 metadata:
+  cairel-title: "Temporary Test File Cleanup Protocol"
   cairel-category: testing
   cairel-version: "1.0.0"
   cairel-tags:

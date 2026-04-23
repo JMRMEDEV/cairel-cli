@@ -2,6 +2,7 @@
 name: package-json-management
 description: Manage package.json dependencies, scripts, and metadata with best practices. Use when adding, removing, or updating npm packages, organizing dependencies, or auditing unused packages.
 metadata:
+  cairel-title: "Package.json Management & Dependencies"
   cairel-category: general
   cairel-version: "1.0.0"
   cairel-tags:

@@ -2,6 +2,7 @@
 name: git-management
 description: Manage git operations safely with human review for commits and protection against destructive commands. Use when committing, pushing, or performing any git operations. Enforces 50-char commit messages and human approval before commits.
 metadata:
+  cairel-title: "Git Repository Management"
   cairel-category: git
   cairel-version: "1.0.0"
   cairel-tags:

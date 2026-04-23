@@ -2,6 +2,7 @@
 name: go-style-conventions
 description: Idiomatic Go style, formatting, naming, and error handling conventions. Use when writing or reviewing Go code. Covers gofmt, export visibility, error wrapping, project structure, context usage, and table-driven tests.
 metadata:
+  cairel-title: "Go Style & Best Practices"
   cairel-category: golang
   cairel-version: "1.0.0"
   cairel-tags:

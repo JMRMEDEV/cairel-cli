@@ -2,6 +2,7 @@
 name: absolute-imports
 description: Configure and use absolute imports with @ alias for cleaner, more maintainable import statements. Use when setting up TypeScript paths or writing import statements. Enforces @/ prefix for external and relative-only for children.
 metadata:
+  cairel-title: "Absolute Imports Configuration"
   cairel-category: typescript
   cairel-version: "1.0.0"
   cairel-tags:

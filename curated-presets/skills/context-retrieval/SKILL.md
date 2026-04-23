@@ -2,6 +2,7 @@
 name: context-retrieval
 description: Minimize token usage through efficient context loading. Use when reading documentation, starting sessions, or loading project files. Covers index-first reading, targeted line ranges, and priority-based section loading.
 metadata:
+  cairel-title: "Context Retrieval & Token Optimization"
   cairel-category: general
   cairel-version: "1.0.0"
   cairel-tags:

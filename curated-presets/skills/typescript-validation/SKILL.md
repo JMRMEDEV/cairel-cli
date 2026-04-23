@@ -2,6 +2,7 @@
 name: typescript-validation
 description: Validate TypeScript compilation after every file change to catch errors early. Use when creating or modifying .ts/.tsx files. Mandates running npx tsc --noEmit and fixing all errors before proceeding.
 metadata:
+  cairel-title: "TypeScript Compilation Validation"
   cairel-category: typescript
   cairel-version: "1.0.0"
   cairel-tags:

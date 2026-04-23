@@ -4,7 +4,7 @@ import Handlebars from 'handlebars';
 import chalk from 'chalk';
 import ora from 'ora';
 import { QuickSetupAnswers, DetailedSetupAnswers, CustomModeAnswers } from '../types/wizard';
-import { selectRules, getRuleCategory } from './rules-selector';
+import { selectRules } from './rules-selector';
 
 export async function generateFiles(
   answers: QuickSetupAnswers | DetailedSetupAnswers | CustomModeAnswers,
@@ -72,18 +72,17 @@ async function createDirectories(paths: Record<string, string>): Promise<void> {
 }
 
 async function copyRules(rules: string[], targetDir: string): Promise<void> {
-  const sourceBase = join(__dirname, '..', '..', 'curated-presets', 'rules');
+  const sourceBase = join(__dirname, '..', '..', 'curated-presets', 'skills');
 
   for (const ruleName of rules) {
-    const category = await getRuleCategory(ruleName);
-    const sourcePath = join(sourceBase, category, `${ruleName}.md`);
+    const sourcePath = join(sourceBase, ruleName, 'SKILL.md');
     const targetPath = join(targetDir, `${ruleName}.md`);
 
     try {
       const content = await fs.readFile(sourcePath, 'utf-8');
       await fs.writeFile(targetPath, content, 'utf-8');
     } catch (error) {
-      console.warn(chalk.yellow(`Warning: Could not copy rule ${ruleName}`));
+      console.warn(chalk.yellow(`Warning: Could not copy skill ${ruleName}`));
     }
   }
 }

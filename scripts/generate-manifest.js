@@ -4,66 +4,60 @@ const fs = require('fs').promises;
 const path = require('path');
 const yaml = require('js-yaml');
 
-const RULES_BASE = path.join(__dirname, '..', 'curated-presets', 'rules');
+const SKILLS_BASE = path.join(__dirname, '..', 'curated-presets', 'skills');
 const MANIFEST_PATH = path.join(__dirname, '..', 'curated-presets', 'rules-manifest.json');
-const CATEGORIES_PATH = path.join(__dirname, '..', 'curated-presets', 'categories.json');
 
-async function parseRuleFrontmatter(filePath) {
-  const content = await fs.readFile(filePath, 'utf-8');
+async function parseSkillFrontmatter(skillDir) {
+  const skillPath = path.join(skillDir, 'SKILL.md');
+  const content = await fs.readFile(skillPath, 'utf-8');
   const match = content.match(/^---\n([\s\S]*?)\n---/);
   
   if (!match) return null;
   
   const frontmatter = yaml.load(match[1]);
-  const meta = frontmatter.meta;
   
-  if (!meta) return null;
+  if (!frontmatter.name) return null;
+  
+  const meta = frontmatter.metadata || {};
   
   const rule = {
-    id: meta.id,
-    title: meta.title,
-    description: meta.description,
-    category: meta.category,
-    alwaysInclude: meta['always-include'] || false
+    id: frontmatter.name,
+    title: meta['cairel-title'] || frontmatter.name,
+    description: frontmatter.description || '',
+    category: meta['cairel-category'] || 'general',
+    alwaysInclude: meta['cairel-always-include'] || false
   };
   
-  if (meta.conditions) {
+  const conditions = meta['cairel-conditions'];
+  if (conditions) {
     // Convert kebab-case to camelCase for consistency
-    const conditions = {};
-    for (const [key, value] of Object.entries(meta.conditions)) {
+    const camelConditions = {};
+    for (const [key, value] of Object.entries(conditions)) {
       const camelKey = key.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
-      conditions[camelKey] = value;
+      camelConditions[camelKey] = value;
     }
-    rule.conditions = conditions;
+    rule.conditions = camelConditions;
   }
   
   return rule;
 }
 
-async function scanRules() {
-  // Load categories from config file
-  const categoriesConfig = JSON.parse(await fs.readFile(CATEGORIES_PATH, 'utf-8'));
-  const categories = categoriesConfig.categories;
+async function scanSkills() {
   const rules = [];
+  const entries = await fs.readdir(SKILLS_BASE, { withFileTypes: true });
   
-  for (const category of categories) {
-    const categoryPath = path.join(RULES_BASE, category);
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    
+    const skillDir = path.join(SKILLS_BASE, entry.name);
+    const skillFile = path.join(skillDir, 'SKILL.md');
     
     try {
-      const files = await fs.readdir(categoryPath);
-      
-      for (const file of files) {
-        if (!file.endsWith('.md') || file === 'README.md') continue;
-        
-        const filePath = path.join(categoryPath, file);
-        const rule = await parseRuleFrontmatter(filePath);
-        
-        if (rule) {
-          rules.push(rule);
-        }
-      }
-    } catch (error) {
-      console.warn(`Warning: Could not scan category ${category}`);
+      await fs.access(skillFile);
+      const rule = await parseSkillFrontmatter(skillDir);
+      if (rule) rules.push(rule);
+    } catch {
+      // No SKILL.md in this directory, skip
     }
   }
   
@@ -71,11 +65,11 @@ async function scanRules() {
 }
 
 async function generateManifest() {
-  console.log('🔍 Scanning rules...');
+  console.log('🔍 Scanning skills...');
   
-  const rules = await scanRules();
+  const rules = await scanSkills();
   
-  console.log(`✓ Found ${rules.length} rules`);
+  console.log(`✓ Found ${rules.length} skills`);
   
   const manifest = { rules };
   

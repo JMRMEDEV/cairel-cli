@@ -2,6 +2,7 @@
 name: icon-usage-patterns
 description: Standardize icon usage with proper wrapping and theming support. Use when adding icons to React components with Chakra UI or GlueStack UI. Covers react-icons wrapping, custom SVG icons, and theme color enforcement.
 metadata:
+  cairel-title: "Icon Usage Patterns"
   cairel-category: ui
   cairel-version: "1.0.0"
   cairel-tags:

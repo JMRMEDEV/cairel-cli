@@ -2,6 +2,7 @@
 name: react-props-destructuring
 description: Use destructured props in React component function parameters for better readability and type safety. Use when creating React, React Native, or Next.js components. Covers default values and rest props pattern.
 metadata:
+  cairel-title: "React Props Destructuring Pattern"
   cairel-category: typescript
   cairel-version: "1.0.0"
   cairel-tags:

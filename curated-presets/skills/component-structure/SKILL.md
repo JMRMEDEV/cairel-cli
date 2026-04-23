@@ -2,6 +2,7 @@
 name: component-structure
 description: Organize React/TypeScript components with consistent structure, barrel exports, and clear separation. Use when creating components, organizing directories, or setting up imports in React, React Native, or Next.js projects.
 metadata:
+  cairel-title: "Component Organization & Structure"
   cairel-category: typescript
   cairel-version: "1.0.0"
   cairel-tags:

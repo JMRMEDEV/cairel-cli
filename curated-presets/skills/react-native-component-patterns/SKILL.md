@@ -2,6 +2,7 @@
 name: react-native-component-patterns
 description: Strict patterns for React Native component creation with GlueStack UI v1 themed components. Use when creating React Native components, organizing directories, or setting up barrel exports. Covers interface naming, import organization, and subcomponent patterns.
 metadata:
+  cairel-title: "React Native Component Patterns (GlueStack UI v1)"
   cairel-category: ui
   cairel-version: "1.0.0"
   cairel-tags:

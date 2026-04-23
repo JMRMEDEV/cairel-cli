@@ -2,6 +2,7 @@
 name: markdown-maintenance
 description: Maintain accurate line numbers and navigation in markdown files for efficient AI context retrieval. Use when creating or modifying .md documentation files, updating indices, or managing navigation tables.
 metadata:
+  cairel-title: "Markdown Maintenance for AI Context"
   cairel-category: general
   cairel-version: "1.0.0"
   cairel-tags:

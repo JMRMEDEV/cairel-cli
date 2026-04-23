@@ -2,6 +2,7 @@
 name: visual-verification
 description: Verify UI changes through screenshot analysis and evidence-based validation. Use when making any visual changes to components, pages, or layouts. Mandates taking screenshots before claiming UI correctness. Covers test IDs and element inspection.
 metadata:
+  cairel-title: "Visual Verification for UI Changes"
   cairel-category: ui
   cairel-version: "1.0.0"
   cairel-tags:

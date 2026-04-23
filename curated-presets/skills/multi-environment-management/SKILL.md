@@ -2,6 +2,7 @@
 name: multi-environment-management
 description: Protect production environment files while allowing safe access to dev and QA configurations. Use when accessing environment variables, .env files, or configuring multi-environment setups. Blocks all production file access.
 metadata:
+  cairel-title: "Multi-Environment Management & Protection"
   cairel-category: backend
   cairel-version: "1.0.0"
   cairel-tags:

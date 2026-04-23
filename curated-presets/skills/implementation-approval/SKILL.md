@@ -2,6 +2,7 @@
 name: implementation-approval
 description: Require explicit human approval before implementing high-level architectural or design decisions. Use when making architecture changes, adding features, switching technologies, or major refactoring. Allows natural flow for implementation details like files, methods, and CRUD endpoints.
 metadata:
+  cairel-title: "Implementation Approval Protocol"
   cairel-category: general
   cairel-version: "1.0.0"
   cairel-tags:

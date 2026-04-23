@@ -2,6 +2,7 @@
 name: semantic-versioning
 description: Follow semantic versioning standards for package version management. Use when implementing features, fixing bugs, or making breaking changes. Covers MAJOR.MINOR.PATCH increments and version reset rules.
 metadata:
+  cairel-title: "Semantic Versioning for Package Management"
   cairel-category: general
   cairel-version: "1.0.0"
   cairel-tags:

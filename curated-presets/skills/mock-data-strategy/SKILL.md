@@ -2,6 +2,7 @@
 name: mock-data-strategy
 description: Use realistic mock data in frontend development with clear separation from production data. Use when backend is unavailable, prototyping UI, or developing features before API is ready. Covers mock data organization and migration path.
 metadata:
+  cairel-title: "Mock Data Strategy for Frontend Development"
   cairel-category: ui
   cairel-version: "1.0.0"
   cairel-tags:

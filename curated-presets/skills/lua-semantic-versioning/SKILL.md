@@ -2,6 +2,7 @@
 name: lua-semantic-versioning
 description: Maintain proper semantic versioning for Lua libraries through metadata file updates. Use when making changes to Lua libraries or CLI tools. Covers version increment decisions and metadata file patterns.
 metadata:
+  cairel-title: "Lua Library Semantic Versioning"
   cairel-category: lua
   cairel-version: "1.0.0"
   cairel-tags:
