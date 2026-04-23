@@ -40,7 +40,7 @@ export async function runWizard(): Promise<QuickSetupAnswers | DetailedSetupAnsw
       choices: [
         { name: 'Quick Setup (High-level, recommended)', value: 'quick' },
         { name: 'Detailed Setup (Granular control)', value: 'detailed' },
-        { name: 'Custom (Select specific rules)', value: 'custom' },
+        { name: 'Custom (Select specific skills)', value: 'custom' },
       ],
     },
   ]);
@@ -56,7 +56,7 @@ export async function runWizard(): Promise<QuickSetupAnswers | DetailedSetupAnsw
     {
       type: 'confirm',
       name: 'wantsReview',
-      message: 'Would you like to review and customize the rules before generating files?',
+      message: 'Would you like to review and customize the skills before generating files?',
       default: false,
     },
   ]);
@@ -170,7 +170,7 @@ async function runQuickSetup(): Promise<QuickSetupAnswers> {
       {
         type: 'checkbox',
         name: 'additionalRules',
-        message: 'Select additional rules (optional):',
+        message: 'Select additional skills (optional):',
         choices: optionalRules.map(r => ({
           name: `${r.title} - ${r.description}`,
           value: r.id,
@@ -379,7 +379,7 @@ async function runCustomSetup(): Promise<CustomModeAnswers> {
     {
       type: 'confirm',
       name: 'wantsReview',
-      message: 'Would you like to review and customize the rules before generating files?',
+      message: 'Would you like to review and customize the skills before generating files?',
       default: false,
     },
   ]);

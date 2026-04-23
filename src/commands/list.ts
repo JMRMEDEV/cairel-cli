@@ -17,8 +17,8 @@ interface RulesManifest {
 }
 
 export const listCommand = new Command('list')
-  .description('List available presets')
-  .option('--rules', 'List only rules')
+  .description('List available skills and presets')
+  .option('--rules', 'List only skills')
   .option('--agents', 'List only agents')
   .option('--category <category>', 'Filter by category')
   .action((options) => {
@@ -43,7 +43,7 @@ function displayRules(categoryFilter?: string): void {
   if (categoryFilter) {
     rules = rules.filter((rule) => rule.category === categoryFilter);
     if (rules.length === 0) {
-      console.log(chalk.yellow(`⚠️  No rules found for category: ${categoryFilter}`));
+      console.log(chalk.yellow(`⚠️  No skills found for category: ${categoryFilter}`));
       return;
     }
   }
@@ -56,12 +56,12 @@ function displayRules(categoryFilter?: string): void {
     return acc;
   }, {} as Record<string, Rule[]>);
 
-  console.log(chalk.bold.blue('\n📋 Available Rules\n'));
+  console.log(chalk.bold.blue('\n📋 Available Skills\n'));
 
   for (const [category, categoryRules] of Object.entries(rulesByCategory)) {
     const separator = '━'.repeat(80);
     console.log(chalk.gray(separator));
-    console.log(chalk.bold.cyan(`${category.toUpperCase()} (${categoryRules.length} rules)`));
+    console.log(chalk.bold.cyan(`${category.toUpperCase()} (${categoryRules.length} skills)`));
     console.log(chalk.gray(separator));
     console.log();
 

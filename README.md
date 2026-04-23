@@ -15,10 +15,10 @@ Skills follow the open [Agent Skills](https://agentskills.io) standard — write
 
 ## Why Cairel?
 
-**The Problem**: Developers manually copy/paste AI assistant rules and configurations between projects, leading to:
+**The Problem**: Developers manually copy/paste AI assistant skills and configurations between projects, leading to:
 - ❌ Inconsistent AI behavior across projects
 - ❌ Time wasted on repetitive setup
-- ❌ Outdated or incomplete rule sets
+- ❌ Outdated or incomplete skill sets
 - ❌ No standardization across teams
 
 **The Solution**: Cairel provides:
@@ -53,7 +53,7 @@ cairel init
 ? How would you like to configure your project?
   ❯ Quick Setup (High-level, recommended)
     Detailed Setup (Granular control)
-    Custom (Select specific rules)
+    Custom (Select specific skills)
 
 ? What type of project is this? UI (Frontend)
 ? Primary language? TypeScript
@@ -70,7 +70,7 @@ cairel init
   ◉ gpt (/home/user/mcp-servers/gpt)
   ◯ web-scraper (/home/user/mcp-servers/web-scraper)
 
-? Would you like to review and customize the rules? (y/N)
+? Would you like to review and customize the skills? (y/N)
 ```
 
 ### What Gets Generated
@@ -125,7 +125,7 @@ Cairel creates Agent Skills in your project following the [agentskills.io](https
 
 **Quick Setup** (Recommended)
 - 6 simple questions
-- Automatic rule selection based on your stack
+- Automatic skill selection based on your stack
 - Perfect for most projects
 
 **Detailed Setup**
@@ -141,8 +141,8 @@ Cairel creates Agent Skills in your project following the [agentskills.io](https
 ### 📋 Optional Review Step
 
 Before generating files, optionally review and customize:
-- See all selected rules with descriptions
-- Toggle rules on/off with checkboxes
+- See all selected skills with descriptions
+- Toggle skills on/off with checkboxes
 - Ensure you get exactly what you need
 
 ### 🔌 Automatic MCP Server Detection
@@ -156,7 +156,7 @@ Cairel automatically detects installed MCP servers:
 
 ### 📦 23 Curated Agent Skills
 
-**General** (6 rules)
+**General** (8 skills)
 - Context retrieval & token optimization
 - Implementation approval protocol
 - Package manager safety
@@ -164,23 +164,23 @@ Cairel automatically detects installed MCP servers:
 - ESLint configuration
 - Package.json management
 
-**TypeScript** (4 rules)
+**TypeScript** (4 skills)
 - TypeScript validation
 - Component structure
 - React props destructuring
 - Absolute imports
 
-**Git** (1 rule)
+**Git** (1 skill)
 - Git management & commit standards
 
-**UI** (5 rules)
+**UI** (6 skills)
 - Visual verification
 - Mock data strategy
 - Icon usage patterns
 - Chakra UI v3 integration
 - GlueStack UI v1 integration
 
-**Backend** (1 rule)
+**Backend** (1 skill)
 - Multi-environment management
 
 ---
@@ -194,7 +194,7 @@ cairel init
 # Select: Quick Setup → UI → TypeScript → React → Yes (Git) → kiro-cli
 ```
 
-**Generated rules**: context-retrieval, implementation-approval, typescript-validation, component-structure, react-props-destructuring, git-management, visual-verification, mock-data-strategy, package-manager-safety, package-json-management, absolute-imports
+**Generated skills**: context-retrieval, implementation-approval, typescript-validation, component-structure, react-props-destructuring, git-management, visual-verification, mock-data-strategy, package-manager-safety, package-json-management, absolute-imports
 
 ### Example 2: Python Backend API
 
@@ -203,13 +203,13 @@ cairel init
 # Select: Quick Setup → Backend → Python → FastAPI → Yes (Git) → Amazon Q
 ```
 
-**Generated rules**: context-retrieval, implementation-approval, git-management
+**Generated skills**: context-retrieval, implementation-approval, git-management
 
 ### Example 3: Custom Configuration
 
 ```bash
 cairel init
-# Select: Custom → Select specific rules → Choose only what you need
+# Select: Custom → Select specific skills → Choose only what you need
 ```
 
 ---
@@ -221,7 +221,7 @@ Initialize AI configuration for your project.
 
 **Options:**
 - Interactive wizard guides you through setup
-- Generates agent configuration and rules
+- Generates agent configuration and skills
 - Detects and configures MCP servers
 
 ### `cairel bootstrap`
@@ -234,29 +234,29 @@ cairel bootstrap
 ```
 
 ### `cairel update`
-Update existing configuration with new rules or settings.
+Update existing configuration with new skills or settings.
 
 **Features:**
 - Backs up existing files
-- Preserves custom rules
-- Selective updates (rules only, agents only, or both)
+- Preserves custom skills
+- Selective updates (skills only, agents only, or both)
 
 ### `cairel validate`
-Validate rule files and agent configurations.
+Validate skill and agent configuration files and agent configurations.
 
 ```bash
 cairel validate                    # Validate all
 cairel validate path/to/rule.md    # Validate specific file
-cairel validate --rules            # Validate rules only
+cairel validate --skills            # Validate skills only
 cairel validate --agents           # Validate agents only
 ```
 
 ### `cairel list`
-List all available rules and their descriptions.
+List all available skills and their descriptions.
 
 ```bash
 cairel list                        # Show all
-cairel list --rules                # Rules only
+cairel list --skills                # Skills only
 cairel list --category typescript  # Filter by category
 ```
 
@@ -307,14 +307,14 @@ cairel list --category typescript  # Filter by category
 ### 1. Start with Quick Setup
 Most projects work great with Quick Setup. You can always run `cairel update` later.
 
-### 2. Review Your Rules
-Use the optional review step to understand what rules will be applied.
+### 2. Review Your Skills
+Use the optional review step to understand what skills will be applied.
 
 ### 3. Customize as Needed
 Don't hesitate to use Custom mode for specialized projects.
 
-### 4. Keep Rules Updated
-Run `cairel update` periodically to get improved rules.
+### 4. Keep Skills Updated
+Run `cairel update` periodically to get improved skills.
 
 ### 5. Version Control Your Configuration
 Commit the generated `.kiro/` or `.amazonq/` directories to your repository.
@@ -332,10 +332,10 @@ Cairel looks for MCP servers in:
 
 If your servers aren't detected, you can still configure them manually in the generated `dev-agent.json`.
 
-### Rules Not Working as Expected
+### Skills Not Working as Expected
 
 1. Validate your configuration: `cairel validate`
-2. Check rule descriptions: `cairel list`
+2. Check skill descriptions: `cairel list`
 3. Review the generated files in `.kiro/steering/` or `.amazonq/rules/`
 
 ### Need to Change Configuration

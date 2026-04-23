@@ -1,7 +1,7 @@
 {
   "name": "cairel",
-  "version": "2.0.0",
-  "description": "CLI tool for initializing AI-driven development projects with standardized rules and agent configurations",
+  "version": "2.0.1",
+  "description": "CLI tool for generating cross-platform Agent Skills for Kiro, GitHub Copilot, Claude Code, and Amazon Q Developer",
   "main": "dist/index.js",
   "bin": {
     "cairel": "dist/index.js"

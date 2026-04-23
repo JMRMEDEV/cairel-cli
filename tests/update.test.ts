@@ -40,7 +40,7 @@ describe('Update Command', () => {
       // Note: This will prompt for input, so we can't fully test interactively
       // We're just checking that it detects the config
       try {
-        execSync(`cd ${TEST_DIR} && echo "rules\nn" | node ${CAIREL_BIN} update`, {
+        execSync(`cd ${TEST_DIR} && echo "skills\nn" | node ${CAIREL_BIN} update`, {
           encoding: 'utf-8',
           timeout: 2000,
         });
@@ -56,7 +56,7 @@ describe('Update Command', () => {
       writeFileSync(join(amazonqPath, 'test-rule.md'), '# Test Rule');
 
       try {
-        execSync(`cd ${TEST_DIR} && echo "rules\nn" | node ${CAIREL_BIN} update`, {
+        execSync(`cd ${TEST_DIR} && echo "skills\nn" | node ${CAIREL_BIN} update`, {
           encoding: 'utf-8',
           timeout: 2000,
         });
@@ -73,7 +73,7 @@ describe('Update Command', () => {
       writeFileSync(join(kirosPath, 'context-retrieval.md'), '# Old Version');
 
       try {
-        execSync(`cd ${TEST_DIR} && echo "rules\ny" | node ${CAIREL_BIN} update`, {
+        execSync(`cd ${TEST_DIR} && echo "skills\ny" | node ${CAIREL_BIN} update`, {
           encoding: 'utf-8',
           timeout: 5000,
         });
@@ -90,7 +90,7 @@ describe('Update Command', () => {
       writeFileSync(join(kirosPath, 'context-retrieval.md'), '# Old Version');
 
       try {
-        const result = execSync(`cd ${TEST_DIR} && printf "rules\\nn\\n" | node ${CAIREL_BIN} update`, {
+        const result = execSync(`cd ${TEST_DIR} && printf "skills\\nn\\n" | node ${CAIREL_BIN} update`, {
           encoding: 'utf-8',
           timeout: 5000,
         });
@@ -118,7 +118,7 @@ describe('Update Command', () => {
         });
       } catch (error: any) {
         expect(error.stdout || '').toContain('What would you like to update');
-        expect(error.stdout || '').toContain('Rules only');
+        expect(error.stdout || '').toContain('Skills only');
         expect(error.stdout || '').toContain('Agents only');
         expect(error.stdout || '').toContain('Both');
       }

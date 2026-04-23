@@ -5,9 +5,9 @@ import * as path from 'path';
 import { Validator } from '../core/validator.js';
 
 export const validateCommand = new Command('validate')
-  .description('Validate rule and agent configuration files')
+  .description('Validate skill and agent configuration files')
   .argument('[path]', 'Path to file or directory to validate')
-  .option('-r, --rules', 'Validate as rules (default: auto-detect)')
+  .option('-r, --rules', 'Validate as skills (default: auto-detect)')
   .option('-a, --agents', 'Validate as agents (default: auto-detect)')
   .option('--fix', 'Attempt to auto-fix issues (not implemented yet)')
   .action(async (targetPath, options) => {
@@ -102,7 +102,7 @@ export const validateCommand = new Command('validate')
 
     // Validate rules
     if (options.rules) {
-      const spinner = ora('Validating rules...').start();
+      const spinner = ora('Validating skills...').start();
       const rulesPath = typeof options.rules === 'string' ? path.resolve(process.cwd(), options.rules) : options.rules;
       
       const fs = await import('fs');
@@ -121,9 +121,9 @@ export const validateCommand = new Command('validate')
       spinner.stop();
 
       if (results.size === 0) {
-        console.log(chalk.yellow(`\n⚠ No rule files found in ${rulesPath}`));
+        console.log(chalk.yellow(`\n⚠ No skill files found in ${rulesPath}`));
       } else {
-        console.log(chalk.bold(`\n📋 Rules Validation Results (${results.size} files):\n`));
+        console.log(chalk.bold(`\n📋 Skills Validation Results (${results.size} files):\n`));
 
         for (const [file, result] of results) {
           if (result.valid && result.errors.length === 0 && result.warnings.length === 0) {

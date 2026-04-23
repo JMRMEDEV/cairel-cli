@@ -21,7 +21,7 @@ program
 
 program
   .command('init')
-  .description('Initialize AI configuration (agents + rules)')
+  .description('Initialize AI configuration (agents + skills)')
   .action(initCommand);
 
 program

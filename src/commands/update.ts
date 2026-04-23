@@ -54,9 +54,9 @@ export const updateCommand = new Command('update')
         name: 'updateType',
         message: 'What would you like to update?',
         choices: [
-          { name: 'Rules only', value: 'rules' },
+          { name: 'Skills only', value: 'skills' },
           { name: 'Agents only', value: 'agents' },
-          { name: 'Both rules and agents', value: 'both' },
+          { name: 'Both skills and agents', value: 'both' },
         ],
       },
     ]);
@@ -119,8 +119,8 @@ export const updateCommand = new Command('update')
     };
 
     // Update rules
-    if (updateType === 'rules' || updateType === 'both') {
-      spinner.start('Loading available rules...');
+    if (updateType === 'skills' || updateType === 'both') {
+      spinner.start('Loading available skills...');
       
       const manifestPath = join(__dirname, '../../curated-presets/rules-manifest.json');
       const manifest = JSON.parse(readFileSync(manifestPath, 'utf-8'));
@@ -145,9 +145,9 @@ export const updateCommand = new Command('update')
           name: 'ruleUpdateMode',
           message: 'How would you like to update rules?',
           choices: [
-            { name: 'Update all existing rules', value: 'update-all' },
-            { name: 'Add new rules only', value: 'add-new' },
-            { name: 'Manage rules (add/remove/update)', value: 'manage' },
+            { name: 'Update all existing skills', value: 'update-all' },
+            { name: 'Add new skills only', value: 'add-new' },
+            { name: 'Manage skills (add/remove/update)', value: 'manage' },
           ],
         },
       ]);
@@ -156,7 +156,7 @@ export const updateCommand = new Command('update')
       let rulesToRemove: string[] = [];
 
       if (ruleUpdateMode === 'update-all') {
-        // Update all existing rules
+        // Update all existing skills
         rulesToProcess = existingRuleIds;
       } else if (ruleUpdateMode === 'add-new') {
         // Only add rules that don't exist
@@ -168,19 +168,19 @@ export const updateCommand = new Command('update')
         const ruleChoices = manifest.rules.map((rule: any) => ({
           name: `${rule.id} - ${rule.description} ${existingRuleIds.includes(rule.id) ? '(existing)' : '(new)'}`,
           value: rule.id,
-          checked: existingRuleIds.includes(rule.id), // Pre-check existing rules
+          checked: existingRuleIds.includes(rule.id), // Pre-check existing skills
         }));
 
         const { selectedRules } = await inquirer.prompt([
           {
             type: 'checkbox',
             name: 'selectedRules',
-            message: 'Select rules to keep (unchecked rules will be removed):',
+            message: 'Select skills to keep (unchecked will be removed):',
             choices: ruleChoices,
             pageSize: 15,
             validate: (answer) => {
               if (answer.length === 0) {
-                return 'You must select at least one rule';
+                return 'You must select at least one skill';
               }
               return true;
             },
@@ -188,12 +188,12 @@ export const updateCommand = new Command('update')
         ]);
 
         rulesToProcess = selectedRules;
-        // Rules to remove = existing rules that weren't selected
+        // Rules to remove = existing skills that weren't selected
         rulesToRemove = existingRuleIds.filter(id => !selectedRules.includes(id));
       }
 
       if (rulesToProcess.length === 0 && rulesToRemove.length === 0) {
-        spinner.info('No rules to update');
+        spinner.info('No skills to update');
       } else {
         spinner.start(`Processing ${rulesToProcess.length} rule(s)...`);
 
@@ -238,7 +238,7 @@ export const updateCommand = new Command('update')
           }
         }
 
-        // Count preserved custom rules (not in manifest)
+        // Count preserved custom skills (not in manifest)
         for (const existingRule of existingRuleIds) {
           const isCustom = !manifest.rules.some((r: any) => r.id === existingRule);
           const wasRemoved = rulesToRemove.includes(existingRule);
@@ -247,7 +247,7 @@ export const updateCommand = new Command('update')
           }
         }
 
-        spinner.succeed('Rules updated');
+        spinner.succeed('Skills updated');
       }
     }
 
@@ -265,18 +265,18 @@ export const updateCommand = new Command('update')
     // Summary
     console.log(chalk.green('\n✓ Update complete\n'));
     
-    if (updateType === 'rules' || updateType === 'both') {
+    if (updateType === 'skills' || updateType === 'both') {
       if (stats.added > 0) {
-        console.log(chalk.green(`  ✓ Added ${stats.added} new rule${stats.added > 1 ? 's' : ''}`));
+        console.log(chalk.green(`  ✓ Added ${stats.added} new skill${stats.added > 1 ? 's' : ''}`));
       }
       if (stats.updated > 0) {
-        console.log(chalk.blue(`  ✓ Updated ${stats.updated} existing rule${stats.updated > 1 ? 's' : ''}`));
+        console.log(chalk.blue(`  ✓ Updated ${stats.updated} existing skill${stats.updated > 1 ? 's' : ''}`));
       }
       if (stats.removed > 0) {
-        console.log(chalk.yellow(`  ✓ Removed ${stats.removed} rule${stats.removed > 1 ? 's' : ''}`));
+        console.log(chalk.yellow(`  ✓ Removed ${stats.removed} skill${stats.removed > 1 ? 's' : ''}`));
       }
       if (stats.preserved > 0) {
-        console.log(chalk.cyan(`  ✓ Preserved ${stats.preserved} custom rule${stats.preserved > 1 ? 's' : ''}`));
+        console.log(chalk.cyan(`  ✓ Preserved ${stats.preserved} custom skill${stats.preserved > 1 ? 's' : ''}`));
       }
     }
     
