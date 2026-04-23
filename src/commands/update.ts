@@ -25,6 +25,13 @@ export const updateCommand = new Command('update')
     const hasKiro = existsSync(kirosPath);
     const hasAmazonQ = existsSync(amazonqPath);
 
+    // Detect skills vs legacy steering
+    const kiroSkillsPath = join(kirosPath, 'skills');
+    const kiroSteeringPath = join(kirosPath, 'steering');
+    const hasKiroSkills = existsSync(kiroSkillsPath);
+    const hasKiroSteering = existsSync(kiroSteeringPath);
+    const isSkillsFormat = hasKiroSkills || existsSync(join(process.cwd(), '.claude', 'skills')) || existsSync(join(process.cwd(), '.github', 'skills'));
+
     if (!hasKiro && !hasAmazonQ) {
       console.log(chalk.yellow('⚠️  No existing configuration found'));
       console.log(chalk.gray('Run "cairel init" to initialize a new configuration'));
@@ -33,7 +40,9 @@ export const updateCommand = new Command('update')
 
     const configPath = hasKiro ? kirosPath : amazonqPath;
     const configType = hasKiro ? 'kiro-cli' : 'Amazon Q';
-    const rulesPath = hasKiro ? join(kirosPath, 'steering') : join(amazonqPath, 'rules');
+    const rulesPath = hasKiro
+      ? (hasKiroSkills ? kiroSkillsPath : kiroSteeringPath)
+      : join(amazonqPath, 'rules');
     const agentsPath = hasKiro ? join(kirosPath, 'agents') : join(amazonqPath, 'cli-agents');
 
     console.log(chalk.blue(`\n🔍 Found ${configType} configuration\n`));
@@ -115,12 +124,17 @@ export const updateCommand = new Command('update')
       
       const manifestPath = join(__dirname, '../../curated-presets/rules-manifest.json');
       const manifest = JSON.parse(readFileSync(manifestPath, 'utf-8'));
-      const curatedRulesPath = join(__dirname, '../../curated-presets/rules');
+      const curatedSkillsPath = join(__dirname, '../../curated-presets/skills');
 
       const existingRules = existsSync(rulesPath) ? readdirSync(rulesPath) : [];
-      const existingRuleIds = existingRules
-        .filter(f => f.endsWith('.md') && f !== 'README.md')
-        .map(f => f.replace('.md', ''));
+      const existingRuleIds = isSkillsFormat
+        ? existingRules.filter(f => {
+            const skillFile = join(rulesPath, f, 'SKILL.md');
+            return existsSync(skillFile);
+          })
+        : existingRules
+            .filter(f => f.endsWith('.md') && f !== 'README.md')
+            .map(f => f.replace('.md', ''));
 
       spinner.stop();
 
@@ -185,12 +199,19 @@ export const updateCommand = new Command('update')
 
         // Remove unchecked rules
         for (const ruleId of rulesToRemove) {
-          const ruleFile = `${ruleId}.md`;
-          const targetPath = join(rulesPath, ruleFile);
-          
-          if (existsSync(targetPath)) {
-            unlinkSync(targetPath);
-            stats.removed++;
+          if (isSkillsFormat) {
+            const targetPath = join(rulesPath, ruleId);
+            if (existsSync(targetPath)) {
+              const { rmSync } = await import('fs');
+              rmSync(targetPath, { recursive: true });
+              stats.removed++;
+            }
+          } else {
+            const targetPath = join(rulesPath, `${ruleId}.md`);
+            if (existsSync(targetPath)) {
+              unlinkSync(targetPath);
+              stats.removed++;
+            }
           }
         }
 
@@ -199,21 +220,20 @@ export const updateCommand = new Command('update')
           const rule = manifest.rules.find((r: any) => r.id === ruleId);
           if (!rule) continue;
 
-          const ruleFile = `${rule.id}.md`;
-          const sourcePath = join(curatedRulesPath, rule.category, ruleFile);
-          const targetPath = join(rulesPath, ruleFile);
+          const sourceSkillPath = join(curatedSkillsPath, rule.id, 'SKILL.md');
+          if (!existsSync(sourceSkillPath)) continue;
 
-          if (!existsSync(sourcePath)) {
-            continue;
+          if (isSkillsFormat) {
+            const targetDir = join(rulesPath, rule.id);
+            mkdirSync(targetDir, { recursive: true });
+            copyFileSync(sourceSkillPath, join(targetDir, 'SKILL.md'));
+          } else {
+            copyFileSync(sourceSkillPath, join(rulesPath, `${rule.id}.md`));
           }
 
           if (existingRuleIds.includes(rule.id)) {
-            // Update existing rule
-            copyFileSync(sourcePath, targetPath);
             stats.updated++;
           } else {
-            // Add new rule
-            copyFileSync(sourcePath, targetPath);
             stats.added++;
           }
         }

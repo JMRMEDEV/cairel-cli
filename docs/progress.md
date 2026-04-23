@@ -778,3 +778,15 @@ The package is ready to be published to npm. Follow steps in PUBLISH.md:
 - ✅ All 80 tests passing
 
 **Next**: Stage 6 - Update & List Commands
+
+### Stage 6: Update & List Commands ✅ COMPLETE
+
+**Completed**:
+- ✅ Updated `cairel update` to detect skills format (`.kiro/skills/`) vs legacy (`.kiro/steering/`)
+- ✅ Skill folders backed up, copied, and removed as directories
+- ✅ Legacy flat-file format still supported for Amazon Q
+- ✅ Existing rule detection works for both folder-based skills and flat `.md` files
+- ✅ `cairel list` works unchanged (reads from manifest, shows titles and descriptions)
+- ✅ All 80 tests passing
+
+**Next**: Stage 7 - Testing & Polish
