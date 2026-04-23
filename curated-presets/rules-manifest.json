@@ -1,16 +1,59 @@
 {
   "rules": [
     {
+      "id": "absolute-imports",
+      "title": "Absolute Imports Configuration",
+      "description": "Configure and use absolute imports with @ alias for cleaner, more maintainable import statements. Use when setting up TypeScript paths or writing import statements. Enforces @/ prefix for external and relative-only for children.",
+      "category": "typescript",
+      "alwaysInclude": false,
+      "conditions": {
+        "languages": [
+          "typescript",
+          "javascript"
+        ]
+      }
+    },
+    {
+      "id": "chakra-ui-v3-integration",
+      "title": "Chakra UI v3 Integration with MCP Tools",
+      "description": "Integrate Chakra UI v3 components using MCP tools for accurate component reference. Use when implementing any Chakra UI component. Mandates checking component props and examples via MCP before implementation.",
+      "category": "ui",
+      "alwaysInclude": false,
+      "conditions": {
+        "uiLibrary": [
+          "chakra-ui"
+        ]
+      }
+    },
+    {
+      "id": "component-structure",
+      "title": "Component Organization & Structure",
+      "description": "Organize React/TypeScript components with consistent structure, barrel exports, and clear separation. Use when creating components, organizing directories, or setting up imports in React, React Native, or Next.js projects.",
+      "category": "typescript",
+      "alwaysInclude": false,
+      "conditions": {
+        "languages": [
+          "typescript",
+          "javascript"
+        ],
+        "frameworks": [
+          "react",
+          "react-native",
+          "next-js"
+        ]
+      }
+    },
+    {
       "id": "context-retrieval",
       "title": "Context Retrieval & Token Optimization",
-      "description": "Minimize token usage through efficient context loading strategies using index files and targeted reads.",
+      "description": "Minimize token usage through efficient context loading. Use when reading documentation, starting sessions, or loading project files. Covers index-first reading, targeted line ranges, and priority-based section loading.",
       "category": "general",
       "alwaysInclude": true
     },
     {
       "id": "development-workflow-meta",
       "title": "Development Workflow and Rule Application",
-      "description": "Systematic rule application based on development context for consistent code quality.",
+      "description": "Systematic rule application based on development context for consistent code quality. Use when starting any development task to identify which rules and skills apply to the current work context (UI, services, testing, documentation).",
       "category": "general",
       "alwaysInclude": false,
       "conditions": {
@@ -26,7 +69,7 @@
     {
       "id": "eslint-configuration",
       "title": "ESLint Configuration & Compliance",
-      "description": "Enforce code quality and consistency through ESLint configuration and automatic fixes.",
+      "description": "Enforce code quality through ESLint compliance. Use when creating or modifying JavaScript/TypeScript files, before committing code, or when linting issues arise. Covers running ESLint, auto-fixing, and avoiding eslint-disable.",
       "category": "general",
       "alwaysInclude": false,
       "conditions": {
@@ -36,127 +79,9 @@
       }
     },
     {
-      "id": "implementation-approval",
-      "title": "Implementation Approval Protocol",
-      "description": "Require explicit human approval before implementing high-level architectural or design decisions.",
-      "category": "general",
-      "alwaysInclude": true
-    },
-    {
-      "id": "markdown-maintenance",
-      "title": "Markdown Maintenance for AI Context",
-      "description": "Maintain accurate line numbers and navigation in markdown files for efficient AI context retrieval.",
-      "category": "general",
-      "alwaysInclude": false,
-      "conditions": {
-        "projectTypes": [
-          "ui",
-          "backend",
-          "cli",
-          "library",
-          "fullstack"
-        ]
-      }
-    },
-    {
-      "id": "package-json-management",
-      "title": "Package.json Management & Dependencies",
-      "description": "Manage package.json dependencies, scripts, and metadata with validation and best practices.",
-      "category": "general",
-      "alwaysInclude": false,
-      "conditions": {
-        "languages": [
-          "typescript",
-          "javascript"
-        ]
-      }
-    },
-    {
-      "id": "package-manager-safety",
-      "title": "Package Manager Safety & Standards",
-      "description": "Prevent destructive package operations by blocking --force flags and requiring human approval.",
-      "category": "general",
-      "alwaysInclude": false,
-      "conditions": {
-        "languages": [
-          "typescript",
-          "javascript"
-        ]
-      }
-    },
-    {
-      "id": "semantic-versioning",
-      "title": "Semantic Versioning for Package Management",
-      "description": "Follow semantic versioning standards for package version management and changelog updates.",
-      "category": "general",
-      "alwaysInclude": false,
-      "conditions": {
-        "versioningStrategy": [
-          "semantic"
-        ]
-      }
-    },
-    {
-      "id": "absolute-imports",
-      "title": "Absolute Imports Configuration",
-      "description": "Configure and use absolute imports with @ alias for cleaner, more maintainable import statements.",
-      "category": "typescript",
-      "alwaysInclude": false,
-      "conditions": {
-        "languages": [
-          "typescript",
-          "javascript"
-        ]
-      }
-    },
-    {
-      "id": "component-structure",
-      "title": "Component Organization & Structure",
-      "description": "Organize React/TypeScript components with consistent structure, barrel exports, and clear separation.",
-      "category": "typescript",
-      "alwaysInclude": false,
-      "conditions": {
-        "languages": [
-          "typescript",
-          "javascript"
-        ],
-        "frameworks": [
-          "react",
-          "react-native",
-          "next-js"
-        ]
-      }
-    },
-    {
-      "id": "react-props-destructuring",
-      "title": "React Props Destructuring Pattern",
-      "description": "Use destructured props in React components for better readability and type safety.",
-      "category": "typescript",
-      "alwaysInclude": false,
-      "conditions": {
-        "frameworks": [
-          "react",
-          "react-native",
-          "next-js"
-        ]
-      }
-    },
-    {
-      "id": "typescript-validation",
-      "title": "TypeScript Compilation Validation",
-      "description": "Mandate TypeScript compilation validation after every file change to catch errors early.",
-      "category": "typescript",
-      "alwaysInclude": false,
-      "conditions": {
-        "languages": [
-          "typescript"
-        ]
-      }
-    },
-    {
       "id": "git-management",
       "title": "Git Repository Management",
-      "description": "Manage git operations safely with human review for commits and protection against destructive commands.",
+      "description": "Manage git operations safely with human review for commits and protection against destructive commands. Use when committing, pushing, or performing any git operations. Enforces 50-char commit messages and human approval before commits.",
       "category": "git",
       "alwaysInclude": false,
       "conditions": {
@@ -164,21 +89,9 @@
       }
     },
     {
-      "id": "chakra-ui-v3-integration",
-      "title": "Chakra UI v3 Integration with MCP Tools",
-      "description": "Integrate Chakra UI v3 components using MCP tools for accurate component reference and usage.",
-      "category": "ui",
-      "alwaysInclude": false,
-      "conditions": {
-        "uiLibrary": [
-          "chakra-ui"
-        ]
-      }
-    },
-    {
       "id": "gluestack-ui-v1-themed",
       "title": "GlueStack UI v1 (Themed) Component Patterns",
-      "description": "Use GlueStack UI v1 themed components with proper configuration and consistent patterns.",
+      "description": "Use GlueStack UI v1 themed components with proper prop extension and rest props pattern. Use when creating React Native components with @gluestack-ui/themed. Covers ComponentProps extension and styling compatibility.",
       "category": "ui",
       "alwaysInclude": false,
       "conditions": {
@@ -188,9 +101,21 @@
       }
     },
     {
+      "id": "go-style-conventions",
+      "title": "Go Style & Best Practices",
+      "description": "Idiomatic Go style, formatting, naming, and error handling conventions. Use when writing or reviewing Go code. Covers gofmt, export visibility, error wrapping, project structure, context usage, and table-driven tests.",
+      "category": "golang",
+      "alwaysInclude": false,
+      "conditions": {
+        "languages": [
+          "go"
+        ]
+      }
+    },
+    {
       "id": "icon-usage-patterns",
       "title": "Icon Usage Patterns",
-      "description": "Standardize icon usage across the project with consistent libraries and naming conventions.",
+      "description": "Standardize icon usage with proper wrapping and theming support. Use when adding icons to React components with Chakra UI or GlueStack UI. Covers react-icons wrapping, custom SVG icons, and theme color enforcement.",
       "category": "ui",
       "alwaysInclude": false,
       "conditions": {
@@ -205,60 +130,16 @@
       }
     },
     {
-      "id": "mock-data-strategy",
-      "title": "Mock Data Strategy for Frontend Development",
-      "description": "Use realistic mock data in frontend development with clear separation from production data.",
-      "category": "ui",
-      "alwaysInclude": false,
-      "conditions": {
-        "projectTypes": [
-          "ui",
-          "fullstack"
-        ]
-      }
-    },
-    {
-      "id": "react-native-component-patterns",
-      "title": "React Native Component Patterns (GlueStack UI v1)",
-      "description": "Strict patterns for React Native component creation with GlueStack UI v1 themed components.",
-      "category": "ui",
-      "alwaysInclude": false,
-      "conditions": {
-        "frameworks": [
-          "react-native"
-        ],
-        "uiLibrary": [
-          "gluestack-ui"
-        ]
-      }
-    },
-    {
-      "id": "visual-verification",
-      "title": "Visual Verification for UI Changes",
-      "description": "Verify UI changes through screenshot analysis and evidence-based validation before completion.",
-      "category": "ui",
-      "alwaysInclude": false,
-      "conditions": {
-        "projectTypes": [
-          "ui",
-          "fullstack"
-        ]
-      }
-    },
-    {
-      "id": "multi-environment-management",
-      "title": "Multi-Environment Management & Protection",
-      "description": "Protect production environment files while allowing safe access to dev and QA configurations.",
-      "category": "backend",
-      "alwaysInclude": false,
-      "conditions": {
-        "requiresEnvVars": true
-      }
+      "id": "implementation-approval",
+      "title": "Implementation Approval Protocol",
+      "description": "Require explicit human approval before implementing high-level architectural or design decisions. Use when making architecture changes, adding features, switching technologies, or major refactoring. Allows natural flow for implementation details like files, methods, and CRUD endpoints.",
+      "category": "general",
+      "alwaysInclude": true
     },
     {
       "id": "lua-semantic-versioning",
       "title": "Lua Library Semantic Versioning",
-      "description": "Maintain proper semantic versioning for Lua libraries through metadata file updates.",
+      "description": "Maintain proper semantic versioning for Lua libraries through metadata file updates. Use when making changes to Lua libraries or CLI tools. Covers version increment decisions and metadata file patterns.",
       "category": "lua",
       "alwaysInclude": false,
       "conditions": {
@@ -272,9 +153,115 @@
       }
     },
     {
+      "id": "markdown-maintenance",
+      "title": "Markdown Maintenance for AI Context",
+      "description": "Maintain accurate line numbers and navigation in markdown files for efficient AI context retrieval. Use when creating or modifying .md documentation files, updating indices, or managing navigation tables.",
+      "category": "general",
+      "alwaysInclude": false,
+      "conditions": {
+        "projectTypes": [
+          "ui",
+          "backend",
+          "cli",
+          "library",
+          "fullstack"
+        ]
+      }
+    },
+    {
+      "id": "mock-data-strategy",
+      "title": "Mock Data Strategy for Frontend Development",
+      "description": "Use realistic mock data in frontend development with clear separation from production data. Use when backend is unavailable, prototyping UI, or developing features before API is ready. Covers mock data organization and migration path.",
+      "category": "ui",
+      "alwaysInclude": false,
+      "conditions": {
+        "projectTypes": [
+          "ui",
+          "fullstack"
+        ]
+      }
+    },
+    {
+      "id": "multi-environment-management",
+      "title": "Multi-Environment Management & Protection",
+      "description": "Protect production environment files while allowing safe access to dev and QA configurations. Use when accessing environment variables, .env files, or configuring multi-environment setups. Blocks all production file access.",
+      "category": "backend",
+      "alwaysInclude": false,
+      "conditions": {
+        "requiresEnvVars": true
+      }
+    },
+    {
+      "id": "package-json-management",
+      "title": "Package.json Management & Dependencies",
+      "description": "Manage package.json dependencies, scripts, and metadata with best practices. Use when adding, removing, or updating npm packages, organizing dependencies, or auditing unused packages.",
+      "category": "general",
+      "alwaysInclude": false,
+      "conditions": {
+        "languages": [
+          "typescript",
+          "javascript"
+        ]
+      }
+    },
+    {
+      "id": "package-manager-safety",
+      "title": "Package Manager Safety & Standards",
+      "description": "Prevent destructive package operations by blocking --force flags and requiring human approval. Use when running npm, yarn, or pnpm commands, installing packages, or executing tests. Enforces non-interactive test execution and lock file safety.",
+      "category": "general",
+      "alwaysInclude": false,
+      "conditions": {
+        "languages": [
+          "typescript",
+          "javascript"
+        ]
+      }
+    },
+    {
+      "id": "react-native-component-patterns",
+      "title": "React Native Component Patterns (GlueStack UI v1)",
+      "description": "Strict patterns for React Native component creation with GlueStack UI v1 themed components. Use when creating React Native components, organizing directories, or setting up barrel exports. Covers interface naming, import organization, and subcomponent patterns.",
+      "category": "ui",
+      "alwaysInclude": false,
+      "conditions": {
+        "frameworks": [
+          "react-native"
+        ],
+        "uiLibrary": [
+          "gluestack-ui"
+        ]
+      }
+    },
+    {
+      "id": "react-props-destructuring",
+      "title": "React Props Destructuring Pattern",
+      "description": "Use destructured props in React component function parameters for better readability and type safety. Use when creating React, React Native, or Next.js components. Covers default values and rest props pattern.",
+      "category": "typescript",
+      "alwaysInclude": false,
+      "conditions": {
+        "frameworks": [
+          "react",
+          "react-native",
+          "next-js"
+        ]
+      }
+    },
+    {
+      "id": "semantic-versioning",
+      "title": "Semantic Versioning for Package Management",
+      "description": "Follow semantic versioning standards for package version management. Use when implementing features, fixing bugs, or making breaking changes. Covers MAJOR.MINOR.PATCH increments and version reset rules.",
+      "category": "general",
+      "alwaysInclude": false,
+      "conditions": {
+        "versioningStrategy": [
+          "semantic"
+        ]
+      }
+    },
+    {
       "id": "test-cleanup-protocol",
       "title": "Temporary Test File Cleanup Protocol",
-      "description": "Manage temporary test files created for validation without polluting the repository.",
+      "description": "Manage temporary test files created for validation without polluting the repository. Use when creating ad-hoc test scripts, validating fixes, or running one-off validation. Covers cleanup of test files and reverting path modifications.",
       "category": "testing",
       "alwaysInclude": false,
       "conditions": {
@@ -285,14 +272,27 @@
       }
     },
     {
-      "id": "go-style-conventions",
-      "title": "Go Style & Best Practices",
-      "description": "Idiomatic Go style, formatting, naming, and error handling conventions",
-      "category": "golang",
+      "id": "typescript-validation",
+      "title": "TypeScript Compilation Validation",
+      "description": "Validate TypeScript compilation after every file change to catch errors early. Use when creating or modifying .ts/.tsx files. Mandates running npx tsc --noEmit and fixing all errors before proceeding.",
+      "category": "typescript",
       "alwaysInclude": false,
       "conditions": {
         "languages": [
-          "go"
+          "typescript"
+        ]
+      }
+    },
+    {
+      "id": "visual-verification",
+      "title": "Visual Verification for UI Changes",
+      "description": "Verify UI changes through screenshot analysis and evidence-based validation. Use when making any visual changes to components, pages, or layouts. Mandates taking screenshots before claiming UI correctness. Covers test IDs and element inspection.",
+      "category": "ui",
+      "alwaysInclude": false,
+      "conditions": {
+        "projectTypes": [
+          "ui",
+          "fullstack"
         ]
       }
     }

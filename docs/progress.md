@@ -662,3 +662,157 @@ The package is ready to be published to npm. Follow steps in PUBLISH.md:
 - ✅ Documentation updated
 
 **Next**: Ready for v1.1.0 release with Go support
+
+---
+
+## 2026-04-22 - v2.0.0 Skills Migration 🚧 IN PROGRESS
+
+### Migration Plan Created
+
+- ✅ Researched Agent Skills standard across Kiro, GitHub Copilot, Claude Code, and agentskills.io
+- ✅ Confirmed skills are the emerging cross-platform standard
+- ✅ Designed migration approach: preserve cairel selection logic in `metadata.cairel-*` fields
+- ✅ Created `docs/skills-migration-plan.md` with 8-stage plan
+
+### Stage 1: Skills Format Design & Rule Conversion ✅ COMPLETE
+
+**Completed**:
+- ✅ Defined cairel metadata schema (`cairel-title`, `cairel-category`, `cairel-version`, `cairel-conditions`, `cairel-tags`, `cairel-always-include`)
+- ✅ Created 23 skill folders in `curated-presets/skills/`
+- ✅ Converted all 23 rules to Agent Skills format (`skill-name/SKILL.md`)
+- ✅ Mapped old frontmatter to skills frontmatter + cairel metadata
+- ✅ Wrote discovery-optimized descriptions (action-oriented, keyword-rich)
+- ✅ Validated all skills against agentskills.io spec constraints
+- ✅ Created `curated-presets/skills/README.md` with format docs and catalog
+
+**Skills Created (23)**:
+
+| Category | Skills |
+|----------|--------|
+| General (8) | context-retrieval, implementation-approval, package-manager-safety, semantic-versioning, eslint-configuration, package-json-management, markdown-maintenance, development-workflow-meta |
+| TypeScript (4) | typescript-validation, component-structure, react-props-destructuring, absolute-imports |
+| Git (1) | git-management |
+| UI (6) | visual-verification, mock-data-strategy, icon-usage-patterns, chakra-ui-v3-integration, gluestack-ui-v1-themed, react-native-component-patterns |
+| Backend (1) | multi-environment-management |
+| Testing (1) | test-cleanup-protocol |
+| Lua (1) | lua-semantic-versioning |
+| Golang (1) | go-style-conventions |
+
+**Validation Results**:
+- ✅ All 23 skill names match directory names
+- ✅ All names valid (lowercase, hyphens, ≤64 chars)
+- ✅ All descriptions present (≤1024 chars)
+- ✅ All cairel metadata preserved in `metadata.cairel-*`
+- ✅ Content condensed for progressive disclosure
+
+**Key Design Decision**:
+- AI tools (Kiro, Copilot, Claude Code) discover skills via `name` and `description`
+- Cairel uses `metadata.cairel-*` fields for wizard-driven conditional selection
+- Both work independently — no conflict
+
+**Next**: Stage 2 - Manifest & Selection Logic Update
+
+### Stage 2: Manifest & Selection Logic Update ✅ COMPLETE
+
+**Completed**:
+- ✅ Updated `scripts/generate-manifest.js` to read from `skills/*/SKILL.md` instead of `rules/{category}/*.md`
+- ✅ Manifest reads `metadata.cairel-*` fields from skills frontmatter
+- ✅ Updated `src/core/generator.ts` `copyRules()` to source from skills folders
+- ✅ Removed `getRuleCategory` dependency (category now in metadata, not folder structure)
+- ✅ Manifest output format unchanged (backward compatible with selector logic)
+- ✅ Build passes, all 80 tests pass
+
+**Verification**:
+- Manifest correctly generates 23 skills with all conditions preserved
+- Rule selection logic produces correct results (no changes needed to `rules-selector.ts`)
+- `npm run build` regenerates manifest from skills on every build
+
+**Next**: Stage 3 - Multi-Platform Output Generation
+
+### Stage 3: Multi-Platform Output Generation ✅ COMPLETE
+
+**Completed**:
+- ✅ Added `Platform` type (`kiro`, `claude-code`, `github-copilot`, `amazon-q`)
+- ✅ Added `platforms: Platform[]` field to all answer interfaces
+- ✅ Replaced single-select "AI Tools" wizard question with multi-select platforms
+- ✅ Updated generator to output skill folders (`skill-name/SKILL.md`) for Kiro, Claude Code, GitHub Copilot
+- ✅ Kept legacy flat format (`.md` files) for Amazon Q backward compatibility
+- ✅ Generator copies `references/` subdirectories when present
+- ✅ Agent JSON generated for Kiro and Amazon Q (platforms that use them)
+- ✅ Derived `aiTool` from `platforms` for backward compatibility
+- ✅ Updated all 80 tests for new platform structure
+
+**Platform Output Paths**:
+- Kiro: `.kiro/skills/skill-name/SKILL.md`
+- Claude Code: `.claude/skills/skill-name/SKILL.md`
+- GitHub Copilot: `.github/skills/skill-name/SKILL.md`
+- Amazon Q: `.amazonq/rules/skill-name.md` (flat, backward compat)
+
+**Test Results**: 11 suites, 80 tests, all passing
+
+**Next**: Stage 4 - Wizard & Template Updates
+
+### Stage 4: Wizard & Template Updates ✅ COMPLETE
+
+**Completed**:
+- ✅ Updated Handlebars template `resources` field to use `RESOURCES_PATH` variable
+- ✅ Kiro agents use `skill://.kiro/skills/*/SKILL.md` (native skill discovery)
+- ✅ Amazon Q agents use `file://.amazonq/rules/*.md` (backward compat)
+- ✅ Updated `buildTemplateVars()` with platform-aware `getResourcesPath()` and `getSkillsDir()`
+- ✅ Updated `generatePrompt()` to be platform-agnostic
+- ✅ Agent JSON generated correctly for both Kiro and Amazon Q
+- ✅ All 80 tests passing
+
+**Next**: Stage 5 - Validation System Update
+
+### Stage 5: Validation System Update ✅ COMPLETE
+
+**Completed**:
+- ✅ Added `SkillFrontmatterSchema` (Zod) for skills spec validation (name, description, metadata.cairel-*)
+- ✅ Added `validateSkill()` method — validates SKILL.md frontmatter, name format, directory name match
+- ✅ Added `validateSkillsDirectory()` method — scans skill folders
+- ✅ Updated `cairel validate` to detect `.kiro/skills/`, `.claude/skills/`, `.github/skills/`
+- ✅ Auto-detects skill folders vs flat rules when given a directory path
+- ✅ All 23 curated skills pass validation
+- ✅ Legacy rule validation preserved for backward compatibility
+- ✅ All 80 tests passing
+
+**Next**: Stage 6 - Update & List Commands
+
+### Stage 6: Update & List Commands ✅ COMPLETE
+
+**Completed**:
+- ✅ Updated `cairel update` to detect skills format (`.kiro/skills/`) vs legacy (`.kiro/steering/`)
+- ✅ Skill folders backed up, copied, and removed as directories
+- ✅ Legacy flat-file format still supported for Amazon Q
+- ✅ Existing rule detection works for both folder-based skills and flat `.md` files
+- ✅ `cairel list` works unchanged (reads from manifest, shows titles and descriptions)
+- ✅ All 80 tests passing
+
+**Next**: Stage 7 - Testing & Polish
+
+### Stage 7: Testing & Polish ✅ COMPLETE
+
+**Manual Testing Results**:
+- ✅ Multi-platform output (Kiro + Claude Code + GitHub Copilot simultaneously): 13 skills each
+- ✅ Amazon Q legacy flat format: 4 flat `.md` files with `file://` resources
+- ✅ Go project: 6 skills including `go-style-conventions`
+- ✅ Generated skills pass `validateSkillsDirectory()` (13/13)
+- ✅ Generated agent JSON passes `validateAgent()`
+- ✅ `cairel list --category golang` shows correct output
+- ✅ `cairel validate curated-presets/skills` validates all 23 skills
+- ✅ All 80 automated tests passing
+
+**Next**: Stage 8 - Documentation & Publication
+
+### Stage 8: Documentation & Publication ✅ COMPLETE
+
+**Completed**:
+- ✅ Updated README.md: multi-platform support, skills format, updated wizard example, new output structure
+- ✅ Updated docs/architecture.md: skills directory paths
+- ✅ Updated docs/CONTRIBUTING.md: skills format for new contributions
+- ✅ Updated docs/TESTING.md: 91 tests across 12 suites
+- ✅ Updated docs/CHANGELOG.md: v2.0.0 entry with breaking changes, additions, preserved features
+- ✅ Version bumped to 2.0.0 in package.json
+- ✅ Build passes as `cairel@2.0.0`
+- ✅ All 91 tests passing

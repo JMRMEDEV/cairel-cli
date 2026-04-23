@@ -2,7 +2,9 @@
 
 **Standardize your AI-driven development workflow in minutes.**
 
-Cairel generates consistent, project-specific configurations for AI coding assistants like [kiro-cli](https://kiro.dev) and [Amazon Q Developer](https://aws.amazon.com/q/developer/), eliminating manual setup and ensuring best practices across your projects.
+Cairel generates consistent, project-specific configurations for AI coding assistants like [Kiro](https://kiro.dev), [GitHub Copilot](https://github.com/features/copilot), [Claude Code](https://claude.ai/code), and [Amazon Q Developer](https://aws.amazon.com/q/developer/), eliminating manual setup and ensuring best practices across your projects.
+
+Skills follow the open [Agent Skills](https://agentskills.io) standard — write once, use everywhere.
 
 [![npm version](https://img.shields.io/npm/v/cairel.svg)](https://www.npmjs.com/package/cairel)
 [![npm downloads](https://img.shields.io/npm/dm/cairel.svg)](https://www.npmjs.com/package/cairel)
@@ -20,11 +22,11 @@ Cairel generates consistent, project-specific configurations for AI coding assis
 - ❌ No standardization across teams
 
 **The Solution**: Cairel provides:
-- ✅ **23 curated, battle-tested rules** for AI assistants
+- ✅ **23 curated Agent Skills** following the open [agentskills.io](https://agentskills.io) standard
 - ✅ **Interactive wizard** for project-specific configuration
+- ✅ **Multi-platform support** — Kiro, GitHub Copilot, Claude Code, Amazon Q Developer
 - ✅ **Automatic MCP server detection** and setup
-- ✅ **Support for multiple AI tools** (kiro-cli, Amazon Q Developer)
-- ✅ **Customizable rule selection** with review step
+- ✅ **Customizable skill selection** with review step
 
 ---
 
@@ -57,7 +59,11 @@ cairel init
 ? Primary language? TypeScript
 ? Framework? React
 ? Use Git for version control? Yes
-? Which AI tool(s) will you use? kiro-cli
+? Which platforms will you use? (select all that apply)
+  ◉ Kiro
+  ◉ Claude Code
+  ◯ GitHub Copilot
+  ◯ Amazon Q Developer
 ✔ Found 5 MCP server(s)
 ? Select MCP servers to configure: 
   ◉ amazon-q-history (/home/user/mcp-servers/amazon-q-history)
@@ -69,29 +75,46 @@ cairel init
 
 ### What Gets Generated
 
-Cairel creates a complete AI configuration in your project:
+Cairel creates Agent Skills in your project following the [agentskills.io](https://agentskills.io) standard:
 
-**For kiro-cli:**
+**For Kiro:**
 ```
 .kiro/
 ├── agents/
-│   └── dev-agent.json      # AI agent configuration
-└── steering/
-    ├── context-retrieval.md
-    ├── implementation-approval.md
-    ├── typescript-validation.md
-    ├── component-structure.md
-    ├── git-management.md
-    └── ... (more rules based on your project)
+│   └── dev-agent.json
+└── skills/
+    ├── context-retrieval/
+    │   └── SKILL.md
+    ├── typescript-validation/
+    │   └── SKILL.md
+    └── ... (more skills based on your project)
 ```
 
-**For Amazon Q Developer:**
+**For Claude Code:**
+```
+.claude/
+└── skills/
+    ├── context-retrieval/
+    │   └── SKILL.md
+    └── ...
+```
+
+**For GitHub Copilot:**
+```
+.github/
+└── skills/
+    ├── context-retrieval/
+    │   └── SKILL.md
+    └── ...
+```
+
+**For Amazon Q Developer (legacy flat format):**
 ```
 .amazonq/
 ├── cli-agents/
 │   └── dev-agent.json
 └── rules/
-    └── ... (same rules as above)
+    └── ... (flat .md files)
 ```
 
 ---
@@ -111,7 +134,7 @@ Cairel creates a complete AI configuration in your project:
 - Ideal for complex projects
 
 **Custom Mode**
-- Select specific rules from all 17 available
+- Select specific skills from all 23 available
 - Full control over your configuration
 - Great for specialized workflows
 
@@ -131,7 +154,7 @@ Cairel automatically detects installed MCP servers:
 - cypress (E2E testing)
 - chakra-ui (component reference)
 
-### 📦 17 Curated Rules
+### 📦 23 Curated Agent Skills
 
 **General** (6 rules)
 - Context retrieval & token optimization
@@ -241,11 +264,13 @@ cairel list --category typescript  # Filter by category
 
 ## Configuration
 
-### Supported AI Tools
+### Supported Platforms
 
-- **kiro-cli**: Creates `.kiro/` directory structure
-- **Amazon Q Developer**: Creates `.amazonq/` directory structure
-- **Both**: Creates both directory structures
+- **Kiro**: Creates `.kiro/skills/` directory with agent configuration
+- **Claude Code**: Creates `.claude/skills/` directory
+- **GitHub Copilot**: Creates `.github/skills/` directory
+- **Amazon Q Developer**: Creates `.amazonq/rules/` directory (legacy flat format)
+- **Multiple platforms**: Select any combination simultaneously
 
 ### Supported Languages
 

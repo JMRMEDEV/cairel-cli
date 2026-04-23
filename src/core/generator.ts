@@ -3,8 +3,26 @@ import { join, dirname } from 'path';
 import Handlebars from 'handlebars';
 import chalk from 'chalk';
 import ora from 'ora';
-import { QuickSetupAnswers, DetailedSetupAnswers, CustomModeAnswers } from '../types/wizard';
-import { selectRules, getRuleCategory } from './rules-selector';
+import { QuickSetupAnswers, DetailedSetupAnswers, CustomModeAnswers, Platform } from '../types/wizard';
+import { selectRules } from './rules-selector';
+
+interface PlatformPaths {
+  skillsDir: string;
+  agentsDir: string;
+}
+
+function getPlatformPaths(platform: Platform, targetDir: string): PlatformPaths {
+  switch (platform) {
+    case 'kiro':
+      return { skillsDir: join(targetDir, '.kiro', 'skills'), agentsDir: join(targetDir, '.kiro', 'agents') };
+    case 'claude-code':
+      return { skillsDir: join(targetDir, '.claude', 'skills'), agentsDir: join(targetDir, '.claude', 'skills') };
+    case 'github-copilot':
+      return { skillsDir: join(targetDir, '.github', 'skills'), agentsDir: join(targetDir, '.github', 'skills') };
+    case 'amazon-q':
+      return { skillsDir: join(targetDir, '.amazonq', 'rules'), agentsDir: join(targetDir, '.amazonq', 'cli-agents') };
+  }
+}
 
 export async function generateFiles(
   answers: QuickSetupAnswers | DetailedSetupAnswers | CustomModeAnswers,
@@ -13,70 +31,86 @@ export async function generateFiles(
   const spinner = ora('Generating configuration...').start();
 
   try {
-    // Determine paths based on AI tool
-    const paths = getPaths(answers.aiTool, targetDir);
-    
-    // Create directories
-    await createDirectories(paths);
-    spinner.text = 'Directories created';
-
-    // Copy rules
-    const rules = 'selectedRules' in answers 
-      ? answers.selectedRules 
+    const platforms: Platform[] = answers.platforms || [answers.aiTool === 'amazon-q' ? 'amazon-q' : 'kiro'];
+    const rules = 'selectedRules' in answers
+      ? answers.selectedRules
       : await selectRules(answers);
-    await copyRules(rules, paths.rulesDir);
-    spinner.text = `Copied ${rules.length} rules`;
 
-    // Generate agent configuration
-    const agentName = await generateAgent(answers, paths.agentsDir);
+    for (const platform of platforms) {
+      const paths = getPlatformPaths(platform, targetDir);
+      await fs.mkdir(paths.skillsDir, { recursive: true });
+      await fs.mkdir(paths.agentsDir, { recursive: true });
+
+      if (platform === 'amazon-q') {
+        // Legacy flat format for Amazon Q
+        await copyRulesFlat(rules, paths.skillsDir);
+      } else {
+        // Skills folder format for all other platforms
+        await copySkillFolders(rules, paths.skillsDir);
+      }
+
+      // Generate agent only for platforms that use them
+      if (platform === 'kiro' || platform === 'amazon-q') {
+        await generateAgent(answers, paths.agentsDir, platform);
+      }
+    }
+
     spinner.succeed(chalk.green('Configuration generated successfully!'));
 
     // Show summary
     console.log(chalk.bold('\n📁 Generated files:'));
-    console.log(chalk.cyan(`  ${paths.rulesDir}/`));
-    rules.forEach(rule => console.log(chalk.gray(`    - ${rule}.md`)));
-    console.log(chalk.cyan(`  ${paths.agentsDir}/`));
-    console.log(chalk.gray(`    - ${agentName}.json`));
+    for (const platform of platforms) {
+      const paths = getPlatformPaths(platform, targetDir);
+      console.log(chalk.cyan(`  ${paths.skillsDir}/`));
+      if (platform === 'amazon-q') {
+        rules.forEach(rule => console.log(chalk.gray(`    - ${rule}.md`)));
+      } else {
+        rules.forEach(rule => console.log(chalk.gray(`    - ${rule}/SKILL.md`)));
+      }
+    }
   } catch (error) {
     spinner.fail(chalk.red('Failed to generate configuration'));
     throw error;
   }
 }
 
-function getPaths(aiTool: string, targetDir: string) {
-  if (aiTool === 'kiro-cli') {
-    return {
-      rulesDir: join(targetDir, '.kiro', 'steering'),
-      agentsDir: join(targetDir, '.kiro', 'agents'),
-    };
-  } else if (aiTool === 'amazon-q') {
-    return {
-      rulesDir: join(targetDir, '.amazonq', 'rules'),
-      agentsDir: join(targetDir, '.amazonq', 'cli-agents'),
-    };
-  } else {
-    // both
-    return {
-      rulesDir: join(targetDir, '.kiro', 'steering'),
-      agentsDir: join(targetDir, '.kiro', 'agents'),
-      rulesDir2: join(targetDir, '.amazonq', 'rules'),
-      agentsDir2: join(targetDir, '.amazonq', 'cli-agents'),
-    };
-  }
-}
-
-async function createDirectories(paths: Record<string, string>): Promise<void> {
-  for (const path of Object.values(paths)) {
-    await fs.mkdir(path, { recursive: true });
-  }
-}
-
-async function copyRules(rules: string[], targetDir: string): Promise<void> {
-  const sourceBase = join(__dirname, '..', '..', 'curated-presets', 'rules');
+async function copySkillFolders(rules: string[], targetDir: string): Promise<void> {
+  const sourceBase = join(__dirname, '..', '..', 'curated-presets', 'skills');
 
   for (const ruleName of rules) {
-    const category = await getRuleCategory(ruleName);
-    const sourcePath = join(sourceBase, category, `${ruleName}.md`);
+    const sourceSkill = join(sourceBase, ruleName, 'SKILL.md');
+    const targetSkillDir = join(targetDir, ruleName);
+    const targetSkill = join(targetSkillDir, 'SKILL.md');
+
+    try {
+      await fs.mkdir(targetSkillDir, { recursive: true });
+      const content = await fs.readFile(sourceSkill, 'utf-8');
+      await fs.writeFile(targetSkill, content, 'utf-8');
+
+      // Copy references/ if exists
+      const refsDir = join(sourceBase, ruleName, 'references');
+      try {
+        const refs = await fs.readdir(refsDir);
+        const targetRefs = join(targetSkillDir, 'references');
+        await fs.mkdir(targetRefs, { recursive: true });
+        for (const ref of refs) {
+          const src = join(refsDir, ref);
+          await fs.copyFile(src, join(targetRefs, ref));
+        }
+      } catch {
+        // No references/ directory, skip
+      }
+    } catch (error) {
+      console.warn(chalk.yellow(`Warning: Could not copy skill ${ruleName}`));
+    }
+  }
+}
+
+async function copyRulesFlat(rules: string[], targetDir: string): Promise<void> {
+  const sourceBase = join(__dirname, '..', '..', 'curated-presets', 'skills');
+
+  for (const ruleName of rules) {
+    const sourcePath = join(sourceBase, ruleName, 'SKILL.md');
     const targetPath = join(targetDir, `${ruleName}.md`);
 
     try {
@@ -90,13 +124,14 @@ async function copyRules(rules: string[], targetDir: string): Promise<void> {
 
 async function generateAgent(
   answers: QuickSetupAnswers | DetailedSetupAnswers | CustomModeAnswers,
-  targetDir: string
+  targetDir: string,
+  platform: Platform
 ): Promise<string> {
   const templatePath = join(__dirname, '..', '..', 'curated-presets', 'templates', 'agent-template.hbs');
   const templateContent = await fs.readFile(templatePath, 'utf-8');
   const template = Handlebars.compile(templateContent);
 
-  const templateVars = buildTemplateVars(answers);
+  const templateVars = buildTemplateVars(answers, platform);
   const agentJson = template(templateVars);
 
   // Use agent name from template vars for filename
@@ -107,7 +142,24 @@ async function generateAgent(
   return agentName;
 }
 
-function buildTemplateVars(answers: QuickSetupAnswers | DetailedSetupAnswers | CustomModeAnswers): Record<string, any> {
+function getResourcesPath(platform: Platform): string {
+  switch (platform) {
+    case 'kiro': return 'skill://.kiro/skills/*/SKILL.md';
+    case 'amazon-q': return 'file://.amazonq/rules/*.md';
+    default: return '';
+  }
+}
+
+function getSkillsDir(platform: Platform): string {
+  switch (platform) {
+    case 'kiro': return '.kiro/skills';
+    case 'claude-code': return '.claude/skills';
+    case 'github-copilot': return '.github/skills';
+    case 'amazon-q': return '.amazonq/rules';
+  }
+}
+
+function buildTemplateVars(answers: QuickSetupAnswers | DetailedSetupAnswers | CustomModeAnswers, platform: Platform = 'kiro'): Record<string, any> {
   // Handle custom mode
   if ('selectedRules' in answers) {
     const mcpServersJson = buildMcpServersJson(answers.mcpServers);
@@ -115,34 +167,24 @@ function buildTemplateVars(answers: QuickSetupAnswers | DetailedSetupAnswers | C
     return {
       AGENT_NAME: 'dev-agent',
       AGENT_DESCRIPTION: 'Custom development agent',
-      AGENT_PROMPT: `You are a developer. You follow best practices and the steering rules defined in ${answers.aiTool === 'amazon-q' ? '.amazonq/rules/' : '.kiro/steering/'} directory.`,
+      AGENT_PROMPT: `You are a developer. You follow best practices and the skills defined in ${getSkillsDir(platform)}/ directory.`,
       
-      // Minimal defaults for custom mode
-      TYPESCRIPT: false,
-      JAVASCRIPT: false,
-      PYTHON: false,
-      LUA: false,
-      REACT: false,
-      REACT_NATIVE: false,
-      NEXT_JS: false,
+      TYPESCRIPT: false, JAVASCRIPT: false, PYTHON: false, LUA: false,
+      REACT: false, REACT_NATIVE: false, NEXT_JS: false,
       
       PACKAGE_MANAGER: 'npm',
-      PACKAGE_MANAGER_NPM: true,
-      PACKAGE_MANAGER_YARN: false,
-      PACKAGE_MANAGER_PNPM: false,
+      PACKAGE_MANAGER_NPM: true, PACKAGE_MANAGER_YARN: false, PACKAGE_MANAGER_PNPM: false,
       
       HAS_MCP_SERVERS: answers.mcpServers.length > 0,
       MCP_SERVERS_JSON: mcpServersJson,
       MCP_SERVERS_PATH: join(require('os').homedir(), 'mcp-servers'),
       
-      USE_GIT: false,
-      USE_ENV_VARS: false,
-      ENV_PROD_PROTECTION: false,
-      USE_TESTING: false,
-      TESTING_FRAMEWORK: 'none',
+      USE_GIT: false, USE_ENV_VARS: false, ENV_PROD_PROTECTION: false,
+      USE_TESTING: false, TESTING_FRAMEWORK: 'none',
       
-      RULES_PATH: answers.aiTool === 'amazon-q' ? '.amazonq/rules' : '.kiro/steering',
-      AGENTS_PATH: answers.aiTool === 'amazon-q' ? '.amazonq/cli-agents' : '.kiro/agents',
+      RESOURCES_PATH: getResourcesPath(platform),
+      RULES_PATH: getSkillsDir(platform),
+      AGENTS_PATH: platform === 'amazon-q' ? '.amazonq/cli-agents' : '.kiro/agents',
     };
   }
   
@@ -182,8 +224,9 @@ function buildTemplateVars(answers: QuickSetupAnswers | DetailedSetupAnswers | C
     TESTING_FRAMEWORK: detailed.testingFramework || 'none',
     
     // Paths
-    RULES_PATH: (answers as QuickSetupAnswers).aiTool === 'amazon-q' ? '.amazonq/rules' : '.kiro/steering',
-    AGENTS_PATH: (answers as QuickSetupAnswers).aiTool === 'amazon-q' ? '.amazonq/cli-agents' : '.kiro/agents',
+    RESOURCES_PATH: getResourcesPath(platform),
+    RULES_PATH: getSkillsDir(platform),
+    AGENTS_PATH: platform === 'amazon-q' ? '.amazonq/cli-agents' : '.kiro/agents',
   };
 }
 
@@ -222,7 +265,6 @@ function generatePrompt(answers: QuickSetupAnswers): string {
   
   const lang = answers.language;
   const framework = answers.framework !== 'none' ? ` and ${answers.framework}` : '';
-  const rulesPath = answers.aiTool === 'amazon-q' ? '.amazonq/rules/' : '.kiro/steering/';
   
-  return `You are a ${type} specializing in ${lang}${framework}. You follow best practices and the steering rules defined in ${rulesPath} directory.`;
+  return `You are a ${type} specializing in ${lang}${framework}. You follow best practices and the skills available in your workspace.`;
 }

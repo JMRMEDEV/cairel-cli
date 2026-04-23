@@ -4,6 +4,7 @@ export type ProjectType = 'ui' | 'backend' | 'cli' | 'library' | 'fullstack';
 export type Language = 'typescript' | 'javascript' | 'python' | 'lua';
 export type Framework = 'react' | 'react-native' | 'next-js' | 'vue' | 'express' | 'fastify' | 'nest-js' | 'flask' | 'django' | 'fastapi' | 'none';
 export type AITool = 'kiro-cli' | 'amazon-q' | 'both';
+export type Platform = 'kiro' | 'claude-code' | 'github-copilot' | 'amazon-q';
 export type PackageManager = 'npm' | 'yarn' | 'pnpm';
 export type TestingFramework = 'jest' | 'vitest' | 'pytest' | 'none';
 export type Linter = 'eslint' | 'ruff' | 'luacheck' | 'none';
@@ -17,6 +18,7 @@ export interface QuickSetupAnswers {
   framework: Framework;
   useGit: boolean;
   aiTool: AITool;
+  platforms: Platform[];
   mcpServers: string[];
   additionalRules?: string[];
 }
@@ -37,6 +39,7 @@ export interface MCPServer {
 
 export interface CustomModeAnswers {
   aiTool: AITool;
+  platforms: Platform[];
   selectedRules: string[];
   mcpServers: string[];
 }

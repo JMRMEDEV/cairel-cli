@@ -17,14 +17,24 @@ export const validateCommand = new Command('validate')
     // If no path provided, auto-detect
     if (!targetPath) {
       const cwd = process.cwd();
+      const kiroSkills = path.join(cwd, '.kiro', 'skills');
       const kiroRules = path.join(cwd, '.kiro', 'steering');
       const kiroAgents = path.join(cwd, '.kiro', 'agents');
+      const claudeSkills = path.join(cwd, '.claude', 'skills');
+      const githubSkills = path.join(cwd, '.github', 'skills');
       const amazonqRules = path.join(cwd, '.amazonq', 'rules');
       const amazonqAgents = path.join(cwd, '.amazonq', 'cli-agents');
 
       const fs = await import('fs');
       
-      if (fs.existsSync(kiroRules)) {
+      // Prefer skills directories over legacy steering
+      if (fs.existsSync(kiroSkills)) {
+        options.skills = kiroSkills;
+      } else if (fs.existsSync(claudeSkills)) {
+        options.skills = claudeSkills;
+      } else if (fs.existsSync(githubSkills)) {
+        options.skills = githubSkills;
+      } else if (fs.existsSync(kiroRules)) {
         options.rules = kiroRules;
       } else if (fs.existsSync(amazonqRules)) {
         options.rules = amazonqRules;
@@ -36,7 +46,7 @@ export const validateCommand = new Command('validate')
         options.agents = amazonqAgents;
       }
 
-      if (!options.rules && !options.agents) {
+      if (!options.rules && !options.agents && !options.skills) {
         console.log(chalk.yellow('\n⚠ No configuration found. Use --rules or --agents to specify a path.'));
         process.exit(1);
       }
@@ -46,7 +56,6 @@ export const validateCommand = new Command('validate')
       const stats = fs.statSync(targetPath);
       
       if (stats.isFile()) {
-        // Validate single file
         const ext = path.extname(targetPath);
         if (ext === '.md') {
           options.rules = targetPath;
@@ -57,9 +66,36 @@ export const validateCommand = new Command('validate')
           process.exit(1);
         }
       } else {
-        // Auto-detect directory type
-        if (!options.rules && !options.agents) {
+        // Check if directory contains skill folders (has SKILL.md inside subdirs)
+        const entries = fs.readdirSync(targetPath, { withFileTypes: true });
+        const hasSkillFolders = entries.some((e: any) => e.isDirectory() && fs.existsSync(path.join(targetPath, e.name, 'SKILL.md')));
+        if (hasSkillFolders) {
+          options.skills = targetPath;
+        } else if (!options.rules && !options.agents) {
           options.rules = targetPath;
+        }
+      }
+    }
+
+    // Validate skills (new format)
+    if (options.skills) {
+      const spinner = ora('Validating skills...').start();
+      const skillsPath = typeof options.skills === 'string' ? path.resolve(process.cwd(), options.skills) : options.skills;
+      const results = await validator.validateSkillsDirectory(skillsPath);
+      spinner.stop();
+
+      if (results.size === 0) {
+        console.log(chalk.yellow(`\n⚠ No skills found in ${skillsPath}`));
+      } else {
+        console.log(chalk.bold(`\n📋 Skills Validation Results (${results.size} skills):\n`));
+        for (const [name, result] of results) {
+          if (result.valid && result.errors.length === 0) {
+            console.log(chalk.green(`✓ ${name}`));
+          } else {
+            hasErrors = true;
+            console.log(chalk.red(`✗ ${name}`));
+            result.errors.forEach(err => console.log(chalk.red(`  • ${err}`)));
+          }
         }
       }
     }

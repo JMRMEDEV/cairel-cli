@@ -8,6 +8,7 @@ describe('Go Language Support', () => {
       framework: 'gin',
       useGit: true,
       aiTool: 'kiro-cli',
+      platforms: ['kiro'],
       mcpServers: [],
       additionalRules: [],
     };
@@ -27,6 +28,7 @@ describe('Go Language Support', () => {
       framework: 'none',
       useGit: false,
       aiTool: 'kiro-cli',
+      platforms: ['kiro'],
       mcpServers: [],
       additionalRules: [],
     };

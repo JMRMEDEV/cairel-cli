@@ -6,10 +6,10 @@ Comprehensive test coverage for all wizard scenarios and file generation.
 
 ## Test Statistics
 
-- **Total Tests**: 78
-- **Test Suites**: 10
+- **Total Tests**: 91
+- **Test Suites**: 12
 - **Status**: ✅ All Passing
-- **Latest Update**: v1.0.1 (2026-01-19)
+- **Latest Update**: v2.0.0 (2026-04-22)
 
 ---
 

@@ -4,7 +4,30 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import matter from 'gray-matter';
 
-// Zod schema for rule frontmatter
+// Zod schema for skills frontmatter (agentskills.io spec + cairel metadata)
+const SkillFrontmatterSchema = z.object({
+  name: z.string().min(1).max(64).regex(/^[a-z][a-z0-9-]*[a-z0-9]$/, 'Name must be lowercase letters, numbers, and hyphens. Cannot start/end with hyphen.'),
+  description: z.string().min(1, 'Description is required').max(1024, 'Description must be at most 1024 characters'),
+  metadata: z.object({
+    'cairel-title': z.string().min(1).optional(),
+    'cairel-category': z.enum(['general', 'typescript', 'javascript', 'python', 'lua', 'git', 'ui', 'backend', 'testing', 'golang']).optional(),
+    'cairel-version': z.string().regex(/^\d+\.\d+\.\d+$/, 'Version must be semver format').optional(),
+    'cairel-tags': z.array(z.string()).optional(),
+    'cairel-always-include': z.boolean().optional(),
+    'cairel-conditions': z.object({
+      languages: z.array(z.string()).optional(),
+      frameworks: z.array(z.string()).optional(),
+      'project-types': z.array(z.string()).optional(),
+      'ui-library': z.array(z.string()).optional(),
+      linter: z.array(z.string()).optional(),
+      'versioning-strategy': z.array(z.string()).optional(),
+      'requires-git': z.boolean().optional(),
+      'requires-env-vars': z.boolean().optional(),
+    }).optional(),
+  }).optional(),
+});
+
+// Legacy Zod schema for old rule frontmatter
 const RuleMetaSchema = z.object({
   id: z.string().min(1),
   title: z.string().min(1),
@@ -88,7 +111,89 @@ export class Validator {
   }
 
   /**
-   * Validate a rule markdown file
+   * Validate a skill folder (skill-name/SKILL.md)
+   */
+  async validateSkill(skillDir: string): Promise<ValidationResult> {
+    const result: ValidationResult = { valid: true, errors: [], warnings: [] };
+
+    try {
+      const skillFile = path.join(skillDir, 'SKILL.md');
+      if (!await fs.pathExists(skillFile)) {
+        result.valid = false;
+        result.errors.push(`Missing SKILL.md in ${skillDir}`);
+        return result;
+      }
+
+      const content = await fs.readFile(skillFile, 'utf-8');
+      const parsed = matter(content);
+
+      if (!parsed.data || Object.keys(parsed.data).length === 0) {
+        result.valid = false;
+        result.errors.push('Missing frontmatter');
+        return result;
+      }
+
+      // Validate frontmatter
+      try {
+        SkillFrontmatterSchema.parse(parsed.data);
+      } catch (error) {
+        result.valid = false;
+        if (error instanceof z.ZodError) {
+          error.issues.forEach((err) => {
+            result.errors.push(`Frontmatter error: ${err.path.join('.')}: ${err.message}`);
+          });
+        }
+      }
+
+      // Validate name matches directory
+      const dirName = path.basename(skillDir);
+      if (parsed.data.name && parsed.data.name !== dirName) {
+        result.valid = false;
+        result.errors.push(`Skill name "${parsed.data.name}" does not match directory "${dirName}"`);
+      }
+
+      // Check for consecutive hyphens in name
+      if (parsed.data.name && parsed.data.name.includes('--')) {
+        result.valid = false;
+        result.errors.push('Skill name must not contain consecutive hyphens');
+      }
+
+    } catch (error) {
+      result.valid = false;
+      result.errors.push(`Validation error: ${error instanceof Error ? error.message : String(error)}`);
+    }
+
+    return result;
+  }
+
+  /**
+   * Validate all skills in a directory (expects skill-name/SKILL.md structure)
+   */
+  async validateSkillsDirectory(dirPath: string): Promise<Map<string, ValidationResult>> {
+    const results = new Map<string, ValidationResult>();
+
+    try {
+      if (!await fs.pathExists(dirPath)) return results;
+
+      const entries = await fs.readdir(dirPath, { withFileTypes: true });
+      for (const entry of entries) {
+        if (!entry.isDirectory()) continue;
+        const skillDir = path.join(dirPath, entry.name);
+        const skillFile = path.join(skillDir, 'SKILL.md');
+        if (await fs.pathExists(skillFile)) {
+          const result = await this.validateSkill(skillDir);
+          results.set(entry.name, result);
+        }
+      }
+    } catch (error) {
+      // Return empty map on error
+    }
+
+    return results;
+  }
+
+  /**
+   * Validate a rule markdown file (legacy format)
    */
   async validateRule(filePath: string): Promise<ValidationResult> {
     const result: ValidationResult = { valid: true, errors: [], warnings: [] };

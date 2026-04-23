@@ -35,7 +35,7 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ projectType: 'ui', language: 'typescript' })
         .mockResolvedValueOnce({ framework: 'react' })
         .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ aiTool: 'kiro-cli' })
+        .mockResolvedValueOnce({ platforms: ['kiro'] })
         .mockResolvedValueOnce({}) // No MCP servers
         .mockResolvedValueOnce({
           testingFramework: 'jest',
@@ -63,7 +63,7 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ projectType: 'fullstack', language: 'javascript' })
         .mockResolvedValueOnce({ framework: 'next-js' })
         .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ aiTool: 'both' })
+        .mockResolvedValueOnce({ platforms: ['kiro', 'amazon-q'] })
         .mockResolvedValueOnce({}) // No MCP servers
         .mockResolvedValueOnce({
           testingFramework: 'vitest',
@@ -89,7 +89,7 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ projectType: 'backend', language: 'typescript' })
         .mockResolvedValueOnce({ framework: 'express' })
         .mockResolvedValueOnce({ useGit: false })
-        .mockResolvedValueOnce({ aiTool: 'amazon-q' })
+        .mockResolvedValueOnce({ platforms: ['amazon-q'] })
         .mockResolvedValueOnce({}) // No MCP servers
         .mockResolvedValueOnce({
           testingFramework: 'jest',
@@ -115,7 +115,7 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ projectType: 'backend', language: 'python' })
         .mockResolvedValueOnce({ framework: 'fastapi' })
         .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ aiTool: 'kiro-cli' })
+        .mockResolvedValueOnce({ platforms: ['kiro'] })
         .mockResolvedValueOnce({}) // No MCP servers
         .mockResolvedValueOnce({
           testingFramework: 'pytest',
@@ -138,7 +138,7 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ projectType: 'backend', language: 'python' })
         .mockResolvedValueOnce({ framework: 'django' })
         .mockResolvedValueOnce({ useGit: false })
-        .mockResolvedValueOnce({ aiTool: 'amazon-q' })
+        .mockResolvedValueOnce({ platforms: ['amazon-q'] })
         .mockResolvedValueOnce({}) // No MCP servers
         .mockResolvedValueOnce({
           testingFramework: 'none',
@@ -162,7 +162,7 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ projectType: 'ui', language: 'typescript' })
         .mockResolvedValueOnce({ framework: 'vue' })
         .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ aiTool: 'kiro-cli' })
+        .mockResolvedValueOnce({ platforms: ['kiro'] })
         .mockResolvedValueOnce({}) // No MCP servers
         .mockResolvedValueOnce({
           testingFramework: 'vitest',
@@ -185,7 +185,7 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ projectType: 'fullstack', language: 'javascript' })
         .mockResolvedValueOnce({ framework: 'next-js' })
         .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ aiTool: 'both' })
+        .mockResolvedValueOnce({ platforms: ['kiro', 'amazon-q'] })
         .mockResolvedValueOnce({}) // No MCP servers
         .mockResolvedValueOnce({
           testingFramework: 'jest',
@@ -200,7 +200,7 @@ describe('Detailed Setup Mode', () => {
       const result = await runWizard() as DetailedSetupAnswers;
 
       expect(result.uiLibrary).toBe('material-ui');
-      expect(result.aiTool).toBe('both');
+      expect(result.platforms).toEqual(['kiro', 'amazon-q']);
     });
   });
 
@@ -211,7 +211,7 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ projectType: 'backend', language: 'typescript' })
         .mockResolvedValueOnce({ framework: 'nestjs' })
         .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ aiTool: 'kiro-cli' })
+        .mockResolvedValueOnce({ platforms: ['kiro'] })
         .mockResolvedValueOnce({}) // No MCP servers
         .mockResolvedValueOnce({
           testingFramework: 'jest',
@@ -233,7 +233,7 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ projectType: 'cli', language: 'javascript' })
         .mockResolvedValueOnce({ framework: 'none' })
         .mockResolvedValueOnce({ useGit: false })
-        .mockResolvedValueOnce({ aiTool: 'amazon-q' })
+        .mockResolvedValueOnce({ platforms: ['amazon-q'] })
         .mockResolvedValueOnce({}) // No MCP servers
         .mockResolvedValueOnce({
           testingFramework: 'none',
