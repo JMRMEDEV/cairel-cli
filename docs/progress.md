@@ -662,3 +662,52 @@ The package is ready to be published to npm. Follow steps in PUBLISH.md:
 - ✅ Documentation updated
 
 **Next**: Ready for v1.1.0 release with Go support
+
+---
+
+## 2026-04-22 - v2.0.0 Skills Migration 🚧 IN PROGRESS
+
+### Migration Plan Created
+
+- ✅ Researched Agent Skills standard across Kiro, GitHub Copilot, Claude Code, and agentskills.io
+- ✅ Confirmed skills are the emerging cross-platform standard
+- ✅ Designed migration approach: preserve cairel selection logic in `metadata.cairel-*` fields
+- ✅ Created `docs/skills-migration-plan.md` with 8-stage plan
+
+### Stage 1: Skills Format Design & Rule Conversion ✅ COMPLETE
+
+**Completed**:
+- ✅ Defined cairel metadata schema (`cairel-category`, `cairel-version`, `cairel-conditions`, `cairel-tags`, `cairel-always-include`)
+- ✅ Created 23 skill folders in `curated-presets/skills/`
+- ✅ Converted all 23 rules to Agent Skills format (`skill-name/SKILL.md`)
+- ✅ Mapped old frontmatter to skills frontmatter + cairel metadata
+- ✅ Wrote discovery-optimized descriptions (action-oriented, keyword-rich)
+- ✅ Validated all skills against agentskills.io spec constraints
+- ✅ Created `curated-presets/skills/README.md` with format docs and catalog
+
+**Skills Created (23)**:
+
+| Category | Skills |
+|----------|--------|
+| General (8) | context-retrieval, implementation-approval, package-manager-safety, semantic-versioning, eslint-configuration, package-json-management, markdown-maintenance, development-workflow-meta |
+| TypeScript (4) | typescript-validation, component-structure, react-props-destructuring, absolute-imports |
+| Git (1) | git-management |
+| UI (6) | visual-verification, mock-data-strategy, icon-usage-patterns, chakra-ui-v3-integration, gluestack-ui-v1-themed, react-native-component-patterns |
+| Backend (1) | multi-environment-management |
+| Testing (1) | test-cleanup-protocol |
+| Lua (1) | lua-semantic-versioning |
+| Golang (1) | go-style-conventions |
+
+**Validation Results**:
+- ✅ All 23 skill names match directory names
+- ✅ All names valid (lowercase, hyphens, ≤64 chars)
+- ✅ All descriptions present (≤1024 chars)
+- ✅ All cairel metadata preserved in `metadata.cairel-*`
+- ✅ Content condensed for progressive disclosure
+
+**Key Design Decision**:
+- AI tools (Kiro, Copilot, Claude Code) discover skills via `name` and `description`
+- Cairel uses `metadata.cairel-*` fields for wizard-driven conditional selection
+- Both work independently — no conflict
+
+**Next**: Stage 2 - Manifest & Selection Logic Update
