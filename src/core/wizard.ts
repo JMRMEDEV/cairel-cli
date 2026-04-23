@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import ora from 'ora';
 import { promises as fs } from 'fs';
 import { join } from 'path';
-import { WizardMode, QuickSetupAnswers, DetailedSetupAnswers, CustomModeAnswers, Framework } from '../types/wizard';
+import { WizardMode, QuickSetupAnswers, DetailedSetupAnswers, CustomModeAnswers, Framework, AITool } from '../types/wizard';
 import { detectMCPServers } from '../utils/mcp-detector';
 import { selectRules } from './rules-selector';
 
@@ -118,16 +118,18 @@ async function runQuickSetup(): Promise<QuickSetupAnswers> {
     },
   ]);
 
-  const aiToolAnswer = await inquirer.prompt([
+  const platformAnswer = await inquirer.prompt([
     {
-      type: 'list',
-      name: 'aiTool',
-      message: 'Which AI tool(s) will you use?',
+      type: 'checkbox',
+      name: 'platforms',
+      message: 'Which platforms will you use? (select all that apply)',
       choices: [
-        { name: 'kiro-cli', value: 'kiro-cli' },
+        { name: 'Kiro', value: 'kiro', checked: true },
+        { name: 'Claude Code', value: 'claude-code' },
+        { name: 'GitHub Copilot', value: 'github-copilot' },
         { name: 'Amazon Q Developer', value: 'amazon-q' },
-        { name: 'Both', value: 'both' },
       ],
+      validate: (input: string[]) => input.length > 0 ? true : 'Select at least one platform',
     },
   ]);
 
@@ -151,11 +153,13 @@ async function runQuickSetup(): Promise<QuickSetupAnswers> {
     },
   ]);
 
+  const platforms = platformAnswer.platforms;
   const result = {
     ...answers,
     framework: frameworkAnswer.framework || 'none',
     useGit: gitAnswer.useGit,
-    aiTool: aiToolAnswer.aiTool,
+    aiTool: (platforms.includes('kiro') ? 'kiro-cli' : platforms.includes('amazon-q') ? 'amazon-q' : 'kiro-cli') as AITool,
+    platforms,
     mcpServers: mcpAnswer.mcpServers || [],
   };
 
@@ -298,19 +302,23 @@ async function runCustomSetup(): Promise<CustomModeAnswers> {
     rulesByCategory[category].push(rule);
   });
 
-  // Select AI tool first
-  const { aiTool } = await inquirer.prompt([
+  // Select platforms first
+  const { platforms } = await inquirer.prompt([
     {
-      type: 'list',
-      name: 'aiTool',
-      message: 'Which AI tool(s) will you use?',
+      type: 'checkbox',
+      name: 'platforms',
+      message: 'Which platforms will you use? (select all that apply)',
       choices: [
-        { name: 'kiro-cli', value: 'kiro-cli' },
+        { name: 'Kiro', value: 'kiro', checked: true },
+        { name: 'Claude Code', value: 'claude-code' },
+        { name: 'GitHub Copilot', value: 'github-copilot' },
         { name: 'Amazon Q Developer', value: 'amazon-q' },
-        { name: 'Both', value: 'both' },
       ],
+      validate: (input: string[]) => input.length > 0 ? true : 'Select at least one platform',
     },
   ]);
+
+  const aiTool: AITool = platforms.includes('kiro') ? 'kiro-cli' : platforms.includes('amazon-q') ? 'amazon-q' : 'kiro-cli';
 
   // Show rules grouped by category
   const ruleChoices = Object.entries(rulesByCategory).flatMap(([category, rules]) => [
@@ -361,6 +369,7 @@ async function runCustomSetup(): Promise<CustomModeAnswers> {
 
   const result: CustomModeAnswers = {
     aiTool,
+    platforms,
     selectedRules,
     mcpServers: mcpAnswer.mcpServers || [],
   };

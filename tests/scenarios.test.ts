@@ -8,6 +8,7 @@ describe('Comprehensive Scenario Testing', () => {
       framework: 'react' as const,
       useGit: true,
       aiTool: 'kiro-cli' as const,
+      platforms: ['kiro' as const],
       mcpServers: [],
     };
 
@@ -45,6 +46,7 @@ describe('Comprehensive Scenario Testing', () => {
       language: 'typescript' as const,
       useGit: true,
       aiTool: 'kiro-cli' as const,
+      platforms: ['kiro' as const],
       mcpServers: [],
     };
 
@@ -83,6 +85,7 @@ describe('Comprehensive Scenario Testing', () => {
       framework: 'none' as const,
       useGit: true,
       aiTool: 'kiro-cli' as const,
+      platforms: ['kiro' as const],
       mcpServers: [],
     };
 
@@ -121,6 +124,7 @@ describe('Comprehensive Scenario Testing', () => {
       language: 'typescript' as const,
       framework: 'none' as const,
       aiTool: 'kiro-cli' as const,
+      platforms: ['kiro' as const],
       mcpServers: [],
     };
 
@@ -142,6 +146,7 @@ describe('Comprehensive Scenario Testing', () => {
       framework: 'react' as const,
       useGit: true,
       aiTool: 'kiro-cli' as const,
+      platforms: ['kiro' as const],
       mcpServers: [],
       testingFramework: 'none' as const,
       linter: 'none' as const,
@@ -209,6 +214,7 @@ describe('Comprehensive Scenario Testing', () => {
         framework: 'next-js',
         useGit: true,
         aiTool: 'kiro-cli',
+      platforms: ['kiro'],
         mcpServers: ['amazon-q-history'],
         testingFramework: 'jest',
         linter: 'eslint',
@@ -243,6 +249,7 @@ describe('Comprehensive Scenario Testing', () => {
         framework: 'fastapi',
         useGit: false,
         aiTool: 'amazon-q',
+      platforms: ['amazon-q'],
         mcpServers: [],
       };
 
@@ -266,6 +273,7 @@ describe('Comprehensive Scenario Testing', () => {
         framework: 'react-native',
         useGit: true,
         aiTool: 'kiro-cli',
+      platforms: ['kiro'],
         mcpServers: [],
         testingFramework: 'jest',
         linter: 'eslint',

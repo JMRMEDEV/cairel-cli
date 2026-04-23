@@ -35,6 +35,7 @@ describe('MCP Server JSON Generation', () => {
       framework: 'react',
       useGit: true,
       aiTool: 'kiro-cli',
+      platforms: ['kiro'],
       mcpServers: ['gpt', 'web-scraper'],
     };
 
@@ -71,6 +72,7 @@ describe('MCP Server JSON Generation', () => {
       framework: 'none',
       useGit: false,
       aiTool: 'kiro-cli',
+      platforms: ['kiro'],
       mcpServers: ['amazon-q-history'],
     };
 
@@ -93,6 +95,7 @@ describe('MCP Server JSON Generation', () => {
       framework: 'none',
       useGit: false,
       aiTool: 'kiro-cli',
+      platforms: ['kiro'],
       mcpServers: [],
     };
 
@@ -114,6 +117,7 @@ describe('MCP Server JSON Generation', () => {
       framework: 'react',
       useGit: true,
       aiTool: 'kiro-cli',
+      platforms: ['kiro'],
       mcpServers: ['amazon-q-history', 'gpt', 'web-scraper', 'cypress', 'chakra-ui'],
     };
 

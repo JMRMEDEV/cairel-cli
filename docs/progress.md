@@ -728,3 +728,26 @@ The package is ready to be published to npm. Follow steps in PUBLISH.md:
 - `npm run build` regenerates manifest from skills on every build
 
 **Next**: Stage 3 - Multi-Platform Output Generation
+
+### Stage 3: Multi-Platform Output Generation ✅ COMPLETE
+
+**Completed**:
+- ✅ Added `Platform` type (`kiro`, `claude-code`, `github-copilot`, `amazon-q`)
+- ✅ Added `platforms: Platform[]` field to all answer interfaces
+- ✅ Replaced single-select "AI Tools" wizard question with multi-select platforms
+- ✅ Updated generator to output skill folders (`skill-name/SKILL.md`) for Kiro, Claude Code, GitHub Copilot
+- ✅ Kept legacy flat format (`.md` files) for Amazon Q backward compatibility
+- ✅ Generator copies `references/` subdirectories when present
+- ✅ Agent JSON generated for Kiro and Amazon Q (platforms that use them)
+- ✅ Derived `aiTool` from `platforms` for backward compatibility
+- ✅ Updated all 80 tests for new platform structure
+
+**Platform Output Paths**:
+- Kiro: `.kiro/skills/skill-name/SKILL.md`
+- Claude Code: `.claude/skills/skill-name/SKILL.md`
+- GitHub Copilot: `.github/skills/skill-name/SKILL.md`
+- Amazon Q: `.amazonq/rules/skill-name.md` (flat, backward compat)
+
+**Test Results**: 11 suites, 80 tests, all passing
+
+**Next**: Stage 4 - Wizard & Template Updates

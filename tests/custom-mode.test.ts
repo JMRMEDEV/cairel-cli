@@ -32,7 +32,7 @@ describe('Custom Mode Tests', () => {
     test('allows user to select custom mode', async () => {
       mockPrompt
         .mockResolvedValueOnce({ mode: 'custom' })
-        .mockResolvedValueOnce({ aiTool: 'kiro-cli' })
+        .mockResolvedValueOnce({ platforms: ['kiro'] })
         .mockResolvedValueOnce({ 
           selectedRules: ['context-retrieval', 'implementation-approval', 'typescript-validation'] 
         })
@@ -41,7 +41,7 @@ describe('Custom Mode Tests', () => {
 
       const result = await runWizard();
 
-      expect(result).toHaveProperty('aiTool', 'kiro-cli');
+      expect(result).toHaveProperty('platforms', ['kiro']);
       expect(result).toHaveProperty('selectedRules');
       expect((result as any).selectedRules).toContain('context-retrieval');
       expect((result as any).selectedRules).toContain('implementation-approval');
@@ -53,7 +53,7 @@ describe('Custom Mode Tests', () => {
 
       mockPrompt
         .mockResolvedValueOnce({ mode: 'custom' })
-        .mockResolvedValueOnce({ aiTool: 'amazon-q' })
+        .mockResolvedValueOnce({ platforms: ['amazon-q'] })
         .mockResolvedValueOnce({ 
           selectedRules: ['context-retrieval', 'implementation-approval'] 
         })
@@ -62,14 +62,14 @@ describe('Custom Mode Tests', () => {
 
       const result = await runWizard();
 
-      expect(result).toHaveProperty('aiTool', 'amazon-q');
+      expect(result).toHaveProperty('platforms', ['amazon-q']);
       expect((result as any).mcpServers).toEqual([]);
     });
 
     test('custom mode with multiple rules selected', async () => {
       mockPrompt
         .mockResolvedValueOnce({ mode: 'custom' })
-        .mockResolvedValueOnce({ aiTool: 'both' })
+        .mockResolvedValueOnce({ platforms: ['kiro', 'amazon-q'] })
         .mockResolvedValueOnce({ 
           selectedRules: [
             'context-retrieval',
@@ -96,7 +96,7 @@ describe('Custom Mode Tests', () => {
         .mockResolvedValueOnce({ projectType: 'ui', language: 'typescript' })
         .mockResolvedValueOnce({ framework: 'react' })
         .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ aiTool: 'kiro-cli' })
+        .mockResolvedValueOnce({ platforms: ['kiro'] })
         .mockResolvedValueOnce({ mcpServers: [] })
         .mockResolvedValueOnce({ wantsReview: false });
 
@@ -112,7 +112,7 @@ describe('Custom Mode Tests', () => {
         .mockResolvedValueOnce({ projectType: 'backend', language: 'python' })
         .mockResolvedValueOnce({ framework: 'fastapi' })
         .mockResolvedValueOnce({ useGit: false })
-        .mockResolvedValueOnce({ aiTool: 'kiro-cli' })
+        .mockResolvedValueOnce({ platforms: ['kiro'] })
         .mockResolvedValueOnce({ mcpServers: [] })
         .mockResolvedValueOnce({ wantsReview: true })
         .mockResolvedValueOnce({ 
@@ -134,7 +134,7 @@ describe('Custom Mode Tests', () => {
         .mockResolvedValueOnce({ projectType: 'ui', language: 'typescript' })
         .mockResolvedValueOnce({ framework: 'react' })
         .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ aiTool: 'kiro-cli' })
+        .mockResolvedValueOnce({ platforms: ['kiro'] })
         .mockResolvedValueOnce({ mcpServers: [] })
         .mockResolvedValueOnce({ wantsReview: true })
         .mockResolvedValueOnce({ 
@@ -154,7 +154,7 @@ describe('Custom Mode Tests', () => {
         .mockResolvedValueOnce({ projectType: 'fullstack', language: 'typescript' })
         .mockResolvedValueOnce({ framework: 'next-js' })
         .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ aiTool: 'kiro-cli' })
+        .mockResolvedValueOnce({ platforms: ['kiro'] })
         .mockResolvedValueOnce({ mcpServers: [] })
         .mockResolvedValueOnce({ 
           testingFramework: 'jest',
@@ -178,7 +178,7 @@ describe('Custom Mode Tests', () => {
         .mockResolvedValueOnce({ projectType: 'ui', language: 'typescript' })
         .mockResolvedValueOnce({ framework: 'react' })
         .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ aiTool: 'amazon-q' })
+        .mockResolvedValueOnce({ platforms: ['amazon-q'] })
         .mockResolvedValueOnce({ mcpServers: ['amazon-q-history'] })
         .mockResolvedValueOnce({ 
           testingFramework: 'vitest',
@@ -210,7 +210,7 @@ describe('Custom Mode Tests', () => {
     test('custom mode with review allows further customization', async () => {
       mockPrompt
         .mockResolvedValueOnce({ mode: 'custom' })
-        .mockResolvedValueOnce({ aiTool: 'kiro-cli' })
+        .mockResolvedValueOnce({ platforms: ['kiro'] })
         .mockResolvedValueOnce({ 
           selectedRules: [
             'context-retrieval',
@@ -237,7 +237,7 @@ describe('Custom Mode Tests', () => {
     test('custom mode review can be cancelled', async () => {
       mockPrompt
         .mockResolvedValueOnce({ mode: 'custom' })
-        .mockResolvedValueOnce({ aiTool: 'kiro-cli' })
+        .mockResolvedValueOnce({ platforms: ['kiro'] })
         .mockResolvedValueOnce({ 
           selectedRules: ['context-retrieval', 'implementation-approval'] 
         })
@@ -257,7 +257,7 @@ describe('Custom Mode Tests', () => {
     test('custom mode with all rules selected', async () => {
       mockPrompt
         .mockResolvedValueOnce({ mode: 'custom' })
-        .mockResolvedValueOnce({ aiTool: 'both' })
+        .mockResolvedValueOnce({ platforms: ['kiro', 'amazon-q'] })
         .mockResolvedValueOnce({ 
           selectedRules: [
             'context-retrieval',
@@ -293,7 +293,7 @@ describe('Custom Mode Tests', () => {
         .mockResolvedValueOnce({ projectType: 'cli', language: 'lua' })
         .mockResolvedValueOnce({}) // No framework prompt (returns empty)
         .mockResolvedValueOnce({ useGit: false })
-        .mockResolvedValueOnce({ aiTool: 'kiro-cli' })
+        .mockResolvedValueOnce({ platforms: ['kiro'] })
         .mockResolvedValueOnce({}) // No MCP servers
         .mockResolvedValueOnce({ wantsReview: true })
         .mockResolvedValueOnce({ 

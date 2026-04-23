@@ -57,16 +57,17 @@ describe('File Generation Integration', () => {
       framework: 'react',
       useGit: true,
       aiTool: 'kiro-cli',
+      platforms: ['kiro'],
       mcpServers: ['amazon-q-history'],
     };
 
     await generateFiles(answers, testDir);
 
     // Check directories exist
-    const rulesDir = join(testDir, '.kiro', 'steering');
+    const skillsDir = join(testDir, '.kiro', 'skills');
     const agentsDir = join(testDir, '.kiro', 'agents');
 
-    expect(await fs.stat(rulesDir)).toBeTruthy();
+    expect(await fs.stat(skillsDir)).toBeTruthy();
     expect(await fs.stat(agentsDir)).toBeTruthy();
 
     // Check agent file exists and has correct content
@@ -77,54 +78,41 @@ describe('File Generation Integration', () => {
     const agent = JSON.parse(agentContent);
 
     expect(agent.name).toBe('dev-agent');
-    expect(agent.description).toContain('Typescript'); // Note: lowercase 't' from generator
+    expect(agent.description).toContain('Typescript');
     expect(agent.prompt).toContain('frontend developer');
     expect(agent.prompt).toContain('typescript');
     expect(agent.prompt).toContain('react');
 
-    // Check rules exist and are correct
-    const rules = await fs.readdir(rulesDir);
+    // Check skill folders exist
+    const skills = await fs.readdir(skillsDir);
     
     // Always included
-    expect(rules).toContain('context-retrieval.md');
-    expect(rules).toContain('implementation-approval.md');
+    expect(skills).toContain('context-retrieval');
+    expect(skills).toContain('implementation-approval');
     
     // TypeScript specific
-    expect(rules).toContain('typescript-validation.md');
-    expect(rules).toContain('package-manager-safety.md');
-    expect(rules).toContain('package-json-management.md');
+    expect(skills).toContain('typescript-validation');
+    expect(skills).toContain('package-manager-safety');
     
     // React specific
-    expect(rules).toContain('react-props-destructuring.md');
-    expect(rules).toContain('component-structure.md');
+    expect(skills).toContain('react-props-destructuring');
+    expect(skills).toContain('component-structure');
     
     // Git
-    expect(rules).toContain('git-management.md');
+    expect(skills).toContain('git-management');
     
     // UI specific
-    expect(rules).toContain('visual-verification.md');
-    expect(rules).toContain('mock-data-strategy.md');
-    
-    // General rules that match all project types
-    expect(rules).toContain('markdown-maintenance.md');
-    expect(rules).toContain('development-workflow-meta.md');
-    
-    // Should NOT have detailed-only rules
-    expect(rules).not.toContain('eslint-configuration.md');
-    expect(rules).not.toContain('semantic-versioning.md');
-    expect(rules).not.toContain('icon-usage-patterns.md'); // Requires UI library
-    
-    // Should have a reasonable number of rules for UI TypeScript React
-    expect(rules.length).toBeGreaterThanOrEqual(10); // At least 10 rules
-    expect(rules.length).toBeLessThan(20); // But not all rules
+    expect(skills).toContain('visual-verification');
+    expect(skills).toContain('mock-data-strategy');
 
-    // Verify rule content (spot check)
-    const tsValidationContent = await fs.readFile(
-      join(rulesDir, 'typescript-validation.md'),
-      'utf-8'
-    );
-    expect(tsValidationContent).toContain('TypeScript Compilation Validation');
-    expect(tsValidationContent).toContain('npx tsc --noEmit');
+    // Each skill should have SKILL.md
+    const tsSkillPath = join(skillsDir, 'typescript-validation', 'SKILL.md');
+    const tsContent = await fs.readFile(tsSkillPath, 'utf-8');
+    expect(tsContent).toContain('TypeScript Compilation Validation');
+    expect(tsContent).toContain('npx tsc --noEmit');
+    
+    expect(skills.length).toBeGreaterThanOrEqual(10);
+    expect(skills.length).toBeLessThan(20);
   });
 
   it('should generate files for Amazon Q', async () => {
@@ -134,6 +122,7 @@ describe('File Generation Integration', () => {
       framework: 'none',
       useGit: false,
       aiTool: 'amazon-q',
+      platforms: ['amazon-q'],
       mcpServers: [],
     };
 

@@ -42,7 +42,7 @@ describe('Wizard Flows with Inquirer Mocking', () => {
         .mockResolvedValueOnce({ projectType: 'ui', language: 'typescript' })
         .mockResolvedValueOnce({ framework: 'react' })
         .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ aiTool: 'kiro-cli' })
+        .mockResolvedValueOnce({ platforms: ['kiro'] })
         .mockResolvedValueOnce({ mcpServers: ['amazon-q-history', 'gpt'] })
         .mockResolvedValueOnce({ wantsReview: false });
 
@@ -53,6 +53,7 @@ describe('Wizard Flows with Inquirer Mocking', () => {
       expect(result.framework).toBe('react');
       expect(result.useGit).toBe(true);
       expect(result.aiTool).toBe('kiro-cli');
+      expect(result.platforms).toEqual(['kiro']);
     });
 
     it('should complete Backend Python flow', async () => {
@@ -61,7 +62,7 @@ describe('Wizard Flows with Inquirer Mocking', () => {
         .mockResolvedValueOnce({ projectType: 'backend', language: 'python' })
         .mockResolvedValueOnce({ framework: 'flask' })
         .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ aiTool: 'kiro-cli' })
+        .mockResolvedValueOnce({ platforms: ['kiro'] })
         .mockResolvedValueOnce({ mcpServers: ['amazon-q-history'] })
         .mockResolvedValueOnce({ wantsReview: false });
 
@@ -78,7 +79,7 @@ describe('Wizard Flows with Inquirer Mocking', () => {
         .mockResolvedValueOnce({ projectType: 'fullstack', language: 'typescript' })
         .mockResolvedValueOnce({ framework: 'next-js' })
         .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ aiTool: 'both' })
+        .mockResolvedValueOnce({ platforms: ['kiro', 'amazon-q'] })
         .mockResolvedValueOnce({ mcpServers: ['amazon-q-history', 'gpt'] })
         .mockResolvedValueOnce({ wantsReview: false });
 
@@ -99,7 +100,7 @@ describe('Wizard Flows with Inquirer Mocking', () => {
         .mockResolvedValueOnce({ projectType: 'ui', language: 'typescript' })
         .mockResolvedValueOnce({ framework: 'react' })
         .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ aiTool: 'kiro-cli' })
+        .mockResolvedValueOnce({ platforms: ['kiro'] })
         .mockResolvedValueOnce({}) // No MCP servers
         .mockResolvedValueOnce({ wantsReview: false });
 

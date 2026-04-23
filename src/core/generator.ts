@@ -3,8 +3,26 @@ import { join, dirname } from 'path';
 import Handlebars from 'handlebars';
 import chalk from 'chalk';
 import ora from 'ora';
-import { QuickSetupAnswers, DetailedSetupAnswers, CustomModeAnswers } from '../types/wizard';
+import { QuickSetupAnswers, DetailedSetupAnswers, CustomModeAnswers, Platform } from '../types/wizard';
 import { selectRules } from './rules-selector';
+
+interface PlatformPaths {
+  skillsDir: string;
+  agentsDir: string;
+}
+
+function getPlatformPaths(platform: Platform, targetDir: string): PlatformPaths {
+  switch (platform) {
+    case 'kiro':
+      return { skillsDir: join(targetDir, '.kiro', 'skills'), agentsDir: join(targetDir, '.kiro', 'agents') };
+    case 'claude-code':
+      return { skillsDir: join(targetDir, '.claude', 'skills'), agentsDir: join(targetDir, '.claude', 'skills') };
+    case 'github-copilot':
+      return { skillsDir: join(targetDir, '.github', 'skills'), agentsDir: join(targetDir, '.github', 'skills') };
+    case 'amazon-q':
+      return { skillsDir: join(targetDir, '.amazonq', 'rules'), agentsDir: join(targetDir, '.amazonq', 'cli-agents') };
+  }
+}
 
 export async function generateFiles(
   answers: QuickSetupAnswers | DetailedSetupAnswers | CustomModeAnswers,
@@ -13,65 +31,82 @@ export async function generateFiles(
   const spinner = ora('Generating configuration...').start();
 
   try {
-    // Determine paths based on AI tool
-    const paths = getPaths(answers.aiTool, targetDir);
-    
-    // Create directories
-    await createDirectories(paths);
-    spinner.text = 'Directories created';
-
-    // Copy rules
-    const rules = 'selectedRules' in answers 
-      ? answers.selectedRules 
+    const platforms: Platform[] = answers.platforms || [answers.aiTool === 'amazon-q' ? 'amazon-q' : 'kiro'];
+    const rules = 'selectedRules' in answers
+      ? answers.selectedRules
       : await selectRules(answers);
-    await copyRules(rules, paths.rulesDir);
-    spinner.text = `Copied ${rules.length} rules`;
 
-    // Generate agent configuration
-    const agentName = await generateAgent(answers, paths.agentsDir);
+    for (const platform of platforms) {
+      const paths = getPlatformPaths(platform, targetDir);
+      await fs.mkdir(paths.skillsDir, { recursive: true });
+      await fs.mkdir(paths.agentsDir, { recursive: true });
+
+      if (platform === 'amazon-q') {
+        // Legacy flat format for Amazon Q
+        await copyRulesFlat(rules, paths.skillsDir);
+      } else {
+        // Skills folder format for all other platforms
+        await copySkillFolders(rules, paths.skillsDir);
+      }
+
+      // Generate agent only for platforms that use them
+      if (platform === 'kiro' || platform === 'amazon-q') {
+        await generateAgent(answers, paths.agentsDir, platform);
+      }
+    }
+
     spinner.succeed(chalk.green('Configuration generated successfully!'));
 
     // Show summary
     console.log(chalk.bold('\n📁 Generated files:'));
-    console.log(chalk.cyan(`  ${paths.rulesDir}/`));
-    rules.forEach(rule => console.log(chalk.gray(`    - ${rule}.md`)));
-    console.log(chalk.cyan(`  ${paths.agentsDir}/`));
-    console.log(chalk.gray(`    - ${agentName}.json`));
+    for (const platform of platforms) {
+      const paths = getPlatformPaths(platform, targetDir);
+      console.log(chalk.cyan(`  ${paths.skillsDir}/`));
+      if (platform === 'amazon-q') {
+        rules.forEach(rule => console.log(chalk.gray(`    - ${rule}.md`)));
+      } else {
+        rules.forEach(rule => console.log(chalk.gray(`    - ${rule}/SKILL.md`)));
+      }
+    }
   } catch (error) {
     spinner.fail(chalk.red('Failed to generate configuration'));
     throw error;
   }
 }
 
-function getPaths(aiTool: string, targetDir: string) {
-  if (aiTool === 'kiro-cli') {
-    return {
-      rulesDir: join(targetDir, '.kiro', 'steering'),
-      agentsDir: join(targetDir, '.kiro', 'agents'),
-    };
-  } else if (aiTool === 'amazon-q') {
-    return {
-      rulesDir: join(targetDir, '.amazonq', 'rules'),
-      agentsDir: join(targetDir, '.amazonq', 'cli-agents'),
-    };
-  } else {
-    // both
-    return {
-      rulesDir: join(targetDir, '.kiro', 'steering'),
-      agentsDir: join(targetDir, '.kiro', 'agents'),
-      rulesDir2: join(targetDir, '.amazonq', 'rules'),
-      agentsDir2: join(targetDir, '.amazonq', 'cli-agents'),
-    };
+async function copySkillFolders(rules: string[], targetDir: string): Promise<void> {
+  const sourceBase = join(__dirname, '..', '..', 'curated-presets', 'skills');
+
+  for (const ruleName of rules) {
+    const sourceSkill = join(sourceBase, ruleName, 'SKILL.md');
+    const targetSkillDir = join(targetDir, ruleName);
+    const targetSkill = join(targetSkillDir, 'SKILL.md');
+
+    try {
+      await fs.mkdir(targetSkillDir, { recursive: true });
+      const content = await fs.readFile(sourceSkill, 'utf-8');
+      await fs.writeFile(targetSkill, content, 'utf-8');
+
+      // Copy references/ if exists
+      const refsDir = join(sourceBase, ruleName, 'references');
+      try {
+        const refs = await fs.readdir(refsDir);
+        const targetRefs = join(targetSkillDir, 'references');
+        await fs.mkdir(targetRefs, { recursive: true });
+        for (const ref of refs) {
+          const src = join(refsDir, ref);
+          await fs.copyFile(src, join(targetRefs, ref));
+        }
+      } catch {
+        // No references/ directory, skip
+      }
+    } catch (error) {
+      console.warn(chalk.yellow(`Warning: Could not copy skill ${ruleName}`));
+    }
   }
 }
 
-async function createDirectories(paths: Record<string, string>): Promise<void> {
-  for (const path of Object.values(paths)) {
-    await fs.mkdir(path, { recursive: true });
-  }
-}
-
-async function copyRules(rules: string[], targetDir: string): Promise<void> {
+async function copyRulesFlat(rules: string[], targetDir: string): Promise<void> {
   const sourceBase = join(__dirname, '..', '..', 'curated-presets', 'skills');
 
   for (const ruleName of rules) {
@@ -82,14 +117,15 @@ async function copyRules(rules: string[], targetDir: string): Promise<void> {
       const content = await fs.readFile(sourcePath, 'utf-8');
       await fs.writeFile(targetPath, content, 'utf-8');
     } catch (error) {
-      console.warn(chalk.yellow(`Warning: Could not copy skill ${ruleName}`));
+      console.warn(chalk.yellow(`Warning: Could not copy rule ${ruleName}`));
     }
   }
 }
 
 async function generateAgent(
   answers: QuickSetupAnswers | DetailedSetupAnswers | CustomModeAnswers,
-  targetDir: string
+  targetDir: string,
+  platform: Platform
 ): Promise<string> {
   const templatePath = join(__dirname, '..', '..', 'curated-presets', 'templates', 'agent-template.hbs');
   const templateContent = await fs.readFile(templatePath, 'utf-8');

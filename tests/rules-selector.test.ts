@@ -10,6 +10,7 @@ describe('Rules Selector', () => {
         framework: 'react',
         useGit: true,
         aiTool: 'kiro-cli',
+      platforms: ['kiro'],
         mcpServers: ['amazon-q-history'],
       };
 
@@ -50,6 +51,7 @@ describe('Rules Selector', () => {
         framework: 'fastapi',
         useGit: false,
         aiTool: 'amazon-q',
+      platforms: ['amazon-q'],
         mcpServers: [],
       };
 
@@ -83,6 +85,7 @@ describe('Rules Selector', () => {
         framework: 'none',
         useGit: false,
         aiTool: 'kiro-cli',
+      platforms: ['kiro'],
         mcpServers: [],
         additionalRules: ['absolute-imports'],
       };
