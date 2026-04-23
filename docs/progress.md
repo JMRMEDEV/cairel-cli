@@ -804,3 +804,15 @@ The package is ready to be published to npm. Follow steps in PUBLISH.md:
 - ✅ All 80 automated tests passing
 
 **Next**: Stage 8 - Documentation & Publication
+
+### Stage 8: Documentation & Publication ✅ COMPLETE
+
+**Completed**:
+- ✅ Updated README.md: multi-platform support, skills format, updated wizard example, new output structure
+- ✅ Updated docs/architecture.md: skills directory paths
+- ✅ Updated docs/CONTRIBUTING.md: skills format for new contributions
+- ✅ Updated docs/TESTING.md: 91 tests across 12 suites
+- ✅ Updated docs/CHANGELOG.md: v2.0.0 entry with breaking changes, additions, preserved features
+- ✅ Version bumped to 2.0.0 in package.json
+- ✅ Build passes as `cairel@2.0.0`
+- ✅ All 91 tests passing

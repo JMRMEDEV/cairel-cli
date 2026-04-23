@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-04-22
+
+### Breaking Changes
+- Output format changed from flat `.md` files to Agent Skills folders (`skill-name/SKILL.md`)
+- Directory targets changed: `.kiro/steering/` → `.kiro/skills/`, etc.
+- Wizard "AI Tools" question replaced with multi-platform select
+- Rule frontmatter schema changed to Agent Skills spec with `metadata.cairel-*` fields
+
+### Added
+- Multi-platform support: Kiro, GitHub Copilot, Claude Code, Amazon Q Developer
+- Agent Skills format following the open [agentskills.io](https://agentskills.io) standard
+- Skills validation (`validateSkill()`, `validateSkillsDirectory()`)
+- `skill://` URI support for Kiro agent resources
+- Auto-detection of `.kiro/skills/`, `.claude/skills/`, `.github/skills/` in validate command
+- 11 new tests for skills migration (91 total)
+- `curated-presets/skills/` directory with 23 skill folders
+- `docs/skills-migration-plan.md` with 8-stage migration plan
+
+### Changed
+- Manifest generator reads from `skills/*/SKILL.md` instead of `rules/{category}/*.md`
+- Generator outputs skill folders for Kiro/Claude/Copilot, flat files for Amazon Q
+- Agent prompt is now platform-agnostic
+- Update command handles both skill folders and legacy flat files
+- `cairel-title` metadata field for human-readable display names
+
+### Preserved
+- All 23 curated rule contents (instructions, checklists, examples)
+- Wizard-driven conditional selection logic via `metadata.cairel-*`
+- Category system and tag-based filtering
+- MCP server configuration
+- Bootstrap command
+- Amazon Q backward compatibility (legacy flat format)
+
 ## [1.0.1] - 2026-01-19
 
 ### Fixed

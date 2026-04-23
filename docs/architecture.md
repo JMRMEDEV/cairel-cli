@@ -64,15 +64,17 @@ Cairel is a CLI tool that generates AI-driven development configurations through
 │      File System Operations         │
 │  ┌────────────────────────────────┐ │
 │  │  Create directories            │ │
+│  │  ├─ .kiro/skills/              │ │
 │  │  ├─ .kiro/agents/              │ │
-│  │  ├─ .kiro/steering/            │ │
+│  │  ├─ .claude/skills/            │ │
+│  │  ├─ .github/skills/            │ │
 │  │  ├─ .amazonq/cli-agents/       │ │
 │  │  └─ .amazonq/rules/            │ │
 │  └────────────────────────────────┘ │
 │  ┌────────────────────────────────┐ │
 │  │  Write files                   │ │
 │  │  ├─ Agent configurations       │ │
-│  │  └─ Rule markdown files        │ │
+│  │  └─ Skill folders (SKILL.md)   │ │
 │  └────────────────────────────────┘ │
 └──────────────┬──────────────────────┘
                │

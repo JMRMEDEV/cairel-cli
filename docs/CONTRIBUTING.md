@@ -59,11 +59,11 @@ Existing categories:
 
 If your rule doesn't fit existing categories, see [Adding New Categories](#adding-new-categories).
 
-### 3. Create the Rule File
+### 3. Create the Skill
 
-**Location**: `curated-presets/rules/{category}/{rule-id}.md`
+**Location**: `curated-presets/skills/{skill-id}/SKILL.md`
 
-**Example**: `curated-presets/rules/typescript/my-new-rule.md`
+**Example**: `curated-presets/skills/my-new-skill/SKILL.md`
 
 ---
 
