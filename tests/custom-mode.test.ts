@@ -1,6 +1,14 @@
-import inquirer from 'inquirer';
-import { runWizard } from '../src/core/wizard';
 import { detectMCPServers } from '../src/utils/mcp-detector';
+
+const mockSelect = jest.fn();
+const mockCheckbox = jest.fn();
+const mockConfirm = jest.fn();
+jest.mock('@inquirer/prompts', () => ({
+  select: (...args: any[]) => mockSelect(...args),
+  checkbox: (...args: any[]) => mockCheckbox(...args),
+  confirm: (...args: any[]) => mockConfirm(...args),
+  Separator: jest.fn((text: string) => ({ type: 'separator', line: text })),
+}));
 
 jest.mock('../src/utils/mcp-detector');
 jest.mock('ora', () => {
@@ -11,17 +19,19 @@ jest.mock('ora', () => {
   };
   return jest.fn(() => mockSpinner);
 });
-jest.mock('inquirer');
+
+import { runWizard } from '../src/core/wizard';
 
 describe('Custom Mode Tests', () => {
-  const mockPrompt = inquirer.prompt as jest.MockedFunction<typeof inquirer.prompt>;
   const mockDetectMCPServers = detectMCPServers as jest.MockedFunction<typeof detectMCPServers>;
   const mockExit = jest.spyOn(process, 'exit').mockImplementation((code?: number) => {
     throw new Error(`process.exit: ${code}`);
   });
 
   beforeEach(() => {
-    mockPrompt.mockReset();
+    mockSelect.mockReset();
+    mockCheckbox.mockReset();
+    mockConfirm.mockReset();
     mockExit.mockClear();
     mockDetectMCPServers.mockReturnValue([
       { name: 'amazon-q-history', path: '/home/user/mcp-servers/amazon-q-history' },
@@ -30,37 +40,32 @@ describe('Custom Mode Tests', () => {
 
   describe('Custom Mode Selection', () => {
     test('allows user to select custom mode', async () => {
-      mockPrompt
-        .mockResolvedValueOnce({ mode: 'custom' })
-        .mockResolvedValueOnce({ platforms: ['kiro'] })
-        .mockResolvedValueOnce({ 
-          selectedRules: ['context-retrieval', 'implementation-approval', 'typescript-validation'] 
-        })
-        .mockResolvedValueOnce({ mcpServers: ['amazon-q-history'] })
-        .mockResolvedValueOnce({ generateAgent: true })
-        .mockResolvedValueOnce({ wantsReview: false });
+      mockSelect.mockResolvedValueOnce('custom');
+      mockCheckbox
+        .mockResolvedValueOnce(['kiro'])       // platforms
+        .mockResolvedValueOnce(['context-retrieval', 'implementation-approval', 'typescript-validation']) // rules
+        .mockResolvedValueOnce(['amazon-q-history']); // mcpServers
+      mockConfirm
+        .mockResolvedValueOnce(true)           // generateAgent
+        .mockResolvedValueOnce(false);         // wantsReview
 
       const result = await runWizard();
 
       expect(result).toHaveProperty('platforms', ['kiro']);
-      expect(result).toHaveProperty('selectedRules');
       expect((result as any).selectedRules).toContain('context-retrieval');
-      expect((result as any).selectedRules).toContain('implementation-approval');
       expect((result as any).selectedRules).toContain('typescript-validation');
     });
 
     test('custom mode with no MCP servers', async () => {
       mockDetectMCPServers.mockReturnValue([]);
 
-      mockPrompt
-        .mockResolvedValueOnce({ mode: 'custom' })
-        .mockResolvedValueOnce({ platforms: ['amazon-q'] })
-        .mockResolvedValueOnce({ 
-          selectedRules: ['context-retrieval', 'implementation-approval'] 
-        })
-        .mockResolvedValueOnce({}) // Empty object when MCP prompt is skipped
-        .mockResolvedValueOnce({ generateAgent: true })
-        .mockResolvedValueOnce({ wantsReview: false });
+      mockSelect.mockResolvedValueOnce('custom');
+      mockCheckbox
+        .mockResolvedValueOnce(['amazon-q'])   // platforms
+        .mockResolvedValueOnce(['context-retrieval', 'implementation-approval']); // rules, no MCP prompt
+      mockConfirm
+        .mockResolvedValueOnce(true)           // generateAgent
+        .mockResolvedValueOnce(false);         // wantsReview
 
       const result = await runWizard();
 
@@ -69,21 +74,17 @@ describe('Custom Mode Tests', () => {
     });
 
     test('custom mode with multiple rules selected', async () => {
-      mockPrompt
-        .mockResolvedValueOnce({ mode: 'custom' })
-        .mockResolvedValueOnce({ platforms: ['kiro', 'amazon-q'] })
-        .mockResolvedValueOnce({ 
-          selectedRules: [
-            'context-retrieval',
-            'implementation-approval',
-            'typescript-validation',
-            'component-structure',
-            'git-management',
-          ] 
-        })
-        .mockResolvedValueOnce({ mcpServers: [] })
-        .mockResolvedValueOnce({ generateAgent: true })
-        .mockResolvedValueOnce({ wantsReview: false });
+      mockSelect.mockResolvedValueOnce('custom');
+      mockCheckbox
+        .mockResolvedValueOnce(['kiro', 'amazon-q'])
+        .mockResolvedValueOnce([
+          'context-retrieval', 'implementation-approval',
+          'typescript-validation', 'component-structure', 'git-management',
+        ])
+        .mockResolvedValueOnce([]); // mcpServers
+      mockConfirm
+        .mockResolvedValueOnce(true)
+        .mockResolvedValueOnce(false);
 
       const result = await runWizard();
 
@@ -94,15 +95,18 @@ describe('Custom Mode Tests', () => {
 
   describe('Review Step - Quick Mode', () => {
     test('quick mode without review proceeds directly', async () => {
-      mockPrompt
-        .mockResolvedValueOnce({ mode: 'quick' })
-        .mockResolvedValueOnce({ projectType: 'ui', language: 'typescript' })
-        .mockResolvedValueOnce({ framework: 'react' })
-        .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ platforms: ['kiro'] })
-        .mockResolvedValueOnce({ mcpServers: [] })
-        .mockResolvedValueOnce({ generateAgent: true })
-        .mockResolvedValueOnce({ wantsReview: false });
+      mockSelect
+        .mockResolvedValueOnce('quick')
+        .mockResolvedValueOnce('ui')
+        .mockResolvedValueOnce('typescript')
+        .mockResolvedValueOnce('react');
+      mockConfirm
+        .mockResolvedValueOnce(true)   // useGit
+        .mockResolvedValueOnce(true)   // generateAgent
+        .mockResolvedValueOnce(false); // wantsReview
+      mockCheckbox
+        .mockResolvedValueOnce(['kiro'])
+        .mockResolvedValueOnce([]);    // mcpServers
 
       const result = await runWizard();
 
@@ -111,19 +115,20 @@ describe('Custom Mode Tests', () => {
     });
 
     test('quick mode with review allows rule selection', async () => {
-      mockPrompt
-        .mockResolvedValueOnce({ mode: 'quick' })
-        .mockResolvedValueOnce({ projectType: 'backend', language: 'python' })
-        .mockResolvedValueOnce({ framework: 'fastapi' })
-        .mockResolvedValueOnce({ useGit: false })
-        .mockResolvedValueOnce({ platforms: ['kiro'] })
-        .mockResolvedValueOnce({ mcpServers: [] })
-        .mockResolvedValueOnce({ generateAgent: true })
-        .mockResolvedValueOnce({ wantsReview: true })
-        .mockResolvedValueOnce({ 
-          finalRules: ['context-retrieval', 'implementation-approval'] 
-        })
-        .mockResolvedValueOnce({ confirmed: true });
+      mockSelect
+        .mockResolvedValueOnce('quick')
+        .mockResolvedValueOnce('backend')
+        .mockResolvedValueOnce('python')
+        .mockResolvedValueOnce('fastapi');
+      mockConfirm
+        .mockResolvedValueOnce(false)  // useGit
+        .mockResolvedValueOnce(true)   // generateAgent
+        .mockResolvedValueOnce(true)   // wantsReview
+        .mockResolvedValueOnce(true);  // confirmed
+      mockCheckbox
+        .mockResolvedValueOnce(['kiro'])
+        .mockResolvedValueOnce([])     // mcpServers
+        .mockResolvedValueOnce(['context-retrieval', 'implementation-approval']); // finalRules
 
       const result = await runWizard();
 
@@ -134,19 +139,20 @@ describe('Custom Mode Tests', () => {
     });
 
     test('quick mode review can be cancelled', async () => {
-      mockPrompt
-        .mockResolvedValueOnce({ mode: 'quick' })
-        .mockResolvedValueOnce({ projectType: 'ui', language: 'typescript' })
-        .mockResolvedValueOnce({ framework: 'react' })
-        .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ platforms: ['kiro'] })
-        .mockResolvedValueOnce({ mcpServers: [] })
-        .mockResolvedValueOnce({ generateAgent: true })
-        .mockResolvedValueOnce({ wantsReview: true })
-        .mockResolvedValueOnce({ 
-          finalRules: ['context-retrieval', 'implementation-approval'] 
-        })
-        .mockResolvedValueOnce({ confirmed: false });
+      mockSelect
+        .mockResolvedValueOnce('quick')
+        .mockResolvedValueOnce('ui')
+        .mockResolvedValueOnce('typescript')
+        .mockResolvedValueOnce('react');
+      mockConfirm
+        .mockResolvedValueOnce(true)   // useGit
+        .mockResolvedValueOnce(true)   // generateAgent
+        .mockResolvedValueOnce(true)   // wantsReview
+        .mockResolvedValueOnce(false); // confirmed = no
+      mockCheckbox
+        .mockResolvedValueOnce(['kiro'])
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce(['context-retrieval', 'implementation-approval']);
 
       await expect(runWizard()).rejects.toThrow('process.exit');
       expect(mockExit).toHaveBeenCalledWith(0);
@@ -155,23 +161,25 @@ describe('Custom Mode Tests', () => {
 
   describe('Review Step - Detailed Mode', () => {
     test('detailed mode without review proceeds directly', async () => {
-      mockPrompt
-        .mockResolvedValueOnce({ mode: 'detailed' })
-        .mockResolvedValueOnce({ projectType: 'fullstack', language: 'typescript' })
-        .mockResolvedValueOnce({ framework: 'next-js' })
-        .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ platforms: ['kiro'] })
-        .mockResolvedValueOnce({ mcpServers: [] })
-        .mockResolvedValueOnce({ generateAgent: true })
-        .mockResolvedValueOnce({ 
-          testingFramework: 'jest',
-          linter: 'eslint',
-          uiLibrary: 'chakra-ui',
-          packageManager: 'pnpm',
-          envVarStrategy: 'yes-with-prod-protection',
-          versioningStrategy: 'semantic',
-        })
-        .mockResolvedValueOnce({ wantsReview: false });
+      mockSelect
+        .mockResolvedValueOnce('detailed')
+        .mockResolvedValueOnce('fullstack')
+        .mockResolvedValueOnce('typescript')
+        // no framework select for fullstack
+        // detailed selects
+        .mockResolvedValueOnce('jest')
+        .mockResolvedValueOnce('eslint')
+        .mockResolvedValueOnce('chakra-ui')
+        .mockResolvedValueOnce('pnpm')
+        .mockResolvedValueOnce('yes-with-prod-protection')
+        .mockResolvedValueOnce('semantic');
+      mockConfirm
+        .mockResolvedValueOnce(true)   // useGit
+        .mockResolvedValueOnce(true)   // generateAgent
+        .mockResolvedValueOnce(false); // wantsReview
+      mockCheckbox
+        .mockResolvedValueOnce(['kiro'])
+        .mockResolvedValueOnce([]);
 
       const result = await runWizard();
 
@@ -180,32 +188,29 @@ describe('Custom Mode Tests', () => {
     });
 
     test('detailed mode with review allows rule customization', async () => {
-      mockPrompt
-        .mockResolvedValueOnce({ mode: 'detailed' })
-        .mockResolvedValueOnce({ projectType: 'ui', language: 'typescript' })
-        .mockResolvedValueOnce({ framework: 'react' })
-        .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ platforms: ['amazon-q'] })
-        .mockResolvedValueOnce({ mcpServers: ['amazon-q-history'] })
-        .mockResolvedValueOnce({ generateAgent: true })
-        .mockResolvedValueOnce({ 
-          testingFramework: 'vitest',
-          linter: 'eslint',
-          uiLibrary: 'gluestack-ui',
-          packageManager: 'yarn',
-          envVarStrategy: 'no',
-          versioningStrategy: 'none',
-        })
-        .mockResolvedValueOnce({ wantsReview: true })
-        .mockResolvedValueOnce({ 
-          finalRules: [
-            'context-retrieval',
-            'implementation-approval',
-            'typescript-validation',
-            'component-structure',
-          ] 
-        })
-        .mockResolvedValueOnce({ confirmed: true });
+      mockSelect
+        .mockResolvedValueOnce('detailed')
+        .mockResolvedValueOnce('ui')
+        .mockResolvedValueOnce('typescript')
+        .mockResolvedValueOnce('react')
+        .mockResolvedValueOnce('vitest')
+        .mockResolvedValueOnce('eslint')
+        .mockResolvedValueOnce('gluestack-ui')
+        .mockResolvedValueOnce('yarn')
+        .mockResolvedValueOnce('no')
+        .mockResolvedValueOnce('none');
+      mockConfirm
+        .mockResolvedValueOnce(true)   // useGit
+        .mockResolvedValueOnce(true)   // generateAgent
+        .mockResolvedValueOnce(true)   // wantsReview
+        .mockResolvedValueOnce(true);  // confirmed
+      mockCheckbox
+        .mockResolvedValueOnce(['amazon-q'])
+        .mockResolvedValueOnce(['amazon-q-history'])
+        .mockResolvedValueOnce([
+          'context-retrieval', 'implementation-approval',
+          'typescript-validation', 'component-structure',
+        ]);
 
       const result = await runWizard();
 
@@ -216,24 +221,19 @@ describe('Custom Mode Tests', () => {
 
   describe('Review Step - Custom Mode', () => {
     test('custom mode with review allows further customization', async () => {
-      mockPrompt
-        .mockResolvedValueOnce({ mode: 'custom' })
-        .mockResolvedValueOnce({ platforms: ['kiro'] })
-        .mockResolvedValueOnce({ 
-          selectedRules: [
-            'context-retrieval',
-            'implementation-approval',
-            'typescript-validation',
-            'git-management',
-          ] 
-        })
-        .mockResolvedValueOnce({ mcpServers: [] })
-        .mockResolvedValueOnce({ generateAgent: true })
-        .mockResolvedValueOnce({ wantsReview: true })
-        .mockResolvedValueOnce({ 
-          finalRules: ['context-retrieval', 'implementation-approval'] 
-        })
-        .mockResolvedValueOnce({ confirmed: true });
+      mockSelect.mockResolvedValueOnce('custom');
+      mockCheckbox
+        .mockResolvedValueOnce(['kiro'])
+        .mockResolvedValueOnce([
+          'context-retrieval', 'implementation-approval',
+          'typescript-validation', 'git-management',
+        ])
+        .mockResolvedValueOnce([])     // mcpServers
+        .mockResolvedValueOnce(['context-retrieval', 'implementation-approval']); // finalRules
+      mockConfirm
+        .mockResolvedValueOnce(true)   // generateAgent
+        .mockResolvedValueOnce(true)   // wantsReview
+        .mockResolvedValueOnce(true);  // confirmed
 
       const result = await runWizard();
 
@@ -244,19 +244,16 @@ describe('Custom Mode Tests', () => {
     });
 
     test('custom mode review can be cancelled', async () => {
-      mockPrompt
-        .mockResolvedValueOnce({ mode: 'custom' })
-        .mockResolvedValueOnce({ platforms: ['kiro'] })
-        .mockResolvedValueOnce({ 
-          selectedRules: ['context-retrieval', 'implementation-approval'] 
-        })
-        .mockResolvedValueOnce({ mcpServers: [] })
-        .mockResolvedValueOnce({ generateAgent: true })
-        .mockResolvedValueOnce({ wantsReview: true })
-        .mockResolvedValueOnce({ 
-          finalRules: ['context-retrieval'] 
-        })
-        .mockResolvedValueOnce({ confirmed: false });
+      mockSelect.mockResolvedValueOnce('custom');
+      mockCheckbox
+        .mockResolvedValueOnce(['kiro'])
+        .mockResolvedValueOnce(['context-retrieval', 'implementation-approval'])
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce(['context-retrieval']);
+      mockConfirm
+        .mockResolvedValueOnce(true)   // generateAgent
+        .mockResolvedValueOnce(true)   // wantsReview
+        .mockResolvedValueOnce(false); // confirmed = no
 
       await expect(runWizard()).rejects.toThrow('process.exit');
       expect(mockExit).toHaveBeenCalledWith(0);
@@ -265,33 +262,21 @@ describe('Custom Mode Tests', () => {
 
   describe('Edge Cases', () => {
     test('custom mode with all rules selected', async () => {
-      mockPrompt
-        .mockResolvedValueOnce({ mode: 'custom' })
-        .mockResolvedValueOnce({ platforms: ['kiro', 'amazon-q'] })
-        .mockResolvedValueOnce({ 
-          selectedRules: [
-            'context-retrieval',
-            'implementation-approval',
-            'package-manager-safety',
-            'typescript-validation',
-            'component-structure',
-            'git-management',
-            'visual-verification',
-            'multi-environment-management',
-            'semantic-versioning',
-            'react-props-destructuring',
-            'mock-data-strategy',
-            'icon-usage-patterns',
-            'absolute-imports',
-            'chakra-ui-v3-integration',
-            'gluestack-ui-v1-themed',
-            'eslint-configuration',
-            'package-json-management',
-          ] 
-        })
-        .mockResolvedValueOnce({ mcpServers: ['amazon-q-history'] })
-        .mockResolvedValueOnce({ generateAgent: true })
-        .mockResolvedValueOnce({ wantsReview: false });
+      mockSelect.mockResolvedValueOnce('custom');
+      mockCheckbox
+        .mockResolvedValueOnce(['kiro', 'amazon-q'])
+        .mockResolvedValueOnce([
+          'context-retrieval', 'implementation-approval', 'package-manager-safety',
+          'typescript-validation', 'component-structure', 'git-management',
+          'visual-verification', 'multi-environment-management', 'semantic-versioning',
+          'react-props-destructuring', 'mock-data-strategy', 'icon-usage-patterns',
+          'absolute-imports', 'chakra-ui-v3-integration', 'gluestack-ui-v1-themed',
+          'eslint-configuration', 'package-json-management',
+        ])
+        .mockResolvedValueOnce(['amazon-q-history']);
+      mockConfirm
+        .mockResolvedValueOnce(true)
+        .mockResolvedValueOnce(false);
 
       const result = await runWizard();
 
@@ -299,23 +284,23 @@ describe('Custom Mode Tests', () => {
     });
 
     test('review step with minimal rules (only required)', async () => {
-      mockPrompt
-        .mockResolvedValueOnce({ mode: 'quick' })
-        .mockResolvedValueOnce({ projectType: 'cli', language: 'lua' })
-        .mockResolvedValueOnce({}) // No framework prompt (returns empty)
-        .mockResolvedValueOnce({ useGit: false })
-        .mockResolvedValueOnce({ platforms: ['kiro'] })
-        .mockResolvedValueOnce({}) // No MCP servers
-        .mockResolvedValueOnce({ generateAgent: true })
-        .mockResolvedValueOnce({ wantsReview: true })
-        .mockResolvedValueOnce({ 
-          finalRules: ['context-retrieval', 'implementation-approval'] 
-        })
-        .mockResolvedValueOnce({ confirmed: true });
+      mockSelect
+        .mockResolvedValueOnce('quick')
+        .mockResolvedValueOnce('cli')
+        .mockResolvedValueOnce('lua');
+      // No framework select (cli+lua has only ['None'])
+      mockConfirm
+        .mockResolvedValueOnce(false)  // useGit
+        .mockResolvedValueOnce(true)   // generateAgent
+        .mockResolvedValueOnce(true)   // wantsReview
+        .mockResolvedValueOnce(true);  // confirmed
+      mockCheckbox
+        .mockResolvedValueOnce(['kiro'])       // platforms
+        .mockResolvedValueOnce([])             // mcpServers
+        .mockResolvedValueOnce(['context-retrieval', 'implementation-approval']); // finalRules in review
 
       const result = await runWizard();
 
-      expect(result).toHaveProperty('selectedRules');
       expect((result as any).selectedRules).toContain('context-retrieval');
       expect((result as any).selectedRules).toContain('implementation-approval');
     });

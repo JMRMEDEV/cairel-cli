@@ -1,11 +1,18 @@
 /**
  * Detailed Setup Mode Tests
- * Tests all additional options in detailed setup
  */
 
-import inquirer from 'inquirer';
-import { runWizard } from '../src/core/wizard';
 import { DetailedSetupAnswers } from '../src/types/wizard';
+
+const mockSelect = jest.fn();
+const mockCheckbox = jest.fn();
+const mockConfirm = jest.fn();
+jest.mock('@inquirer/prompts', () => ({
+  select: (...args: any[]) => mockSelect(...args),
+  checkbox: (...args: any[]) => mockCheckbox(...args),
+  confirm: (...args: any[]) => mockConfirm(...args),
+  Separator: jest.fn((text: string) => ({ type: 'separator', line: text })),
+}));
 
 jest.mock('../src/utils/mcp-detector', () => ({
   detectMCPServers: jest.fn(() => []),
@@ -19,34 +26,46 @@ jest.mock('ora', () => {
   return jest.fn(() => mockSpinner);
 });
 
-jest.mock('inquirer');
+import { runWizard } from '../src/core/wizard';
 
 describe('Detailed Setup Mode', () => {
-  const mockPrompt = inquirer.prompt as jest.MockedFunction<typeof inquirer.prompt>;
-
   beforeEach(() => {
-    mockPrompt.mockReset();
+    mockSelect.mockReset();
+    mockCheckbox.mockReset();
+    mockConfirm.mockReset();
   });
+
+  // Helper: set up quick setup mocks for detailed mode
+  function mockQuickSetup(opts: {
+    projectType: string; language: string; framework?: string;
+    useGit: boolean; platforms: string[]; generateAgent?: boolean;
+  }) {
+    const s = mockSelect
+      .mockResolvedValueOnce('detailed')
+      .mockResolvedValueOnce(opts.projectType)
+      .mockResolvedValueOnce(opts.language);
+    if (opts.framework) {
+      s.mockResolvedValueOnce(opts.framework);
+    }
+    mockConfirm
+      .mockResolvedValueOnce(opts.useGit)
+      .mockResolvedValueOnce(opts.generateAgent ?? true);
+    mockCheckbox
+      .mockResolvedValueOnce(opts.platforms);
+  }
 
   describe('TypeScript/JavaScript Projects', () => {
     it('should configure Jest + ESLint + npm for TypeScript UI', async () => {
-      mockPrompt
-        .mockResolvedValueOnce({ mode: 'detailed' })
-        .mockResolvedValueOnce({ projectType: 'ui', language: 'typescript' })
-        .mockResolvedValueOnce({ framework: 'react' })
-        .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ platforms: ['kiro'] })
-        .mockResolvedValueOnce({}) // No MCP servers
-        .mockResolvedValueOnce({ generateAgent: true })
-        .mockResolvedValueOnce({
-          testingFramework: 'jest',
-          linter: 'eslint',
-          uiLibrary: 'chakra-ui',
-          packageManager: 'npm',
-          envVarStrategy: 'yes-with-prod-protection',
-          versioningStrategy: 'semantic',
-        })
-        .mockResolvedValueOnce({ wantsReview: false });
+      mockQuickSetup({ projectType: 'ui', language: 'typescript', framework: 'react', useGit: true, platforms: ['kiro'] });
+      // Detailed selects: testing, linter, uiLibrary, packageManager, envVar, versioning
+      mockSelect
+        .mockResolvedValueOnce('jest')
+        .mockResolvedValueOnce('eslint')
+        .mockResolvedValueOnce('chakra-ui')
+        .mockResolvedValueOnce('npm')
+        .mockResolvedValueOnce('yes-with-prod-protection')
+        .mockResolvedValueOnce('semantic');
+      mockConfirm.mockResolvedValueOnce(false); // wantsReview
 
       const result = await runWizard() as DetailedSetupAnswers;
 
@@ -59,23 +78,15 @@ describe('Detailed Setup Mode', () => {
     });
 
     it('should configure Vitest + pnpm for JavaScript fullstack', async () => {
-      mockPrompt
-        .mockResolvedValueOnce({ mode: 'detailed' })
-        .mockResolvedValueOnce({ projectType: 'fullstack', language: 'javascript' })
-        .mockResolvedValueOnce({ framework: 'next-js' })
-        .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ platforms: ['kiro', 'amazon-q'] })
-        .mockResolvedValueOnce({}) // No MCP servers
-        .mockResolvedValueOnce({ generateAgent: true })
-        .mockResolvedValueOnce({
-          testingFramework: 'vitest',
-          linter: 'eslint',
-          uiLibrary: 'gluestack-ui',
-          packageManager: 'pnpm',
-          envVarStrategy: 'yes-without-protection',
-          versioningStrategy: 'calver',
-        })
-        .mockResolvedValueOnce({ wantsReview: false });
+      mockQuickSetup({ projectType: 'fullstack', language: 'javascript', useGit: true, platforms: ['kiro', 'amazon-q'] });
+      mockSelect
+        .mockResolvedValueOnce('vitest')
+        .mockResolvedValueOnce('eslint')
+        .mockResolvedValueOnce('gluestack-ui')
+        .mockResolvedValueOnce('pnpm')
+        .mockResolvedValueOnce('yes-without-protection')
+        .mockResolvedValueOnce('calver');
+      mockConfirm.mockResolvedValueOnce(false);
 
       const result = await runWizard() as DetailedSetupAnswers;
 
@@ -86,22 +97,14 @@ describe('Detailed Setup Mode', () => {
     });
 
     it('should configure yarn for TypeScript backend', async () => {
-      mockPrompt
-        .mockResolvedValueOnce({ mode: 'detailed' })
-        .mockResolvedValueOnce({ projectType: 'backend', language: 'typescript' })
-        .mockResolvedValueOnce({ framework: 'express' })
-        .mockResolvedValueOnce({ useGit: false })
-        .mockResolvedValueOnce({ platforms: ['amazon-q'] })
-        .mockResolvedValueOnce({}) // No MCP servers
-        .mockResolvedValueOnce({ generateAgent: true })
-        .mockResolvedValueOnce({
-          testingFramework: 'jest',
-          linter: 'eslint',
-          packageManager: 'yarn',
-          envVarStrategy: 'no',
-          versioningStrategy: 'none',
-        })
-        .mockResolvedValueOnce({ wantsReview: false });
+      mockQuickSetup({ projectType: 'backend', language: 'typescript', framework: 'express', useGit: false, platforms: ['amazon-q'] });
+      mockSelect
+        .mockResolvedValueOnce('jest')
+        .mockResolvedValueOnce('eslint')
+        .mockResolvedValueOnce('yarn')     // no uiLibrary for backend
+        .mockResolvedValueOnce('no')
+        .mockResolvedValueOnce('none');
+      mockConfirm.mockResolvedValueOnce(false);
 
       const result = await runWizard() as DetailedSetupAnswers;
 
@@ -113,21 +116,13 @@ describe('Detailed Setup Mode', () => {
 
   describe('Python Projects', () => {
     it('should configure pytest + Ruff for Python backend', async () => {
-      mockPrompt
-        .mockResolvedValueOnce({ mode: 'detailed' })
-        .mockResolvedValueOnce({ projectType: 'backend', language: 'python' })
-        .mockResolvedValueOnce({ framework: 'fastapi' })
-        .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ platforms: ['kiro'] })
-        .mockResolvedValueOnce({}) // No MCP servers
-        .mockResolvedValueOnce({ generateAgent: true })
-        .mockResolvedValueOnce({
-          testingFramework: 'pytest',
-          linter: 'ruff',
-          envVarStrategy: 'yes-with-prod-protection',
-          versioningStrategy: 'semantic',
-        })
-        .mockResolvedValueOnce({ wantsReview: false });
+      mockQuickSetup({ projectType: 'backend', language: 'python', framework: 'fastapi', useGit: true, platforms: ['kiro'] });
+      mockSelect
+        .mockResolvedValueOnce('pytest')
+        .mockResolvedValueOnce('ruff')
+        .mockResolvedValueOnce('yes-with-prod-protection')  // no uiLibrary, no packageManager
+        .mockResolvedValueOnce('semantic');
+      mockConfirm.mockResolvedValueOnce(false);
 
       const result = await runWizard() as DetailedSetupAnswers;
 
@@ -137,21 +132,13 @@ describe('Detailed Setup Mode', () => {
     });
 
     it('should handle Python without testing or linting', async () => {
-      mockPrompt
-        .mockResolvedValueOnce({ mode: 'detailed' })
-        .mockResolvedValueOnce({ projectType: 'backend', language: 'python' })
-        .mockResolvedValueOnce({ framework: 'django' })
-        .mockResolvedValueOnce({ useGit: false })
-        .mockResolvedValueOnce({ platforms: ['amazon-q'] })
-        .mockResolvedValueOnce({}) // No MCP servers
-        .mockResolvedValueOnce({ generateAgent: true })
-        .mockResolvedValueOnce({
-          testingFramework: 'none',
-          linter: 'none',
-          envVarStrategy: 'no',
-          versioningStrategy: 'none',
-        })
-        .mockResolvedValueOnce({ wantsReview: false });
+      mockQuickSetup({ projectType: 'backend', language: 'python', framework: 'django', useGit: false, platforms: ['amazon-q'] });
+      mockSelect
+        .mockResolvedValueOnce('none')
+        .mockResolvedValueOnce('none')
+        .mockResolvedValueOnce('no')
+        .mockResolvedValueOnce('none');
+      mockConfirm.mockResolvedValueOnce(false);
 
       const result = await runWizard() as DetailedSetupAnswers;
 
@@ -162,23 +149,15 @@ describe('Detailed Setup Mode', () => {
 
   describe('UI Library Options', () => {
     it('should configure Tailwind CSS', async () => {
-      mockPrompt
-        .mockResolvedValueOnce({ mode: 'detailed' })
-        .mockResolvedValueOnce({ projectType: 'ui', language: 'typescript' })
-        .mockResolvedValueOnce({ framework: 'vue' })
-        .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ platforms: ['kiro'] })
-        .mockResolvedValueOnce({}) // No MCP servers
-        .mockResolvedValueOnce({ generateAgent: true })
-        .mockResolvedValueOnce({
-          testingFramework: 'vitest',
-          linter: 'eslint',
-          uiLibrary: 'tailwind-css',
-          packageManager: 'pnpm',
-          envVarStrategy: 'no',
-          versioningStrategy: 'none',
-        })
-        .mockResolvedValueOnce({ wantsReview: false });
+      mockQuickSetup({ projectType: 'ui', language: 'typescript', framework: 'vue', useGit: true, platforms: ['kiro'] });
+      mockSelect
+        .mockResolvedValueOnce('vitest')
+        .mockResolvedValueOnce('eslint')
+        .mockResolvedValueOnce('tailwind-css')
+        .mockResolvedValueOnce('pnpm')
+        .mockResolvedValueOnce('no')
+        .mockResolvedValueOnce('none');
+      mockConfirm.mockResolvedValueOnce(false);
 
       const result = await runWizard() as DetailedSetupAnswers;
 
@@ -186,23 +165,15 @@ describe('Detailed Setup Mode', () => {
     });
 
     it('should configure Material UI', async () => {
-      mockPrompt
-        .mockResolvedValueOnce({ mode: 'detailed' })
-        .mockResolvedValueOnce({ projectType: 'fullstack', language: 'javascript' })
-        .mockResolvedValueOnce({ framework: 'next-js' })
-        .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ platforms: ['kiro', 'amazon-q'] })
-        .mockResolvedValueOnce({}) // No MCP servers
-        .mockResolvedValueOnce({ generateAgent: true })
-        .mockResolvedValueOnce({
-          testingFramework: 'jest',
-          linter: 'eslint',
-          uiLibrary: 'material-ui',
-          packageManager: 'yarn',
-          envVarStrategy: 'yes-without-protection',
-          versioningStrategy: 'calver',
-        })
-        .mockResolvedValueOnce({ wantsReview: false });
+      mockQuickSetup({ projectType: 'fullstack', language: 'javascript', useGit: true, platforms: ['kiro', 'amazon-q'] });
+      mockSelect
+        .mockResolvedValueOnce('jest')
+        .mockResolvedValueOnce('eslint')
+        .mockResolvedValueOnce('material-ui')
+        .mockResolvedValueOnce('yarn')
+        .mockResolvedValueOnce('yes-without-protection')
+        .mockResolvedValueOnce('calver');
+      mockConfirm.mockResolvedValueOnce(false);
 
       const result = await runWizard() as DetailedSetupAnswers;
 
@@ -213,22 +184,14 @@ describe('Detailed Setup Mode', () => {
 
   describe('Environment Variable Strategies', () => {
     it('should configure with production protection', async () => {
-      mockPrompt
-        .mockResolvedValueOnce({ mode: 'detailed' })
-        .mockResolvedValueOnce({ projectType: 'backend', language: 'typescript' })
-        .mockResolvedValueOnce({ framework: 'nestjs' })
-        .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ platforms: ['kiro'] })
-        .mockResolvedValueOnce({}) // No MCP servers
-        .mockResolvedValueOnce({ generateAgent: true })
-        .mockResolvedValueOnce({
-          testingFramework: 'jest',
-          linter: 'eslint',
-          packageManager: 'npm',
-          envVarStrategy: 'yes-with-prod-protection',
-          versioningStrategy: 'semantic',
-        })
-        .mockResolvedValueOnce({ wantsReview: false });
+      mockQuickSetup({ projectType: 'backend', language: 'typescript', framework: 'nestjs', useGit: true, platforms: ['kiro'] });
+      mockSelect
+        .mockResolvedValueOnce('jest')
+        .mockResolvedValueOnce('eslint')
+        .mockResolvedValueOnce('npm')
+        .mockResolvedValueOnce('yes-with-prod-protection')
+        .mockResolvedValueOnce('semantic');
+      mockConfirm.mockResolvedValueOnce(false);
 
       const result = await runWizard() as DetailedSetupAnswers;
 
@@ -236,22 +199,14 @@ describe('Detailed Setup Mode', () => {
     });
 
     it('should configure without protection', async () => {
-      mockPrompt
-        .mockResolvedValueOnce({ mode: 'detailed' })
-        .mockResolvedValueOnce({ projectType: 'cli', language: 'javascript' })
-        .mockResolvedValueOnce({ framework: 'none' })
-        .mockResolvedValueOnce({ useGit: false })
-        .mockResolvedValueOnce({ platforms: ['amazon-q'] })
-        .mockResolvedValueOnce({}) // No MCP servers
-        .mockResolvedValueOnce({ generateAgent: true })
-        .mockResolvedValueOnce({
-          testingFramework: 'none',
-          linter: 'none',
-          packageManager: 'npm',
-          envVarStrategy: 'yes-without-protection',
-          versioningStrategy: 'none',
-        })
-        .mockResolvedValueOnce({ wantsReview: false });
+      mockQuickSetup({ projectType: 'cli', language: 'javascript', useGit: false, platforms: ['amazon-q'] });
+      mockSelect
+        .mockResolvedValueOnce('none')
+        .mockResolvedValueOnce('none')
+        .mockResolvedValueOnce('npm')
+        .mockResolvedValueOnce('yes-without-protection')
+        .mockResolvedValueOnce('none');
+      mockConfirm.mockResolvedValueOnce(false);
 
       const result = await runWizard() as DetailedSetupAnswers;
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import inquirer from 'inquirer';
+import { select } from '@inquirer/prompts';
 import chalk from 'chalk';
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -48,27 +48,22 @@ program.addCommand(listCommand);
 
 // Getting started menu when no command provided
 if (process.argv.length === 2) {
-  inquirer
-    .prompt([
-      {
-        type: 'list',
-        name: 'action',
-        message: 'What would you like to do?',
-        choices: [
-          { name: 'Initialize AI configuration (cairel init)', value: 'init' },
-          { name: 'Bootstrap project documentation (cairel bootstrap)', value: 'bootstrap' },
-          { name: 'Update existing configuration (cairel update)', value: 'update' },
-          { name: 'Validate rules (cairel validate)', value: 'validate' },
-          { name: 'List available presets (cairel list)', value: 'list' },
-          { name: 'Show help (cairel --help)', value: 'help' },
-        ],
-      },
-    ])
-    .then((answers) => {
-      if (answers.action === 'help') {
+  select({
+    message: 'What would you like to do?',
+    choices: [
+      { name: 'Initialize AI configuration (cairel init)', value: 'init' },
+      { name: 'Bootstrap project documentation (cairel bootstrap)', value: 'bootstrap' },
+      { name: 'Update existing configuration (cairel update)', value: 'update' },
+      { name: 'Validate rules (cairel validate)', value: 'validate' },
+      { name: 'List available presets (cairel list)', value: 'list' },
+      { name: 'Show help (cairel --help)', value: 'help' },
+    ],
+  })
+    .then((action) => {
+      if (action === 'help') {
         program.help();
       } else {
-        process.argv.push(answers.action);
+        process.argv.push(action);
         program.parse(process.argv);
       }
     });

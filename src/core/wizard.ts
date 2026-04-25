@@ -1,14 +1,14 @@
-import inquirer from 'inquirer';
+import { select, checkbox, confirm, Separator } from '@inquirer/prompts';
 import chalk from 'chalk';
 import ora from 'ora';
 import { promises as fs } from 'fs';
 import { join } from 'path';
-import { WizardMode, QuickSetupAnswers, DetailedSetupAnswers, CustomModeAnswers, Framework, AITool } from '../types/wizard';
+import { WizardMode, QuickSetupAnswers, DetailedSetupAnswers, CustomModeAnswers, Framework, AITool, Platform, TestingFramework, Linter, UILibrary, PackageManager, EnvVarStrategy, VersioningStrategy } from '../types/wizard';
 import { detectMCPServers } from '../utils/mcp-detector';
 import { selectRules } from './rules-selector';
 
 function getTerminalPageSize(): number {
-  return (process.stdout.rows || 24) - 3;
+  return Math.min((process.stdout.rows || 24) - 3, 15);
 }
 
 interface OptionalRule {
@@ -24,8 +24,6 @@ async function getOptionalRules(answers: Partial<QuickSetupAnswers>): Promise<Op
   
   const unclassified = manifest.rules.filter((r: any) => !r.alwaysInclude && !r.conditions);
   
-  // For now, return empty array since all rules are classified
-  // In the future, this will show rules without conditions
   return unclassified.map((r: any) => ({
     id: r.id,
     title: r.id.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()),
@@ -36,18 +34,14 @@ async function getOptionalRules(answers: Partial<QuickSetupAnswers>): Promise<Op
 export async function runWizard(): Promise<QuickSetupAnswers | DetailedSetupAnswers | CustomModeAnswers> {
   console.log(chalk.bold.blue('\n🚀 Cairel - AI Development Initialization\n'));
 
-  const { mode } = await inquirer.prompt<{ mode: WizardMode }>([
-    {
-      type: 'list',
-      name: 'mode',
-      message: 'How would you like to configure your project?',
-      choices: [
-        { name: 'Quick Setup (High-level, recommended)', value: 'quick' },
-        { name: 'Detailed Setup (Granular control)', value: 'detailed' },
-        { name: 'Custom (Select specific skills)', value: 'custom' },
-      ],
-    },
-  ]);
+  const mode = await select<WizardMode>({
+    message: 'How would you like to configure your project?',
+    choices: [
+      { name: 'Quick Setup (High-level, recommended)', value: 'quick' },
+      { name: 'Detailed Setup (Granular control)', value: 'detailed' },
+      { name: 'Custom (Select specific skills)', value: 'custom' },
+    ],
+  });
 
   if (mode === 'custom') {
     return await runCustomSetup();
@@ -55,15 +49,10 @@ export async function runWizard(): Promise<QuickSetupAnswers | DetailedSetupAnsw
 
   const answers = mode === 'quick' ? await runQuickSetup() : await runDetailedSetup();
   
-  // Optional review step with rule selection
-  const { wantsReview } = await inquirer.prompt([
-    {
-      type: 'confirm',
-      name: 'wantsReview',
-      message: 'Would you like to review and customize the skills before generating files?',
-      default: false,
-    },
-  ]);
+  const wantsReview = await confirm({
+    message: 'Would you like to review and customize the skills before generating files?',
+    default: false,
+  });
 
   if (wantsReview) {
     const selectedRules = await reviewAndSelectRules(answers);
@@ -71,7 +60,6 @@ export async function runWizard(): Promise<QuickSetupAnswers | DetailedSetupAnsw
       console.log(chalk.yellow('\n❌ Configuration cancelled'));
       process.exit(0);
     }
-    // Override with user-selected rules
     (answers as any).selectedRules = selectedRules;
   }
   
@@ -79,125 +67,99 @@ export async function runWizard(): Promise<QuickSetupAnswers | DetailedSetupAnsw
 }
 
 async function runQuickSetup(): Promise<QuickSetupAnswers> {
-  const answers = await inquirer.prompt([
-    {
-      type: 'list',
-      name: 'projectType',
-      message: 'What type of project is this?',
-      choices: [
-        { name: 'UI (Frontend)', value: 'ui' },
-        { name: 'Backend (API/Server)', value: 'backend' },
-        { name: 'CLI Tool', value: 'cli' },
-        { name: 'Library/Package', value: 'library' },
-        { name: 'Full-stack', value: 'fullstack' },
-      ],
-    },
-    {
-      type: 'list',
-      name: 'language',
-      message: 'Primary language?',
-      choices: ['TypeScript', 'JavaScript', 'Python', 'Go', 'Lua'],
-      filter: (val: string) => val.toLowerCase(),
-    },
-  ]);
+  const projectType = await select({
+    message: 'What type of project is this?',
+    choices: [
+      { name: 'UI (Frontend)', value: 'ui' as const },
+      { name: 'Backend (API/Server)', value: 'backend' as const },
+      { name: 'CLI Tool', value: 'cli' as const },
+      { name: 'Library/Package', value: 'library' as const },
+      { name: 'Full-stack', value: 'fullstack' as const },
+    ],
+  });
 
-  const frameworkChoices = getFrameworkChoices(answers.projectType, answers.language);
+  const language = await select({
+    message: 'Primary language?',
+    choices: [
+      { name: 'TypeScript', value: 'typescript' as const },
+      { name: 'JavaScript', value: 'javascript' as const },
+      { name: 'Python', value: 'python' as const },
+      { name: 'Go', value: 'go' as const },
+      { name: 'Lua', value: 'lua' as const },
+    ],
+  });
+
+  const frameworkChoices = getFrameworkChoices(projectType, language);
   
-  const frameworkAnswer = await inquirer.prompt([
-    {
-      type: 'list',
-      name: 'framework',
+  let framework: Framework = 'none';
+  if (frameworkChoices.length > 1) {
+    framework = await select<Framework>({
       message: 'Framework?',
-      choices: frameworkChoices,
-      when: () => frameworkChoices.length > 1,
-    },
-  ]);
+      choices: frameworkChoices.map(f => ({ name: f, value: f.toLowerCase().replace(/\./g, '-').replace(/\s+/g, '-') as Framework })),
+    });
+  }
 
-  const gitAnswer = await inquirer.prompt([
-    {
-      type: 'confirm',
-      name: 'useGit',
-      message: 'Use Git for version control?',
-      default: true,
-    },
-  ]);
+  const useGit = await confirm({
+    message: 'Use Git for version control?',
+    default: true,
+  });
 
-  const platformAnswer = await inquirer.prompt([
-    {
-      type: 'checkbox',
-      name: 'platforms',
-      message: 'Which platforms will you use? (select all that apply)',
-      choices: [
-        { name: 'Kiro', value: 'kiro', checked: true },
-        { name: 'Claude Code', value: 'claude-code' },
-        { name: 'GitHub Copilot', value: 'github-copilot' },
-        { name: 'Amazon Q Developer', value: 'amazon-q' },
-      ],
-      validate: (input: string[]) => input.length > 0 ? true : 'Select at least one platform',
-    },
-  ]);
+  const platforms = await checkbox<Platform>({
+    message: 'Which platforms will you use? (select all that apply)',
+    choices: [
+      { name: 'Kiro', value: 'kiro' as const, checked: true },
+      { name: 'Claude Code', value: 'claude-code' as const },
+      { name: 'GitHub Copilot', value: 'github-copilot' as const },
+      { name: 'Amazon Q Developer', value: 'amazon-q' as const },
+    ],
+    required: true,
+  });
 
   const spinner = ora('Detecting MCP servers...').start();
   const detectedServers = detectMCPServers();
   spinner.succeed(`Found ${detectedServers.length} MCP server(s)`);
 
-  const mcpChoices = detectedServers.map(s => ({
-    name: `${s.name} (${s.path})`,
-    value: s.name,
-    checked: true,
-  }));
-
-  const mcpAnswer = await inquirer.prompt([
-    {
-      type: 'checkbox',
-      name: 'mcpServers',
+  let mcpServers: string[] = [];
+  if (detectedServers.length > 0) {
+    mcpServers = await checkbox({
       message: 'Select MCP servers to configure:',
-      choices: mcpChoices,
-      when: () => mcpChoices.length > 0,
-    },
-  ]);
-
-  const platforms = platformAnswer.platforms;
-  const result: QuickSetupAnswers = {
-    ...answers,
-    framework: frameworkAnswer.framework || 'none',
-    useGit: gitAnswer.useGit,
-    aiTool: (platforms.includes('kiro') ? 'kiro-cli' : platforms.includes('amazon-q') ? 'amazon-q' : 'kiro-cli') as AITool,
-    platforms,
-    mcpServers: mcpAnswer.mcpServers || [],
-  };
-
-  // Ask about agent generation (only for platforms that support agents)
-  const supportsAgents = platforms.some((p: string) => p === 'kiro' || p === 'amazon-q');
-  if (supportsAgents) {
-    const { generateAgent } = await inquirer.prompt([
-      {
-        type: 'confirm',
-        name: 'generateAgent',
-        message: 'Generate a default agent based on your selected skills?',
-        default: true,
-      },
-    ]);
-    result.generateAgent = generateAgent;
-  } else {
-    result.generateAgent = false;
+      choices: detectedServers.map(s => ({
+        name: `${s.name} (${s.path})`,
+        value: s.name,
+        checked: true,
+      })),
+    });
   }
 
-  // Offer optional rules
+  const supportsAgents = platforms.some(p => p === 'kiro' || p === 'amazon-q');
+  let generateAgent = false;
+  if (supportsAgents) {
+    generateAgent = await confirm({
+      message: 'Generate a default agent based on your selected skills?',
+      default: true,
+    });
+  }
+
+  const result: QuickSetupAnswers = {
+    projectType,
+    language,
+    framework,
+    useGit,
+    aiTool: (platforms.includes('kiro') ? 'kiro-cli' : platforms.includes('amazon-q') ? 'amazon-q' : 'kiro-cli') as AITool,
+    platforms,
+    mcpServers,
+    generateAgent,
+  };
+
   const optionalRules = await getOptionalRules(result);
   if (optionalRules.length > 0) {
-    const optionalAnswer = await inquirer.prompt([
-      {
-        type: 'checkbox',
-        name: 'additionalRules',
-        message: 'Select additional skills (optional):',
-        choices: optionalRules.map(r => ({
-          name: `${r.title} - ${r.description}`,
-          value: r.id,
-        })),
-      },
-    ]);
-    result.additionalRules = optionalAnswer.additionalRules || [];
+    result.additionalRules = await checkbox({
+      message: 'Select additional skills (optional):',
+      choices: optionalRules.map(r => ({
+        name: `${r.title} - ${r.description}`,
+        value: r.id,
+      })),
+    });
   }
 
   return result;
@@ -206,57 +168,64 @@ async function runQuickSetup(): Promise<QuickSetupAnswers> {
 async function runDetailedSetup(): Promise<DetailedSetupAnswers> {
   const quickAnswers = await runQuickSetup();
 
-  const additionalAnswers = await inquirer.prompt([
-    {
-      type: 'list',
-      name: 'testingFramework',
-      message: 'Testing framework?',
-      choices: getTestingFrameworkChoices(quickAnswers.language),
-    },
-    {
-      type: 'list',
-      name: 'linter',
-      message: 'Linting tool?',
-      choices: getLinterChoices(quickAnswers.language),
-    },
-    {
-      type: 'list',
-      name: 'uiLibrary',
-      message: 'UI library?',
-      choices: ['Chakra UI', 'GlueStack UI', 'Tailwind CSS', 'Material UI', 'None'],
-      filter: (val: string) => val.toLowerCase().replace(/\s+/g, '-'),
-      when: () => quickAnswers.projectType === 'ui' || quickAnswers.projectType === 'fullstack',
-    },
-    {
-      type: 'list',
-      name: 'packageManager',
-      message: 'Package manager?',
-      choices: ['npm', 'yarn', 'pnpm'],
-      when: () => quickAnswers.language === 'typescript' || quickAnswers.language === 'javascript',
-    },
-    {
-      type: 'list',
-      name: 'envVarStrategy',
-      message: 'Environment variables?',
-      choices: [
-        { name: 'Yes, with production protection', value: 'yes-with-prod-protection' },
-        { name: 'Yes, without protection', value: 'yes-without-protection' },
-        { name: 'No', value: 'no' },
-      ],
-    },
-    {
-      type: 'list',
-      name: 'versioningStrategy',
-      message: 'Versioning strategy?',
-      choices: [
-        { name: 'Semantic Versioning (semver)', value: 'semantic' },
-        { name: 'Calendar Versioning (calver)', value: 'calver' },
-        { name: 'None', value: 'none' },
-      ],
-    },
-  ]);
+  const testingFramework = await select<TestingFramework>({
+    message: 'Testing framework?',
+    choices: getTestingFrameworkChoices(quickAnswers.language).map(c => ({ name: c, value: c.toLowerCase() as TestingFramework })),
+  });
 
-  return { ...quickAnswers, ...additionalAnswers };
+  const linter = await select<Linter>({
+    message: 'Linting tool?',
+    choices: getLinterChoices(quickAnswers.language).map(c => ({ name: c, value: c.toLowerCase() as Linter })),
+  });
+
+  let uiLibrary: UILibrary | undefined;
+  if (quickAnswers.projectType === 'ui' || quickAnswers.projectType === 'fullstack') {
+    uiLibrary = await select<UILibrary>({
+      message: 'UI library?',
+      choices: ['Chakra UI', 'GlueStack UI', 'Tailwind CSS', 'Material UI', 'None'].map(c => ({
+        name: c,
+        value: c.toLowerCase().replace(/\s+/g, '-') as UILibrary,
+      })),
+    });
+  }
+
+  let packageManager: PackageManager | undefined;
+  if (quickAnswers.language === 'typescript' || quickAnswers.language === 'javascript') {
+    packageManager = await select<PackageManager>({
+      message: 'Package manager?',
+      choices: (['npm', 'yarn', 'pnpm'] as const).map(c => ({ name: c, value: c })),
+    });
+  }
+
+  const envVarStrategy = await select<EnvVarStrategy>({
+    message: 'Environment variables?',
+    choices: [
+      { name: 'Yes, with production protection', value: 'yes-with-prod-protection' as const },
+      { name: 'Yes, without protection', value: 'yes-without-protection' as const },
+      { name: 'No', value: 'no' as const },
+    ],
+  });
+
+  const versioningStrategy = await select<VersioningStrategy>({
+    message: 'Versioning strategy?',
+    choices: [
+      { name: 'Semantic Versioning (semver)', value: 'semantic' as const },
+      { name: 'Calendar Versioning (calver)', value: 'calver' as const },
+      { name: 'None', value: 'none' as const },
+    ],
+  });
+
+  const detailed: DetailedSetupAnswers = {
+    ...quickAnswers,
+    testingFramework,
+    linter,
+    envVarStrategy,
+    versioningStrategy,
+  };
+  if (uiLibrary) detailed.uiLibrary = uiLibrary;
+  if (packageManager) detailed.packageManager = packageManager;
+
+  return detailed;
 }
 
 function getFrameworkChoices(projectType: string, language: string): string[] {
@@ -307,12 +276,10 @@ function getLinterChoices(language: string): string[] {
 async function runCustomSetup(): Promise<CustomModeAnswers> {
   console.log(chalk.yellow('\n📝 Custom Mode: Select specific rules for your project\n'));
 
-  // Load all available rules
   const manifestPath = join(__dirname, '..', '..', 'curated-presets', 'rules-manifest.json');
   const content = await fs.readFile(manifestPath, 'utf-8');
   const manifest = JSON.parse(content);
 
-  // Group rules by category
   const rulesByCategory: Record<string, any[]> = {};
   manifest.rules.forEach((rule: any) => {
     const category = rule.category || 'other';
@@ -322,104 +289,72 @@ async function runCustomSetup(): Promise<CustomModeAnswers> {
     rulesByCategory[category].push(rule);
   });
 
-  // Select platforms first
-  const { platforms } = await inquirer.prompt([
-    {
-      type: 'checkbox',
-      name: 'platforms',
-      message: 'Which platforms will you use? (select all that apply)',
-      choices: [
-        { name: 'Kiro', value: 'kiro', checked: true },
-        { name: 'Claude Code', value: 'claude-code' },
-        { name: 'GitHub Copilot', value: 'github-copilot' },
-        { name: 'Amazon Q Developer', value: 'amazon-q' },
-      ],
-      validate: (input: string[]) => input.length > 0 ? true : 'Select at least one platform',
-    },
-  ]);
+  const platforms = await checkbox<Platform>({
+    message: 'Which platforms will you use? (select all that apply)',
+    choices: [
+      { name: 'Kiro', value: 'kiro' as const, checked: true },
+      { name: 'Claude Code', value: 'claude-code' as const },
+      { name: 'GitHub Copilot', value: 'github-copilot' as const },
+      { name: 'Amazon Q Developer', value: 'amazon-q' as const },
+    ],
+    required: true,
+  });
 
   const aiTool: AITool = platforms.includes('kiro') ? 'kiro-cli' : platforms.includes('amazon-q') ? 'amazon-q' : 'kiro-cli';
 
-  // Show rules grouped by category
   const ruleChoices = Object.entries(rulesByCategory).flatMap(([category, rules]) => [
-    new inquirer.Separator(chalk.bold.cyan(`\n${category.toUpperCase()}`)),
+    new Separator(`── ${category.toUpperCase()} ──`),
     ...rules.map((rule: any) => ({
-      name: `${rule.id.replace(/-/g, ' ')} ${chalk.gray(`(${rule.description || 'No description'})`)}`,
+      name: `${rule.id.replace(/-/g, ' ')} (${rule.description || 'No description'})`,
       value: rule.id,
       checked: rule.alwaysInclude || false,
     })),
   ]);
 
-  const { selectedRules } = await inquirer.prompt([
-    {
-      type: 'checkbox',
-      name: 'selectedRules',
-      message: 'Select rules to include:',
-      choices: ruleChoices,
-      pageSize: getTerminalPageSize(),
-      loop: false,
-      validate: (input: string[]) => {
-        if (input.length === 0) {
-          return 'Please select at least one rule';
-        }
-        return true;
-      },
-    },
-  ]);
+  const selectedRules = await checkbox({
+    message: 'Select rules to include:',
+    choices: ruleChoices,
+    pageSize: getTerminalPageSize(),
+    loop: false,
+    required: true,
+  });
 
-  // MCP servers
   const spinner = ora('Detecting MCP servers...').start();
   const detectedServers = detectMCPServers();
   spinner.succeed(`Found ${detectedServers.length} MCP server(s)`);
 
-  const mcpChoices = detectedServers.map(s => ({
-    name: `${s.name} (${s.path})`,
-    value: s.name,
-    checked: false,
-  }));
-
-  const mcpAnswer = await inquirer.prompt([
-    {
-      type: 'checkbox',
-      name: 'mcpServers',
+  let mcpServers: string[] = [];
+  if (detectedServers.length > 0) {
+    mcpServers = await checkbox({
       message: 'Select MCP servers to configure:',
-      choices: mcpChoices,
-      when: () => mcpChoices.length > 0,
-    },
-  ]);
+      choices: detectedServers.map(s => ({
+        name: `${s.name} (${s.path})`,
+        value: s.name,
+      })),
+    });
+  }
+
+  const supportsAgents = platforms.some(p => p === 'kiro' || p === 'amazon-q');
+  let generateAgent = false;
+  if (supportsAgents) {
+    generateAgent = await confirm({
+      message: 'Generate a default agent based on your selected skills?',
+      default: true,
+    });
+  }
 
   const result: CustomModeAnswers = {
     aiTool,
     platforms,
     selectedRules,
-    mcpServers: mcpAnswer.mcpServers || [],
+    mcpServers,
+    generateAgent,
   };
 
-  // Ask about agent generation (only for platforms that support agents)
-  const supportsAgents = platforms.some((p: string) => p === 'kiro' || p === 'amazon-q');
-  if (supportsAgents) {
-    const { generateAgent } = await inquirer.prompt([
-      {
-        type: 'confirm',
-        name: 'generateAgent',
-        message: 'Generate a default agent based on your selected skills?',
-        default: true,
-      },
-    ]);
-    result.generateAgent = generateAgent;
-  } else {
-    result.generateAgent = false;
-  }
-
-  // Optional review step for custom mode
-  const { wantsReview } = await inquirer.prompt([
-    {
-      type: 'confirm',
-      name: 'wantsReview',
-      message: 'Would you like to review and customize the skills before generating files?',
-      default: false,
-    },
-  ]);
+  const wantsReview = await confirm({
+    message: 'Would you like to review and customize the skills before generating files?',
+    default: false,
+  });
 
   if (wantsReview) {
     const reviewedRules = await reviewAndSelectRulesCustom(result.selectedRules, manifest.rules);
@@ -436,50 +371,34 @@ async function runCustomSetup(): Promise<CustomModeAnswers> {
 async function reviewAndSelectRules(answers: QuickSetupAnswers | DetailedSetupAnswers): Promise<string[] | null> {
   console.log(chalk.bold.cyan('\n📋 Review & Customize Rules\n'));
 
-  // Get rules that would be selected
   const selectedRules = await selectRules(answers);
   
-  // Load manifest to get descriptions
   const manifestPath = join(__dirname, '..', '..', 'curated-presets', 'rules-manifest.json');
   const content = await fs.readFile(manifestPath, 'utf-8');
   const manifest = JSON.parse(content);
 
-  // Create choices with descriptions
   const ruleChoices = selectedRules.map(ruleId => {
     const rule = manifest.rules.find((r: any) => r.id === ruleId);
     const description = rule?.description || 'No description';
     return {
-      name: `${ruleId.replace(/-/g, ' ')} ${chalk.gray(`- ${description}`)}`,
+      name: `${ruleId.replace(/-/g, ' ')} - ${description}`,
       value: ruleId,
       checked: true,
     };
   });
 
-  const { finalRules } = await inquirer.prompt([
-    {
-      type: 'checkbox',
-      name: 'finalRules',
-      message: 'Select rules to include (uncheck to exclude):',
-      choices: ruleChoices,
-      pageSize: getTerminalPageSize(),
-      loop: false,
-      validate: (input: string[]) => {
-        if (input.length === 0) {
-          return 'Please select at least one rule';
-        }
-        return true;
-      },
-    },
-  ]);
+  const finalRules = await checkbox({
+    message: 'Select rules to include (uncheck to exclude):',
+    choices: ruleChoices,
+    pageSize: getTerminalPageSize(),
+    loop: false,
+    required: true,
+  });
 
-  const { confirmed } = await inquirer.prompt([
-    {
-      type: 'confirm',
-      name: 'confirmed',
-      message: `\nProceed with ${finalRules.length} rule(s)?`,
-      default: true,
-    },
-  ]);
+  const confirmed = await confirm({
+    message: `Proceed with ${finalRules.length} rule(s)?`,
+    default: true,
+  });
 
   return confirmed ? finalRules : null;
 }
@@ -487,119 +406,28 @@ async function reviewAndSelectRules(answers: QuickSetupAnswers | DetailedSetupAn
 async function reviewAndSelectRulesCustom(selectedRules: string[], allRules: any[]): Promise<string[] | null> {
   console.log(chalk.bold.cyan('\n📋 Review & Customize Rules\n'));
 
-  // Create choices with descriptions
   const ruleChoices = selectedRules.map(ruleId => {
     const rule = allRules.find((r: any) => r.id === ruleId);
     const description = rule?.description || 'No description';
     return {
-      name: `${ruleId.replace(/-/g, ' ')} ${chalk.gray(`- ${description}`)}`,
+      name: `${ruleId.replace(/-/g, ' ')} - ${description}`,
       value: ruleId,
       checked: true,
     };
   });
 
-  const { finalRules } = await inquirer.prompt([
-    {
-      type: 'checkbox',
-      name: 'finalRules',
-      message: 'Select rules to include (uncheck to exclude):',
-      choices: ruleChoices,
-      pageSize: getTerminalPageSize(),
-      loop: false,
-      validate: (input: string[]) => {
-        if (input.length === 0) {
-          return 'Please select at least one rule';
-        }
-        return true;
-      },
-    },
-  ]);
-
-  const { confirmed } = await inquirer.prompt([
-    {
-      type: 'confirm',
-      name: 'confirmed',
-      message: `\nProceed with ${finalRules.length} rule(s)?`,
-      default: true,
-    },
-  ]);
-
-  return confirmed ? finalRules : null;
-}
-
-async function reviewConfiguration(answers: QuickSetupAnswers | DetailedSetupAnswers): Promise<boolean> {
-  console.log(chalk.bold.cyan('\n📋 Review Configuration\n'));
-
-  // Get selected rules
-  const rules = await selectRules(answers);
-
-  // Show configuration summary
-  console.log(chalk.bold('Project Configuration:'));
-  console.log(chalk.gray(`  Project Type: ${answers.projectType}`));
-  console.log(chalk.gray(`  Language: ${answers.language}`));
-  console.log(chalk.gray(`  Framework: ${answers.framework}`));
-  console.log(chalk.gray(`  Git: ${answers.useGit ? 'Yes' : 'No'}`));
-  console.log(chalk.gray(`  AI Tool: ${answers.aiTool}`));
-
-  if ('testingFramework' in answers) {
-    console.log(chalk.gray(`  Testing: ${answers.testingFramework}`));
-    console.log(chalk.gray(`  Linter: ${answers.linter}`));
-    if (answers.uiLibrary) {
-      console.log(chalk.gray(`  UI Library: ${answers.uiLibrary}`));
-    }
-    if (answers.packageManager) {
-      console.log(chalk.gray(`  Package Manager: ${answers.packageManager}`));
-    }
-    console.log(chalk.gray(`  Environment Variables: ${answers.envVarStrategy}`));
-    console.log(chalk.gray(`  Versioning: ${answers.versioningStrategy}`));
-  }
-
-  console.log(chalk.bold(`\nRules to be included (${rules.length}):`));
-  rules.forEach(rule => console.log(chalk.gray(`  ✓ ${rule}`)));
-
-  if (answers.mcpServers.length > 0) {
-    console.log(chalk.bold(`\nMCP Servers (${answers.mcpServers.length}):`));
-    answers.mcpServers.forEach(server => console.log(chalk.gray(`  ✓ ${server}`)));
-  }
-
-  const { confirmed } = await inquirer.prompt([
-    {
-      type: 'confirm',
-      name: 'confirmed',
-      message: '\nProceed with this configuration?',
-      default: true,
-    },
-  ]);
-
-  return confirmed;
-}
-
-async function reviewCustomConfiguration(answers: CustomModeAnswers, allRules: any[]): Promise<boolean> {
-  console.log(chalk.bold.cyan('\n📋 Review Configuration\n'));
-
-  console.log(chalk.bold('Project Configuration:'));
-  console.log(chalk.gray(`  AI Tool: ${answers.aiTool}`));
-
-  console.log(chalk.bold(`\nRules to be included (${answers.selectedRules.length}):`));
-  answers.selectedRules.forEach(ruleId => {
-    const rule = allRules.find((r: any) => r.id === ruleId);
-    const description = rule?.description || 'No description';
-    console.log(chalk.gray(`  ✓ ${ruleId.replace(/-/g, ' ')} ${chalk.dim(`(${description})`)}`));
+  const finalRules = await checkbox({
+    message: 'Select rules to include (uncheck to exclude):',
+    choices: ruleChoices,
+    pageSize: getTerminalPageSize(),
+    loop: false,
+    required: true,
   });
 
-  if (answers.mcpServers.length > 0) {
-    console.log(chalk.bold(`\nMCP Servers (${answers.mcpServers.length}):`));
-    answers.mcpServers.forEach(server => console.log(chalk.gray(`  ✓ ${server}`)));
-  }
+  const confirmed = await confirm({
+    message: `Proceed with ${finalRules.length} rule(s)?`,
+    default: true,
+  });
 
-  const { confirmed } = await inquirer.prompt([
-    {
-      type: 'confirm',
-      name: 'confirmed',
-      message: '\nProceed with this configuration?',
-      default: true,
-    },
-  ]);
-
-  return confirmed;
+  return confirmed ? finalRules : null;
 }
