@@ -1,6 +1,6 @@
 {
   "name": "cairel",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "CLI tool for generating cross-platform Agent Skills for Kiro, GitHub Copilot, Claude Code, and Amazon Q Developer",
   "main": "dist/index.js",
   "bin": {

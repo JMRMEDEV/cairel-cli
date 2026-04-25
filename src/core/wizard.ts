@@ -7,6 +7,10 @@ import { WizardMode, QuickSetupAnswers, DetailedSetupAnswers, CustomModeAnswers,
 import { detectMCPServers } from '../utils/mcp-detector';
 import { selectRules } from './rules-selector';
 
+function getTerminalPageSize(): number {
+  return (process.stdout.rows || 24) - 3;
+}
+
 interface OptionalRule {
   id: string;
   title: string;
@@ -336,7 +340,8 @@ async function runCustomSetup(): Promise<CustomModeAnswers> {
       name: 'selectedRules',
       message: 'Select rules to include:',
       choices: ruleChoices,
-      pageSize: 15,
+      pageSize: getTerminalPageSize(),
+      loop: false,
       validate: (input: string[]) => {
         if (input.length === 0) {
           return 'Please select at least one rule';
@@ -424,7 +429,8 @@ async function reviewAndSelectRules(answers: QuickSetupAnswers | DetailedSetupAn
       name: 'finalRules',
       message: 'Select rules to include (uncheck to exclude):',
       choices: ruleChoices,
-      pageSize: 15,
+      pageSize: getTerminalPageSize(),
+      loop: false,
       validate: (input: string[]) => {
         if (input.length === 0) {
           return 'Please select at least one rule';
@@ -466,7 +472,8 @@ async function reviewAndSelectRulesCustom(selectedRules: string[], allRules: any
       name: 'finalRules',
       message: 'Select rules to include (uncheck to exclude):',
       choices: ruleChoices,
-      pageSize: 15,
+      pageSize: getTerminalPageSize(),
+      loop: false,
       validate: (input: string[]) => {
         if (input.length === 0) {
           return 'Please select at least one rule';
