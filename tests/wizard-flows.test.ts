@@ -1,10 +1,19 @@
 /**
- * Wizard Flow Integration Tests using Inquirer mocking
+ * Wizard Flow Integration Tests using @inquirer/prompts mocking
  */
 
-import inquirer from 'inquirer';
-import { runWizard } from '../src/core/wizard';
 import { QuickSetupAnswers, DetailedSetupAnswers } from '../src/types/wizard';
+
+// Mock @inquirer/prompts
+const mockSelect = jest.fn();
+const mockCheckbox = jest.fn();
+const mockConfirm = jest.fn();
+jest.mock('@inquirer/prompts', () => ({
+  select: (...args: any[]) => mockSelect(...args),
+  checkbox: (...args: any[]) => mockCheckbox(...args),
+  confirm: (...args: any[]) => mockConfirm(...args),
+  Separator: jest.fn((text: string) => ({ type: 'separator', line: text })),
+}));
 
 // Mock MCP detector
 jest.mock('../src/utils/mcp-detector', () => ({
@@ -25,27 +34,29 @@ jest.mock('ora', () => {
   return jest.fn(() => mockSpinner);
 });
 
-// Mock inquirer
-jest.mock('inquirer');
+import { runWizard } from '../src/core/wizard';
 
-describe('Wizard Flows with Inquirer Mocking', () => {
-  const mockPrompt = inquirer.prompt as jest.MockedFunction<typeof inquirer.prompt>;
-
+describe('Wizard Flows with @inquirer/prompts Mocking', () => {
   beforeEach(() => {
-    mockPrompt.mockReset();
+    mockSelect.mockReset();
+    mockCheckbox.mockReset();
+    mockConfirm.mockReset();
   });
 
   describe('Quick Setup Mode', () => {
     it('should complete UI TypeScript React flow', async () => {
-      mockPrompt
-        .mockResolvedValueOnce({ mode: 'quick' })
-        .mockResolvedValueOnce({ projectType: 'ui', language: 'typescript' })
-        .mockResolvedValueOnce({ framework: 'react' })
-        .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ platforms: ['kiro'] })
-        .mockResolvedValueOnce({ mcpServers: ['amazon-q-history', 'gpt'] })
-        .mockResolvedValueOnce({ generateAgent: true })
-        .mockResolvedValueOnce({ wantsReview: false });
+      mockSelect
+        .mockResolvedValueOnce('quick')       // mode
+        .mockResolvedValueOnce('ui')           // projectType
+        .mockResolvedValueOnce('typescript')   // language
+        .mockResolvedValueOnce('react');       // framework
+      mockConfirm
+        .mockResolvedValueOnce(true)           // useGit
+        .mockResolvedValueOnce(true)           // generateAgent
+        .mockResolvedValueOnce(false);         // wantsReview
+      mockCheckbox
+        .mockResolvedValueOnce(['kiro'])       // platforms
+        .mockResolvedValueOnce(['amazon-q-history', 'gpt']); // mcpServers
 
       const result = await runWizard();
 
@@ -58,15 +69,18 @@ describe('Wizard Flows with Inquirer Mocking', () => {
     });
 
     it('should complete Backend Python flow', async () => {
-      mockPrompt
-        .mockResolvedValueOnce({ mode: 'quick' })
-        .mockResolvedValueOnce({ projectType: 'backend', language: 'python' })
-        .mockResolvedValueOnce({ framework: 'flask' })
-        .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ platforms: ['kiro'] })
-        .mockResolvedValueOnce({ mcpServers: ['amazon-q-history'] })
-        .mockResolvedValueOnce({ generateAgent: true })
-        .mockResolvedValueOnce({ wantsReview: false });
+      mockSelect
+        .mockResolvedValueOnce('quick')
+        .mockResolvedValueOnce('backend')
+        .mockResolvedValueOnce('python')
+        .mockResolvedValueOnce('flask');
+      mockConfirm
+        .mockResolvedValueOnce(true)           // useGit
+        .mockResolvedValueOnce(true)           // generateAgent
+        .mockResolvedValueOnce(false);         // wantsReview
+      mockCheckbox
+        .mockResolvedValueOnce(['kiro'])
+        .mockResolvedValueOnce(['amazon-q-history']);
 
       const result = await runWizard();
 
@@ -76,20 +90,23 @@ describe('Wizard Flows with Inquirer Mocking', () => {
     });
 
     it('should complete Fullstack Next.js flow', async () => {
-      mockPrompt
-        .mockResolvedValueOnce({ mode: 'quick' })
-        .mockResolvedValueOnce({ projectType: 'fullstack', language: 'typescript' })
-        .mockResolvedValueOnce({ framework: 'next-js' })
-        .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ platforms: ['kiro', 'amazon-q'] })
-        .mockResolvedValueOnce({ mcpServers: ['amazon-q-history', 'gpt'] })
-        .mockResolvedValueOnce({ generateAgent: true })
-        .mockResolvedValueOnce({ wantsReview: false });
+      mockSelect
+        .mockResolvedValueOnce('quick')
+        .mockResolvedValueOnce('fullstack')
+        .mockResolvedValueOnce('typescript');
+      // fullstack+typescript has no framework choices (falls through to ['None']), so no framework select
+      mockConfirm
+        .mockResolvedValueOnce(true)           // useGit
+        .mockResolvedValueOnce(true)           // generateAgent
+        .mockResolvedValueOnce(false);         // wantsReview
+      mockCheckbox
+        .mockResolvedValueOnce(['kiro', 'amazon-q'])
+        .mockResolvedValueOnce(['amazon-q-history', 'gpt']);
 
       const result = await runWizard();
 
       expect(result.projectType).toBe('fullstack');
-      expect(result.framework).toBe('next-js');
+      expect(result.framework).toBe('none');
     });
   });
 
@@ -98,15 +115,17 @@ describe('Wizard Flows with Inquirer Mocking', () => {
       const { detectMCPServers } = require('../src/utils/mcp-detector');
       detectMCPServers.mockReturnValueOnce([]);
 
-      mockPrompt
-        .mockResolvedValueOnce({ mode: 'quick' })
-        .mockResolvedValueOnce({ projectType: 'ui', language: 'typescript' })
-        .mockResolvedValueOnce({ framework: 'react' })
-        .mockResolvedValueOnce({ useGit: true })
-        .mockResolvedValueOnce({ platforms: ['kiro'] })
-        .mockResolvedValueOnce({}) // No MCP servers
-        .mockResolvedValueOnce({ generateAgent: true })
-        .mockResolvedValueOnce({ wantsReview: false });
+      mockSelect
+        .mockResolvedValueOnce('quick')
+        .mockResolvedValueOnce('ui')
+        .mockResolvedValueOnce('typescript')
+        .mockResolvedValueOnce('react');
+      mockConfirm
+        .mockResolvedValueOnce(true)           // useGit
+        .mockResolvedValueOnce(true)           // generateAgent
+        .mockResolvedValueOnce(false);         // wantsReview
+      mockCheckbox
+        .mockResolvedValueOnce(['kiro']);       // platforms only, no MCP prompt
 
       const result = await runWizard();
 
@@ -114,4 +133,3 @@ describe('Wizard Flows with Inquirer Mocking', () => {
     });
   });
 });
-

@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import inquirer from 'inquirer';
+import { select, checkbox, confirm } from '@inquirer/prompts';
 import chalk from 'chalk';
 import ora from 'ora';
 import { existsSync, readdirSync, copyFileSync, mkdirSync, readFileSync, unlinkSync } from 'fs';
@@ -48,32 +48,24 @@ export const updateCommand = new Command('update')
     console.log(chalk.blue(`\n🔍 Found ${configType} configuration\n`));
 
     // Ask what to update
-    const { updateType } = await inquirer.prompt([
-      {
-        type: 'list',
-        name: 'updateType',
-        message: 'What would you like to update?',
-        choices: [
-          { name: 'Skills only', value: 'skills' },
-          { name: 'Agents only', value: 'agents' },
-          { name: 'Both skills and agents', value: 'both' },
-        ],
-      },
-    ]);
+    const updateType = await select({
+      message: 'What would you like to update?',
+      choices: [
+        { name: 'Skills only', value: 'skills' },
+        { name: 'Agents only', value: 'agents' },
+        { name: 'Both skills and agents', value: 'both' },
+      ],
+    });
 
     // Create backup
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').split('T')[0]! + '-' + 
                       new Date().toTimeString().split(' ')[0]!.replace(/:/g, '-');
     const backupPath = join(configPath, `.backup-${timestamp}`);
 
-    const { confirmBackup } = await inquirer.prompt([
-      {
-        type: 'confirm',
-        name: 'confirmBackup',
-        message: `Backup will be created at ${chalk.cyan(backupPath)}\nContinue?`,
-        default: true,
-      },
-    ]);
+    const confirmBackup = await confirm({
+      message: `Backup will be created at ${chalk.cyan(backupPath)}\nContinue?`,
+      default: true,
+    });
 
     if (!confirmBackup) {
       console.log(chalk.yellow('Update cancelled'));
@@ -139,18 +131,14 @@ export const updateCommand = new Command('update')
       spinner.stop();
 
       // Ask user which rules to update
-      const { ruleUpdateMode } = await inquirer.prompt([
-        {
-          type: 'list',
-          name: 'ruleUpdateMode',
-          message: 'How would you like to update rules?',
-          choices: [
-            { name: 'Update all existing skills', value: 'update-all' },
-            { name: 'Add new skills only', value: 'add-new' },
-            { name: 'Manage skills (add/remove/update)', value: 'manage' },
-          ],
-        },
-      ]);
+      const ruleUpdateMode = await select({
+        message: 'How would you like to update rules?',
+        choices: [
+          { name: 'Update all existing skills', value: 'update-all' },
+          { name: 'Add new skills only', value: 'add-new' },
+          { name: 'Manage skills (add/remove/update)', value: 'manage' },
+        ],
+      });
 
       let rulesToProcess: string[] = [];
       let rulesToRemove: string[] = [];
@@ -171,21 +159,17 @@ export const updateCommand = new Command('update')
           checked: existingRuleIds.includes(rule.id), // Pre-check existing skills
         }));
 
-        const { selectedRules } = await inquirer.prompt([
-          {
-            type: 'checkbox',
-            name: 'selectedRules',
-            message: 'Select skills to keep (unchecked will be removed):',
-            choices: ruleChoices,
-            pageSize: 15,
-            validate: (answer) => {
-              if (answer.length === 0) {
-                return 'You must select at least one skill';
-              }
-              return true;
-            },
+        const selectedRules: string[] = await checkbox({
+          message: 'Select skills to keep (unchecked will be removed):',
+          choices: ruleChoices,
+          pageSize: 15,
+          validate: (answer) => {
+            if (answer.length === 0) {
+              return 'You must select at least one skill';
+            }
+            return true;
           },
-        ]);
+        });
 
         rulesToProcess = selectedRules;
         // Rules to remove = existing skills that weren't selected
