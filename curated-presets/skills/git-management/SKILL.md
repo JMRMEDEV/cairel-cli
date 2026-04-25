@@ -42,6 +42,8 @@ Ready to commit? (y/n)
 
 **All commit messages MUST be ≤ 50 characters.** Imperative mood, concise, descriptive.
 
+**No commit message body.** Most teams rarely use commit bodies, and they add noise. Write only the subject line. If the user explicitly requests a body, then include one.
+
 > **Conventional Commits**: If the project has the `conventional-commits` skill enabled, commit messages MUST follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) format instead. The 50-char limit applies to the `<type>[scope]: <description>` line. See the `conventional-commits` skill for full details.
 
 ### 3. Never Push Without Explicit Request
