@@ -21,7 +21,8 @@
   ],
   "resources": [
     "file://.kiro/steering/*.md",
-    "file://docs/*.md"
+    "file://docs/*.md",
+    "skill://.kiro/skills/*/SKILL.md"
   ],
   "hooks": {
     "agentSpawn": [
