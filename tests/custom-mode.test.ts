@@ -37,6 +37,7 @@ describe('Custom Mode Tests', () => {
           selectedRules: ['context-retrieval', 'implementation-approval', 'typescript-validation'] 
         })
         .mockResolvedValueOnce({ mcpServers: ['amazon-q-history'] })
+        .mockResolvedValueOnce({ generateAgent: true })
         .mockResolvedValueOnce({ wantsReview: false });
 
       const result = await runWizard();
@@ -58,6 +59,7 @@ describe('Custom Mode Tests', () => {
           selectedRules: ['context-retrieval', 'implementation-approval'] 
         })
         .mockResolvedValueOnce({}) // Empty object when MCP prompt is skipped
+        .mockResolvedValueOnce({ generateAgent: true })
         .mockResolvedValueOnce({ wantsReview: false });
 
       const result = await runWizard();
@@ -80,6 +82,7 @@ describe('Custom Mode Tests', () => {
           ] 
         })
         .mockResolvedValueOnce({ mcpServers: [] })
+        .mockResolvedValueOnce({ generateAgent: true })
         .mockResolvedValueOnce({ wantsReview: false });
 
       const result = await runWizard();
@@ -98,6 +101,7 @@ describe('Custom Mode Tests', () => {
         .mockResolvedValueOnce({ useGit: true })
         .mockResolvedValueOnce({ platforms: ['kiro'] })
         .mockResolvedValueOnce({ mcpServers: [] })
+        .mockResolvedValueOnce({ generateAgent: true })
         .mockResolvedValueOnce({ wantsReview: false });
 
       const result = await runWizard();
@@ -114,6 +118,7 @@ describe('Custom Mode Tests', () => {
         .mockResolvedValueOnce({ useGit: false })
         .mockResolvedValueOnce({ platforms: ['kiro'] })
         .mockResolvedValueOnce({ mcpServers: [] })
+        .mockResolvedValueOnce({ generateAgent: true })
         .mockResolvedValueOnce({ wantsReview: true })
         .mockResolvedValueOnce({ 
           finalRules: ['context-retrieval', 'implementation-approval'] 
@@ -136,6 +141,7 @@ describe('Custom Mode Tests', () => {
         .mockResolvedValueOnce({ useGit: true })
         .mockResolvedValueOnce({ platforms: ['kiro'] })
         .mockResolvedValueOnce({ mcpServers: [] })
+        .mockResolvedValueOnce({ generateAgent: true })
         .mockResolvedValueOnce({ wantsReview: true })
         .mockResolvedValueOnce({ 
           finalRules: ['context-retrieval', 'implementation-approval'] 
@@ -156,6 +162,7 @@ describe('Custom Mode Tests', () => {
         .mockResolvedValueOnce({ useGit: true })
         .mockResolvedValueOnce({ platforms: ['kiro'] })
         .mockResolvedValueOnce({ mcpServers: [] })
+        .mockResolvedValueOnce({ generateAgent: true })
         .mockResolvedValueOnce({ 
           testingFramework: 'jest',
           linter: 'eslint',
@@ -180,6 +187,7 @@ describe('Custom Mode Tests', () => {
         .mockResolvedValueOnce({ useGit: true })
         .mockResolvedValueOnce({ platforms: ['amazon-q'] })
         .mockResolvedValueOnce({ mcpServers: ['amazon-q-history'] })
+        .mockResolvedValueOnce({ generateAgent: true })
         .mockResolvedValueOnce({ 
           testingFramework: 'vitest',
           linter: 'eslint',
@@ -220,6 +228,7 @@ describe('Custom Mode Tests', () => {
           ] 
         })
         .mockResolvedValueOnce({ mcpServers: [] })
+        .mockResolvedValueOnce({ generateAgent: true })
         .mockResolvedValueOnce({ wantsReview: true })
         .mockResolvedValueOnce({ 
           finalRules: ['context-retrieval', 'implementation-approval'] 
@@ -242,6 +251,7 @@ describe('Custom Mode Tests', () => {
           selectedRules: ['context-retrieval', 'implementation-approval'] 
         })
         .mockResolvedValueOnce({ mcpServers: [] })
+        .mockResolvedValueOnce({ generateAgent: true })
         .mockResolvedValueOnce({ wantsReview: true })
         .mockResolvedValueOnce({ 
           finalRules: ['context-retrieval'] 
@@ -280,6 +290,7 @@ describe('Custom Mode Tests', () => {
           ] 
         })
         .mockResolvedValueOnce({ mcpServers: ['amazon-q-history'] })
+        .mockResolvedValueOnce({ generateAgent: true })
         .mockResolvedValueOnce({ wantsReview: false });
 
       const result = await runWizard();
@@ -295,6 +306,7 @@ describe('Custom Mode Tests', () => {
         .mockResolvedValueOnce({ useGit: false })
         .mockResolvedValueOnce({ platforms: ['kiro'] })
         .mockResolvedValueOnce({}) // No MCP servers
+        .mockResolvedValueOnce({ generateAgent: true })
         .mockResolvedValueOnce({ wantsReview: true })
         .mockResolvedValueOnce({ 
           finalRules: ['context-retrieval', 'implementation-approval'] 

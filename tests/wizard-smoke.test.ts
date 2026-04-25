@@ -51,7 +51,7 @@ describe('Wizard Smoke Tests', () => {
 
     // Send all ENTERs to accept defaults
     setTimeout(async () => {
-      for (let i = 0; i < 8; i++) {
+      for (let i = 0; i < 9; i++) {
         await new Promise(r => setTimeout(r, 200));
         mockStdin.send(ENTER);
       }

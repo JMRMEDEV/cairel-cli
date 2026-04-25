@@ -37,6 +37,7 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ useGit: true })
         .mockResolvedValueOnce({ platforms: ['kiro'] })
         .mockResolvedValueOnce({}) // No MCP servers
+        .mockResolvedValueOnce({ generateAgent: true })
         .mockResolvedValueOnce({
           testingFramework: 'jest',
           linter: 'eslint',
@@ -65,6 +66,7 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ useGit: true })
         .mockResolvedValueOnce({ platforms: ['kiro', 'amazon-q'] })
         .mockResolvedValueOnce({}) // No MCP servers
+        .mockResolvedValueOnce({ generateAgent: true })
         .mockResolvedValueOnce({
           testingFramework: 'vitest',
           linter: 'eslint',
@@ -91,6 +93,7 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ useGit: false })
         .mockResolvedValueOnce({ platforms: ['amazon-q'] })
         .mockResolvedValueOnce({}) // No MCP servers
+        .mockResolvedValueOnce({ generateAgent: true })
         .mockResolvedValueOnce({
           testingFramework: 'jest',
           linter: 'eslint',
@@ -117,6 +120,7 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ useGit: true })
         .mockResolvedValueOnce({ platforms: ['kiro'] })
         .mockResolvedValueOnce({}) // No MCP servers
+        .mockResolvedValueOnce({ generateAgent: true })
         .mockResolvedValueOnce({
           testingFramework: 'pytest',
           linter: 'ruff',
@@ -140,6 +144,7 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ useGit: false })
         .mockResolvedValueOnce({ platforms: ['amazon-q'] })
         .mockResolvedValueOnce({}) // No MCP servers
+        .mockResolvedValueOnce({ generateAgent: true })
         .mockResolvedValueOnce({
           testingFramework: 'none',
           linter: 'none',
@@ -164,6 +169,7 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ useGit: true })
         .mockResolvedValueOnce({ platforms: ['kiro'] })
         .mockResolvedValueOnce({}) // No MCP servers
+        .mockResolvedValueOnce({ generateAgent: true })
         .mockResolvedValueOnce({
           testingFramework: 'vitest',
           linter: 'eslint',
@@ -187,6 +193,7 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ useGit: true })
         .mockResolvedValueOnce({ platforms: ['kiro', 'amazon-q'] })
         .mockResolvedValueOnce({}) // No MCP servers
+        .mockResolvedValueOnce({ generateAgent: true })
         .mockResolvedValueOnce({
           testingFramework: 'jest',
           linter: 'eslint',
@@ -213,6 +220,7 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ useGit: true })
         .mockResolvedValueOnce({ platforms: ['kiro'] })
         .mockResolvedValueOnce({}) // No MCP servers
+        .mockResolvedValueOnce({ generateAgent: true })
         .mockResolvedValueOnce({
           testingFramework: 'jest',
           linter: 'eslint',
@@ -235,6 +243,7 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce({ useGit: false })
         .mockResolvedValueOnce({ platforms: ['amazon-q'] })
         .mockResolvedValueOnce({}) // No MCP servers
+        .mockResolvedValueOnce({ generateAgent: true })
         .mockResolvedValueOnce({
           testingFramework: 'none',
           linter: 'none',

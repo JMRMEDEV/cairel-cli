@@ -21,6 +21,7 @@ export interface QuickSetupAnswers {
   platforms: Platform[];
   mcpServers: string[];
   additionalRules?: string[];
+  generateAgent?: boolean;
 }
 
 export interface DetailedSetupAnswers extends QuickSetupAnswers {
@@ -42,4 +43,5 @@ export interface CustomModeAnswers {
   platforms: Platform[];
   selectedRules: string[];
   mcpServers: string[];
+  generateAgent?: boolean;
 }

@@ -158,7 +158,7 @@ async function runQuickSetup(): Promise<QuickSetupAnswers> {
   ]);
 
   const platforms = platformAnswer.platforms;
-  const result = {
+  const result: QuickSetupAnswers = {
     ...answers,
     framework: frameworkAnswer.framework || 'none',
     useGit: gitAnswer.useGit,
@@ -166,6 +166,22 @@ async function runQuickSetup(): Promise<QuickSetupAnswers> {
     platforms,
     mcpServers: mcpAnswer.mcpServers || [],
   };
+
+  // Ask about agent generation (only for platforms that support agents)
+  const supportsAgents = platforms.some((p: string) => p === 'kiro' || p === 'amazon-q');
+  if (supportsAgents) {
+    const { generateAgent } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'generateAgent',
+        message: 'Generate a default agent based on your selected skills?',
+        default: true,
+      },
+    ]);
+    result.generateAgent = generateAgent;
+  } else {
+    result.generateAgent = false;
+  }
 
   // Offer optional rules
   const optionalRules = await getOptionalRules(result);
@@ -181,7 +197,7 @@ async function runQuickSetup(): Promise<QuickSetupAnswers> {
         })),
       },
     ]);
-    (result as any).additionalRules = optionalAnswer.additionalRules || [];
+    result.additionalRules = optionalAnswer.additionalRules || [];
   }
 
   return result;
@@ -378,6 +394,22 @@ async function runCustomSetup(): Promise<CustomModeAnswers> {
     selectedRules,
     mcpServers: mcpAnswer.mcpServers || [],
   };
+
+  // Ask about agent generation (only for platforms that support agents)
+  const supportsAgents = platforms.some((p: string) => p === 'kiro' || p === 'amazon-q');
+  if (supportsAgents) {
+    const { generateAgent } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'generateAgent',
+        message: 'Generate a default agent based on your selected skills?',
+        default: true,
+      },
+    ]);
+    result.generateAgent = generateAgent;
+  } else {
+    result.generateAgent = false;
+  }
 
   // Optional review step for custom mode
   const { wantsReview } = await inquirer.prompt([

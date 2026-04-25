@@ -39,7 +39,6 @@ export async function generateFiles(
     for (const platform of platforms) {
       const paths = getPlatformPaths(platform, targetDir);
       await fs.mkdir(paths.skillsDir, { recursive: true });
-      await fs.mkdir(paths.agentsDir, { recursive: true });
 
       if (platform === 'amazon-q') {
         // Legacy flat format for Amazon Q
@@ -49,8 +48,10 @@ export async function generateFiles(
         await copySkillFolders(rules, paths.skillsDir);
       }
 
-      // Generate agent only for platforms that use them
-      if (platform === 'kiro' || platform === 'amazon-q') {
+      // Generate agent only for platforms that use them, and only if user opted in
+      const wantsAgent = answers.generateAgent !== false;
+      if (wantsAgent && (platform === 'kiro' || platform === 'amazon-q')) {
+        await fs.mkdir(paths.agentsDir, { recursive: true });
         await generateAgent(answers, paths.agentsDir, platform);
       }
     }
