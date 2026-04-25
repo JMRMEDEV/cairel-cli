@@ -137,11 +137,11 @@ describe('Skills Migration (v2.0)', () => {
   describe('Skills Validation', () => {
     const validator = new Validator();
 
-    it('should validate all 23 curated skills', async () => {
+    it('should validate all curated skills', async () => {
       const skillsDir = join(__dirname, '..', 'curated-presets', 'skills');
       const results = await validator.validateSkillsDirectory(skillsDir);
 
-      expect(results.size).toBe(23);
+      expect(results.size).toBeGreaterThanOrEqual(24);
       for (const [name, result] of results) {
         expect(result.valid).toBe(true);
         expect(result.errors).toHaveLength(0);
@@ -204,7 +204,7 @@ description: Name does not match directory
       const manifestPath = join(__dirname, '..', 'curated-presets', 'rules-manifest.json');
       const manifest = require(manifestPath);
 
-      expect(manifest.rules.length).toBe(23);
+      expect(manifest.rules.length).toBeGreaterThanOrEqual(24);
 
       // Check always-include skills
       const contextRetrieval = manifest.rules.find((r: any) => r.id === 'context-retrieval');

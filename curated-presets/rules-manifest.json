@@ -51,6 +51,16 @@
       "alwaysInclude": true
     },
     {
+      "id": "conventional-commits",
+      "title": "Conventional Commits",
+      "description": "Enforce Conventional Commits specification for all git commit messages. Use when committing changes to ensure messages follow the type(scope) description format. Supports feat, fix, docs, style, refactor, perf, test, build, ci, chore, and revert types with optional scope and breaking change indicators.",
+      "category": "git",
+      "alwaysInclude": false,
+      "conditions": {
+        "requiresGit": true
+      }
+    },
+    {
       "id": "development-workflow-meta",
       "title": "Development Workflow and Rule Application",
       "description": "Systematic rule application based on development context for consistent code quality. Use when starting any development task to identify which rules and skills apply to the current work context (UI, services, testing, documentation).",
@@ -81,7 +91,7 @@
     {
       "id": "git-management",
       "title": "Git Repository Management",
-      "description": "Manage git operations safely with human review for commits and protection against destructive commands. Use when committing, pushing, or performing any git operations. Enforces 50-char commit messages and human approval before commits.",
+      "description": "Manage git operations safely with human review for commits and protection against destructive commands. Use when committing, pushing, branching, or performing any git operations. Enforces human approval before pushes, blocks force operations without confirmation, and requires pulling base branch before creating new branches.",
       "category": "git",
       "alwaysInclude": false,
       "conditions": {
