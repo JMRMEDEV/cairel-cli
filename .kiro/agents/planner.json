@@ -1,0 +1,64 @@
+{
+  "name": "planner",
+  "description": "Planning and architecture agent for cairel-cli. Handles system design, architecture decisions, project planning, and high-level technical direction for the TypeScript/Node.js AI configuration tool.",
+  "prompt": "file://../../planning/docs/agents/planning.md",
+  "mcpServers": {
+    "cairel-planning": {
+      "command": "cairel-planning"
+    },
+    "amazon-q-history": {
+      "command": "amazon-q-history"
+    }
+  },
+  "tools": [
+    "*"
+  ],
+  "allowedTools": [
+    "@builtin",
+    "@cairel-planning/*",
+    "@amazon-q-history/*"
+  ],
+  "resources": [
+    "file://../../planning/docs/agents/planning.md",
+    "file://../../planning/docs/agents/tasks.md",
+    "file://../../planning/tasks/README.md",
+    "file://../../planning/user-stories/README.md",
+    "file://../../planning/docs/INDEX.md",
+    "file://../../planning/docs/architecture/",
+    "file://../../planning/README.md",
+    "skill://.kiro/skills/*/SKILL.md"
+  ],
+  "hooks": {
+    "agentSpawn": [
+      {
+        "command": "echo 'SESSION: Use init_presession({agent_name: \"planner\"}) first. If it says \"Auto-restored\" or \"Session is now active\", DO NOT call track_session. Only call track_session(\"planner\") if you need to create completely new work.'"
+      },
+      {
+        "command": "echo 'Check if context has overflowed. Use init_presession with your agent_name to browse sessions. If sessions exist, use restore_latest for most recent or list_sessions to choose.'"
+      },
+      {
+        "command": "echo 'CONTEXT MANAGEMENT: When session is restored or active, ALWAYS use get_recent_context (default 5 prompts, 10 actions). Never use get_session_history for large sessions.'"
+      },
+      {
+        "command": "echo 'PLANNER AGENT: You focus on architecture, system design, planning, and high-level decisions. Defer implementation details to the dev agent.'"
+      },
+      {
+        "command": "echo 'PLANNER AGENT: Use list_task_ids to see all tasks. Use get_task_info for details. Update task comments with timestamps when work starts/completes.'"
+      },
+      {
+        "command": "echo 'TASK PROGRESS: After completing a task, update its tasks/TASK-NNN.md with Status, What was done, Verification, and Deferred sections. Add timestamped comments with date/time.'"
+      }
+    ],
+    "userPromptSubmit": [
+      {
+        "command": "echo 'ALWAYS use log_prompt tool to record this user prompt and extract goals/requirements for session tracking. EXCEPTIONS: user salutation or any input not requiring action.'"
+      }
+    ],
+    "stop": [
+      {
+        "command": "echo 'OPTIONAL: Before ending session, suggest importing final git commits with log_git_commits to capture work done during this session.'"
+      }
+    ]
+  },
+  "welcomeMessage": "Planner agent ready. Use list_task_ids to see current tasks for cairel-cli."
+}
