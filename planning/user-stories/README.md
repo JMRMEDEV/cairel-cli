@@ -65,6 +65,18 @@
 | SKL-03 | Cairel metadata in skill frontmatter | P0 | 🟢 Done | `cli` |
 | SKL-04 | Add new skill categories and skills | P1 | 🔴 MVP | `cli` |
 
+### Constraints
+| ID | Story | Priority | Scope | Subprojects |
+|----|-------|----------|-------|-------------|
+| CON-01 | Author constraint companions for curated skills | P1 | 🔴 MVP | `cli` |
+| CON-02 | Generate always-loaded constraints for Kiro | P1 | 🔴 MVP | `cli` |
+| CON-03 | Generate always-loaded constraints for Claude Code | P1 | 🔴 MVP | `cli` |
+| CON-04 | Generate always-loaded constraints for GitHub Copilot | P1 | 🔴 MVP | `cli` |
+| CON-05 | Generate always-loaded constraints for Cursor | P1 | 🔴 MVP | `cli` |
+| CON-06 | Generate constraints for Amazon Q | P2 | 🔴 MVP | `cli` |
+| CON-07 | Add Cursor as a supported platform | P1 | 🔴 MVP | `cli` |
+| CON-08 | Validate constraint files | P2 | 🔴 MVP | `cli` |
+
 ### Planning Workflow
 | ID | Story | Priority | Scope | Subprojects |
 |----|-------|----------|-------|-------------|
@@ -93,19 +105,20 @@
 
 ---
 
-**Total Stories**: 37
+**Total Stories**: 45
 - 🟢 Done: 22
-- 🔴 MVP: 5
+- 🔴 MVP: 13
 - 🟡 Post-MVP: 10
 
 **By Domain**:
 | Domain | Count |
 |--------|-------|
 | wizard | 6 |
-| generation | 7 |
-| validation | 4 |
+| generation | 8 |
+| validation | 5 |
 | commands | 5 |
 | skills | 4 |
+| constraints | 7 |
 | planning | 5 |
 | carm | 4 |
 | enhancements | 5 |

@@ -49,35 +49,44 @@ ENH-02   | P2 | Post-MVP | Configuration profiles (save/reuse)                  
 ENH-03   | P2 | Post-MVP | Smart merge for update command                          | enhancements | cli
 ENH-04   | P2 | Post-MVP | Dry-run mode for init/update                            | enhancements | cli
 ENH-05   | P3 | Post-MVP | YAML config support                                    | enhancements | cli
+CON-01   | P1 | MVP      | Author constraint companions for curated skills        | constraints  | cli
+CON-02   | P1 | MVP      | Generate always-loaded constraints for Kiro             | constraints  | cli
+CON-03   | P1 | MVP      | Generate always-loaded constraints for Claude Code      | constraints  | cli
+CON-04   | P1 | MVP      | Generate always-loaded constraints for GitHub Copilot   | constraints  | cli
+CON-05   | P1 | MVP      | Generate always-loaded constraints for Cursor           | constraints  | cli
+CON-06   | P2 | MVP      | Generate constraints for Amazon Q                      | constraints  | cli
+CON-07   | P1 | MVP      | Add Cursor as a supported platform                     | generation   | cli
+CON-08   | P2 | MVP      | Validate constraint files                              | validation   | cli
 ```
 
 ## Counts
 
 | Filter | Count |
 |--------|-------|
-| Total | 37 |
+| Total | 45 |
 | Done | 22 |
-| MVP | 5 |
+| MVP | 13 |
 | Post-MVP | 10 |
 | P0 | 19 |
-| P1 | 9 |
-| P2 | 4 |
+| P1 | 15 |
+| P2 | 6 |
 | P3 | 8 |
 
 ### By Domain
 | Domain | Count |
 |--------|-------|
 | wizard | 6 |
-| generation | 7 |
-| validation | 4 |
+| generation | 8 |
+| validation | 5 |
 | commands | 5 |
 | skills | 4 |
 | planning | 5 |
+| constraints | 7 |
 | carm | 4 |
 | enhancements | 5 |
 
 ### By Subproject (stories touching each)
 | Subproject | Total | Done | MVP |
 |------------|-------|------|-----|
-| cli | 32 | 22 | 1 |
+| cli | 40 | 22 | 9 |
 | mcp | 5 | 0 | 5 |
