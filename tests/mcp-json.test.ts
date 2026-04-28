@@ -4,6 +4,14 @@ import { tmpdir } from 'os';
 import { generateFiles } from '../src/core/generator';
 import { QuickSetupAnswers } from '../src/types/wizard';
 
+// Mock @inquirer/prompts (ESM module)
+jest.mock('@inquirer/prompts', () => ({
+  select: jest.fn(),
+  checkbox: jest.fn(),
+  confirm: jest.fn(),
+  Separator: jest.fn(),
+}));
+
 // Mock ora
 jest.mock('ora', () => {
   const mockSpinner = {

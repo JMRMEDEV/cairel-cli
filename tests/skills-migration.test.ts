@@ -3,6 +3,14 @@ import { join } from 'path';
 import { tmpdir } from 'os';
 import { QuickSetupAnswers } from '../src/types/wizard';
 
+// Mock @inquirer/prompts (ESM module)
+jest.mock('@inquirer/prompts', () => ({
+  select: jest.fn(),
+  checkbox: jest.fn(),
+  confirm: jest.fn(),
+  Separator: jest.fn(),
+}));
+
 jest.mock('ora', () => ({
   __esModule: true,
   default: jest.fn(() => ({

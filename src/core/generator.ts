@@ -3,6 +3,7 @@ import { join, dirname } from 'path';
 import Handlebars from 'handlebars';
 import chalk from 'chalk';
 import ora from 'ora';
+import { select, checkbox, confirm } from '@inquirer/prompts';
 import { QuickSetupAnswers, DetailedSetupAnswers, CustomModeAnswers, Platform } from '../types/wizard';
 import { selectRules } from './rules-selector';
 
@@ -53,6 +54,9 @@ export async function generateFiles(
       if (wantsAgent && (platform === 'kiro' || platform === 'amazon-q')) {
         await fs.mkdir(paths.agentsDir, { recursive: true });
         await generateAgent(answers, paths.agentsDir, platform);
+      } else if (platform === 'kiro' || platform === 'amazon-q') {
+        // If not generating a new agent, check for existing agents to patch
+        await patchExistingAgents(paths.agentsDir, platform);
       }
     }
 
@@ -141,6 +145,89 @@ async function generateAgent(
   await fs.writeFile(targetPath, agentJson, 'utf-8');
   
   return agentName;
+}
+
+async function patchExistingAgents(agentsDir: string, platform: Platform): Promise<void> {
+  try {
+    await fs.access(agentsDir);
+  } catch {
+    return; // No agents directory
+  }
+
+  const files = await fs.readdir(agentsDir);
+  const agentFiles = files.filter(f => f.endsWith('.json'));
+  if (agentFiles.length === 0) return;
+
+  const resourceEntry = getResourcesPath(platform);
+  if (!resourceEntry) return;
+
+  // Parse agents and check which already have skills
+  const agents: { file: string; name: string; hasSkills: boolean }[] = [];
+  for (const file of agentFiles) {
+    try {
+      const content = await fs.readFile(join(agentsDir, file), 'utf-8');
+      const agent = JSON.parse(content);
+      const resources: string[] = agent.resources || [];
+      agents.push({
+        file,
+        name: agent.name || file.replace('.json', ''),
+        hasSkills: resources.some((r: string) => r.includes('skill://') || r.includes('skills')),
+      });
+    } catch {
+      // Skip invalid JSON
+    }
+  }
+
+  const needsPatch = agents.filter(a => !a.hasSkills);
+  if (needsPatch.length === 0) {
+    console.log(chalk.gray('\n  All existing agents already reference skills.'));
+    return;
+  }
+
+  console.log(chalk.bold(`\n🔗 Found ${agents.length} existing agent(s) without skill references:`));
+  needsPatch.forEach(a => console.log(chalk.gray(`  - ${a.name} (${a.file})`)));
+
+  const wantsPatch = await confirm({
+    message: 'Add skill references to existing agents?',
+    default: true,
+  });
+
+  if (!wantsPatch) return;
+
+  let agentsToPatch: string[];
+
+  if (needsPatch.length === 1) {
+    agentsToPatch = [needsPatch[0]!.file];
+  } else {
+    const mode = await select({
+      message: 'Which agents should reference skills?',
+      choices: [
+        { name: 'All agents', value: 'all' as const },
+        { name: 'Select specific agents', value: 'pick' as const },
+      ],
+    });
+
+    if (mode === 'all') {
+      agentsToPatch = needsPatch.map(a => a.file);
+    } else {
+      agentsToPatch = await checkbox({
+        message: 'Select agents to patch:',
+        choices: needsPatch.map(a => ({ name: `${a.name} (${a.file})`, value: a.file, checked: true })),
+        required: true,
+      });
+    }
+  }
+
+  for (const file of agentsToPatch) {
+    const filePath = join(agentsDir, file);
+    const content = await fs.readFile(filePath, 'utf-8');
+    const agent = JSON.parse(content);
+    if (!agent.resources) agent.resources = [];
+    agent.resources.push(resourceEntry);
+    await fs.writeFile(filePath, JSON.stringify(agent, null, 2) + '\n', 'utf-8');
+  }
+
+  console.log(chalk.green(`  ✓ Patched ${agentsToPatch.length} agent(s) with skill references`));
 }
 
 function getResourcesPath(platform: Platform): string {
