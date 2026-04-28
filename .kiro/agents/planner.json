@@ -19,6 +19,7 @@
     "@amazon-q-history/*"
   ],
   "resources": [
+    "file://.kiro/steering/**/*.md",
     "file://../../planning/docs/agents/planning.md",
     "file://../../planning/docs/agents/tasks.md",
     "file://../../planning/tasks/README.md",
