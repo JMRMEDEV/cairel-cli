@@ -14,6 +14,7 @@ const SkillFrontmatterSchema = z.object({
     'cairel-version': z.string().regex(/^\d+\.\d+\.\d+$/, 'Version must be semver format').optional(),
     'cairel-tags': z.array(z.string()).optional(),
     'cairel-always-include': z.boolean().optional(),
+    'cairel-enforcement': z.enum(['enforced', 'contextual', 'available']),
     'cairel-conditions': z.object({
       languages: z.array(z.string()).optional(),
       frameworks: z.array(z.string()).optional(),
@@ -26,6 +27,29 @@ const SkillFrontmatterSchema = z.object({
     }).optional(),
   }).optional(),
 });
+
+// Kiro steering file schema (inclusion: always|auto)
+const KiroSteeringSchema = z.object({
+  inclusion: z.enum(['always', 'auto'], {
+    error: (issue) =>
+      issue.input === undefined
+        ? 'Missing "inclusion" field. Expected "always" or "auto".'
+        : 'Invalid "inclusion" value. Expected "always" or "auto".',
+  }),
+  name: z.string().min(1, 'Name must not be empty').optional(),
+  description: z.string().min(1, 'Description must not be empty').optional(),
+}).refine(
+  (data) => {
+    // When inclusion is 'auto', name and description are required
+    if (data.inclusion === 'auto') {
+      return !!data.name && !!data.description;
+    }
+    return true;
+  },
+  {
+    message: 'Steering files with "inclusion: auto" require both "name" and "description" fields.',
+  }
+);
 
 // Legacy Zod schema for old rule frontmatter
 const RuleMetaSchema = z.object({
@@ -50,6 +74,32 @@ const RuleMetaSchema = z.object({
     'requires-env-vars': z.boolean().optional(),
   }).optional(),
 });
+
+// Zod schema for Cursor .mdc directive frontmatter
+// Cursor rules use YAML frontmatter with:
+//   - description: string (required)
+//   - alwaysApply: boolean (optional — controls enforcement level)
+//   - globs: string | string[] (optional — file glob scoping)
+const CursorDirectiveSchema = z.object({
+  description: z.string().min(1, 'Description is required'),
+  alwaysApply: z.boolean().optional(),
+  globs: z.union([z.string(), z.array(z.string())]).optional(),
+});
+
+// Enforcement level derived from Cursor .mdc frontmatter
+export type CursorEnforcement = 'enforced' | 'contextual' | 'available';
+
+/**
+ * Map Cursor .mdc frontmatter to an enforcement level.
+ *   alwaysApply: true  → enforced
+ *   alwaysApply: false → available
+ *   alwaysApply absent → contextual (Cursor's "Apply Intelligently")
+ */
+export function cursorEnforcementLevel(data: { alwaysApply?: boolean }): CursorEnforcement {
+  if (data.alwaysApply === true) return 'enforced';
+  if (data.alwaysApply === false) return 'available';
+  return 'contextual';
+}
 
 // AJV schema for agent JSON
 const agentJsonSchema = {
@@ -101,6 +151,7 @@ export interface ValidationResult {
   valid: boolean;
   errors: string[];
   warnings: string[];
+  enforcement?: CursorEnforcement;
 }
 
 export class Validator {
@@ -196,6 +247,79 @@ export class Validator {
   }
 
   /**
+   * Validate a Kiro steering file (.kiro/steering/*.md)
+   */
+  async validateSteeringFile(filePath: string): Promise<ValidationResult> {
+    const result: ValidationResult = { valid: true, errors: [], warnings: [] };
+
+    try {
+      if (!await fs.pathExists(filePath)) {
+        result.valid = false;
+        result.errors.push(`File not found: ${filePath}`);
+        return result;
+      }
+
+      const content = await fs.readFile(filePath, 'utf-8');
+      const parsed = matter(content);
+
+      if (!parsed.data || Object.keys(parsed.data).length === 0) {
+        result.valid = false;
+        result.errors.push('Missing frontmatter. Kiro steering files require at least "inclusion: always" or "inclusion: auto".');
+        return result;
+      }
+
+      // Validate frontmatter with KiroSteeringSchema
+      try {
+        KiroSteeringSchema.parse(parsed.data);
+      } catch (error) {
+        result.valid = false;
+        if (error instanceof z.ZodError) {
+          error.issues.forEach((err) => {
+            const fieldPath = err.path.length > 0 ? `${err.path.join('.')}: ` : '';
+            result.errors.push(`Frontmatter error: ${fieldPath}${err.message}`);
+          });
+        }
+      }
+
+      // Size warning for enforced steering files
+      if (parsed.data.inclusion === 'always') {
+        const lines = content.split('\n').length;
+        if (lines > 30) {
+          result.warnings.push(`Enforced steering file is ${lines} lines (recommended: ≤30 lines)`);
+        }
+      }
+
+    } catch (error) {
+      result.valid = false;
+      result.errors.push(`Validation error: ${error instanceof Error ? error.message : String(error)}`);
+    }
+
+    return result;
+  }
+
+  /**
+   * Validate all steering files in a directory (.kiro/steering/)
+   */
+  async validateSteeringDirectory(dirPath: string): Promise<Map<string, ValidationResult>> {
+    const results = new Map<string, ValidationResult>();
+
+    try {
+      const files = await this.findMarkdownFiles(dirPath);
+
+      for (const file of files) {
+        const result = await this.validateSteeringFile(file);
+        results.set(path.relative(dirPath, file), result);
+      }
+    } catch (error) {
+      if (process.env['DEBUG']) {
+        console.warn(`[validator] Could not read steering directory ${dirPath}:`, error);
+      }
+    }
+
+    return results;
+  }
+
+  /**
    * Validate a rule markdown file (legacy format)
    */
   async validateRule(filePath: string): Promise<ValidationResult> {
@@ -258,6 +382,53 @@ export class Validator {
   }
 
   /**
+   * Validate a Cursor directive file (.cursor/rules/*.mdc)
+   */
+  async validateCursorDirective(filePath: string): Promise<ValidationResult> {
+    const result: ValidationResult = { valid: true, errors: [], warnings: [] };
+
+    try {
+      if (!await fs.pathExists(filePath)) {
+        result.valid = false;
+        result.errors.push(`File not found: ${filePath}`);
+        return result;
+      }
+
+      const content = await fs.readFile(filePath, 'utf-8');
+      const parsed = matter(content);
+
+      if (!parsed.data || Object.keys(parsed.data).length === 0) {
+        result.valid = false;
+        result.errors.push('Missing frontmatter. Cursor directives require at least a "description" field.');
+        return result;
+      }
+
+      // Validate frontmatter with CursorDirectiveSchema
+      try {
+        CursorDirectiveSchema.parse(parsed.data);
+      } catch (error) {
+        result.valid = false;
+        if (error instanceof z.ZodError) {
+          error.issues.forEach((err) => {
+            const fieldPath = err.path.length > 0 ? `${err.path.join('.')}: ` : '';
+            result.errors.push(`Frontmatter error: ${fieldPath}${err.message}`);
+          });
+        }
+        return result;
+      }
+
+      // Derive enforcement level from alwaysApply mapping
+      result.enforcement = cursorEnforcementLevel(parsed.data as { alwaysApply?: boolean });
+
+    } catch (error) {
+      result.valid = false;
+      result.errors.push(`Validation error: ${error instanceof Error ? error.message : String(error)}`);
+    }
+
+    return result;
+  }
+
+  /**
    * Validate an agent JSON file
    */
   async validateAgent(filePath: string): Promise<ValidationResult> {
@@ -309,10 +480,12 @@ export class Validator {
     const results = new Map<string, ValidationResult>();
 
     try {
-      const files = await this.findMarkdownFiles(dirPath);
+      const files = await this.findDirectiveFiles(dirPath);
 
       for (const file of files) {
-        const result = await this.validateRule(file);
+        const result = file.endsWith('.mdc')
+          ? await this.validateCursorDirective(file)
+          : await this.validateRule(file);
         results.set(path.relative(dirPath, file), result);
       }
     } catch (error) {
@@ -344,6 +517,39 @@ export class Validator {
     }
 
     return results;
+  }
+
+  /**
+   * Find directive files (.md and .mdc) recursively.
+   * Includes Cursor's .mdc extension alongside standard .md files.
+   * Excludes README.md.
+   */
+  private async findDirectiveFiles(dirPath: string): Promise<string[]> {
+    const files: string[] = [];
+
+    async function scan(dir: string) {
+      const entries = await fs.readdir(dir, { withFileTypes: true });
+
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+
+        if (entry.isDirectory()) {
+          await scan(fullPath);
+        } else if (
+          entry.isFile() &&
+          (entry.name.endsWith('.md') || entry.name.endsWith('.mdc')) &&
+          entry.name !== 'README.md'
+        ) {
+          files.push(fullPath);
+        }
+      }
+    }
+
+    if (await fs.pathExists(dirPath)) {
+      await scan(dirPath);
+    }
+
+    return files;
   }
 
   private async findMarkdownFiles(dirPath: string): Promise<string[]> {
