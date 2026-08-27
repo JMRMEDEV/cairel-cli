@@ -68,18 +68,19 @@ DIR-08   | P2 | MVP      | Validate directives per enforcement level            
 DIR-09   | P1 | MVP      | Enforced directive content is concise extract          | directives   | cli
 DIR-10   | P2 | MVP      | Update command respects enforcement levels             | directives   | cli
 REL-01   | P2 | MVP      | Automated semver release from Conventional Commits     | release      | cli
+REL-02   | P1 | MVP      | Tokenless npm publishing via Trusted Publishing (OIDC) | release      | cli
 ```
 
 ## Counts
 
 | Filter | Count |
 |--------|-------|
-| Total | 56 |
+| Total | 57 |
 | Done | 22 |
-| MVP | 24 |
+| MVP | 25 |
 | Post-MVP | 10 |
 | P0 | 22 |
-| P1 | 19 |
+| P1 | 20 |
 | P2 | 10 |
 | P3 | 8 |
 
@@ -96,10 +97,10 @@ REL-01   | P2 | MVP      | Automated semver release from Conventional Commits   
 | constraints | 7 |
 | carm | 4 |
 | enhancements | 5 |
-| release | 1 |
+| release | 2 |
 
 ### By Subproject (stories touching each)
 | Subproject | Total | Done | MVP |
 |------------|-------|------|-----|
-| cli | 41 | 22 | 10 |
+| cli | 42 | 22 | 11 |
 | mcp | 5 | 0 | 5 |
