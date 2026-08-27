@@ -71,14 +71,14 @@ Source: https://docs.npmjs.com/trusted-publishers (read 2026-08-27).
 
 ## Acceptance Criteria
 
-- [ ] `release.yml` uses OIDC: `id-token: write` present, no `NPM_TOKEN` in publish
-- [ ] Node bumped to ≥ 22.14.0 and npm ≥ 11.5.1 available in the job
-- [ ] `npm publish` runs without a token; dry-run path preserved
-- [ ] Safe-by-default gating unchanged (push → dry-run; live only via dispatch)
-- [ ] `package.json` `repository.url` matches the GitHub repo (verified)
-- [ ] YAML validates; `npm run build` + `npm test` still green
-- [ ] `docs/PUBLISH.md` documents the Trusted Publisher setup + hardening
-- [ ] ADR updated to reflect OIDC decision
+- [x] `release.yml` uses OIDC: `id-token: write` present, no `NPM_TOKEN` in publish
+- [x] Node bumped to ≥ 22.14.0 and npm ≥ 11.5.1 available in the job
+- [x] `npm publish` runs without a token; dry-run path preserved
+- [x] Safe-by-default gating unchanged (push → dry-run; live only via dispatch)
+- [x] `package.json` `repository.url` matches the GitHub repo (verified)
+- [x] YAML validates; `npm run build` + `npm test` still green
+- [x] `docs/PUBLISH.md` documents the Trusted Publisher setup + hardening
+- [x] ADR updated to reflect OIDC decision
 
 ## Notes / Risks / Human Actions
 
@@ -98,3 +98,69 @@ Source: https://docs.npmjs.com/trusted-publishers (read 2026-08-27).
   recommendation. Requirements captured from docs.npmjs.com/trusted-publishers:
   npm ≥ 11.5.1, Node ≥ 22.14.0, `id-token: write`, per-package trusted publisher
   config keyed on exact workflow filename, tokenless `npm publish`, auto-provenance.
+- **2026-08-27 12:42** — Complete. Migrated `.github/workflows/release.yml` to tokenless
+  OIDC: added `permissions: id-token: write` (kept `contents: write`), bumped
+  `setup-node` to Node 22, added an `npm i -g npm@latest` step (echoes `npm -v`), and
+  removed `NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}` from the publish step (plain
+  `npm publish --access public`, dry-run branch kept, no `--provenance`). All TASK-026
+  gating preserved. Rewrote the `docs/PUBLISH.md` go-live section (Trusted Publisher
+  setup, ENEEDAUTH troubleshooting, 2FA/disallow-tokens hardening), added ADR-011, noted
+  ADR-010 + TASK-026 superseded. Verified: YAML parses (`npx js-yaml`), `npm run build`
+  exit 0, `npm test` 256/256, no `NPM_TOKEN`/`NODE_AUTH_TOKEN` left in the publish path,
+  `repository.url` = `https://github.com/JMRMEDEV/cairel-cli.git`. No commits/tags/pushes;
+  no secret added.
+
+## Status: ✅ COMPLETE (2026-08-27)
+
+### What was done
+
+1. **`.github/workflows/release.yml` → tokenless OIDC:**
+   - Added `permissions: id-token: write` (the critical OIDC bit) alongside the existing
+     `contents: write` (still needed for the tag push + GitHub Release).
+   - Bumped `actions/setup-node@v4` to `node-version: 22` (bundles npm ≥ 11.5.1);
+     `registry-url: https://registry.npmjs.org` unchanged.
+   - Added an `Ensure npm >= 11.5.1` step running `npm i -g npm@latest` and echoing
+     `npm -v` (belt-and-suspenders).
+   - Removed `env: NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}` from the publish step. It
+     now runs plain `npm publish --access public` (npm CLI auto-detects OIDC). Dry-run
+     branch (`npm publish --access public --dry-run`) preserved. No `--provenance` (auto).
+   - Updated header/go-live comment blocks to describe the tokenless flow + Trusted
+     Publisher setup.
+   - All TASK-026 behavior preserved: safe-by-default gating (dry_run defaults true, push
+     forced to dry-run), `resolve` job + loop guard, commit-range bump detection since
+     last `v*` tag, build + `npm test` gate, tag + GitHub Release (no commit-back to
+     protected master), `HUMAN: flip live` markers.
+2. **`docs/PUBLISH.md`:** replaced the `NPM_TOKEN` / granular-token go-live section with
+   the Trusted Publisher setup (npmjs.com → Packages → cairel → Settings → Trusted
+   Publisher → GitHub Actions → user `JMRMEDEV`, repo `cairel-cli`, workflow filename
+   `release.yml`, allowed action `npm publish`), an `ENEEDAUTH` troubleshooting note
+   (npm doesn't validate config at save time), and the hardening recommendation (require
+   2FA + disallow tokens; revoke leftover tokens). Updated the intro + "how it works"
+   release step to reference OIDC/ADR-011 and auto-provenance.
+3. **`planning/docs/architecture/decisions.md`:** added **ADR-011** (npm Trusted
+   Publishing / OIDC — tokenless) and added a supersede note to ADR-010's status +
+   header.
+4. **`planning/tasks/TASK-026.md`:** added a Comments note that its `NPM_TOKEN` guidance
+   is superseded by TASK-027 / REL-02 / ADR-011.
+
+### Verification
+
+- YAML: `npx js-yaml .github/workflows/release.yml` → "YAML OK: parses cleanly".
+- No token in publish path: `grep NPM_TOKEN|NODE_AUTH_TOKEN` on the workflow returns only
+  two explanatory comment lines confirming tokenlessness — zero active references.
+- Build: `npm run build` → exit 0 (`tsc` + prebuild manifest gen).
+- Tests: `npm test` → 20 suites, **256/256 passed**.
+- `package.json` `repository.url` = `https://github.com/JMRMEDEV/cairel-cli.git`
+  (verified, unchanged — matches the OIDC requirement).
+- No commits, tags, or pushes were made; no secret was added. Changes left in the working
+  tree for review.
+
+### Deferred (human action required — NOT done here)
+
+- **Configure the Trusted Publisher on npmjs.com** (cannot be automated): Packages →
+  `cairel` → Settings → Trusted Publisher → GitHub Actions → org/user `JMRMEDEV`, repo
+  `cairel-cli`, workflow filename `release.yml` (exact, case-sensitive), allowed action
+  `npm publish`. Publishing fails with `ENEEDAUTH` until this is saved.
+- **Run a live release**: Actions → *Release* → Run workflow → `dry_run: false`.
+- **Hardening (recommended):** set the package's Publishing access to "require 2FA +
+  disallow tokens" and revoke any leftover automation/granular tokens.

@@ -104,8 +104,14 @@ Post v2.0: npm-like package manager for AI rules and agents. Community contribut
 
 ## ADR-010: Automated Release — Tag-Based, Adapted from munin
 
-**Status**: Accepted  
+**Status**: Accepted (publishing mechanism superseded by ADR-011)  
 **Date**: 2026-08-27
+
+> **Superseded in part by [ADR-011](#adr-011-npm-trusted-publishing-oidc--tokenless):**
+> the `NPM_TOKEN` / `NODE_AUTH_TOKEN` publishing approach described in point 3 below is
+> retired in favor of tokenless npm Trusted Publishing (OIDC). The rest of this ADR
+> (tag-based release, commit-range bump detection, test gate, safe-by-default, loop
+> guard) remains in force.
 
 ### Context
 
@@ -133,3 +139,76 @@ Adopt the munin automated-release pattern **with adaptations**, implemented in `
 - Requires a human-provisioned `NPM_TOKEN` secret; the workflow cannot self-provision it (documented in `docs/PUBLISH.md`).
 - Because the tag is pushed (not a branch commit), `package.json`'s version on `master` is only updated when a follow-up PR syncs it, or the tag is treated as the source of truth for published versions. Maintainers should be aware the committed `package.json` version may briefly lag the published/tagged version.
 - Diverges from the munin workflow, so the two are no longer copy-identical; the adaptations above are the rationale for the drift.
+
+## ADR-011: npm Trusted Publishing (OIDC) — Tokenless
+
+**Status**: Accepted  
+**Date**: 2026-08-27
+
+### Context
+
+ADR-010 shipped the automated release workflow authenticating to npm with a
+long-lived `NPM_TOKEN` automation secret (`NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}`).
+That approach is now both fragile and increasingly unsupported:
+
+- npm removed legacy tokens in November 2025 (only granular tokens remain), and from
+  August 2026 bypass-2FA tokens are blocked from account-governance actions.
+- A stored token is a long-lived credential that must be rotated and can be leaked or
+  exfiltrated.
+- npm's own docs explicitly recommend **Trusted Publishing (OIDC)** over tokens for
+  CI/CD, and the maintainer opted to skip token setup entirely.
+
+Source: https://docs.npmjs.com/trusted-publishers (read 2026-08-27).
+
+### Decision
+
+Migrate `.github/workflows/release.yml` to **npm Trusted Publishing via OIDC**,
+retiring `NPM_TOKEN` from the publish path entirely (REL-02 / TASK-027):
+
+1. **Tokenless publish.** Remove `NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}` from the
+   publish step. `npm publish --access public` runs with no token; the npm CLI
+   auto-detects the GitHub Actions OIDC environment and mints a short-lived,
+   workflow-scoped credential at publish time. No secret is stored, rotated, or leaked.
+
+2. **OIDC permission.** Declare `permissions: id-token: write` (the critical bit) while
+   keeping `contents: write` (the workflow still pushes the tag and cuts the GitHub
+   Release).
+
+3. **Toolchain requirements.** Trusted Publishing needs npm ≥ 11.5.1 and Node ≥ 22.14.0.
+   Bump `actions/setup-node` to `node-version: 22` (which bundles a qualifying npm) and,
+   belt-and-suspenders, run `npm i -g npm@latest` before publish (echoing `npm -v`).
+   GitHub-hosted runners only (`ubuntu-latest`); self-hosted is unsupported.
+
+4. **Automatic provenance.** For a public repo + public package, OIDC auto-generates
+   provenance attestations. We do NOT pass `--provenance`.
+
+5. **Per-package trusted-publisher config (human action).** The publisher is authorized
+   on npmjs.com per package (Packages → cairel → Settings → Trusted Publisher → GitHub
+   Actions), keyed on org/user `JMRMEDEV`, repo `cairel-cli`, and the exact workflow
+   filename `release.yml`. npm does not validate this at save time — a mismatch only
+   surfaces as `ENEEDAUTH` on publish.
+
+6. **Preserved from ADR-010.** Safe-by-default gating (dry_run defaults true; push forced
+   to dry-run), commit-range bump detection, build + `npm test` gate, tag-based release
+   (no protected-branch commit-back), loop guard, and `registry-url:
+   https://registry.npmjs.org` all remain unchanged.
+
+7. **repository.url requirement.** OIDC requires `package.json` `repository.url` to match
+   the GitHub repo; it is already `https://github.com/JMRMEDEV/cairel-cli.git` and must
+   stay that way.
+
+### Consequences
+
+- No long-lived npm credential exists in GitHub secrets — nothing to rotate or leak.
+- Each publish is authenticated by a short-lived, workflow-scoped OIDC credential that
+  cannot be extracted or reused, and provenance is emitted automatically.
+- The workflow filename `release.yml` becomes load-bearing: renaming it breaks publishing
+  until the trusted-publisher config on npmjs.com is updated to match.
+- Enabling live publish is now a human step on npmjs.com (configure the Trusted
+  Publisher), not adding a repo secret. Recommended hardening: set the package's
+  Publishing access to "require 2FA + disallow tokens" and revoke any leftover automation
+  tokens.
+- If private dependencies are ever added, installs would still need a read-only token —
+  not applicable today (all deps are public).
+- Supersedes the `NPM_TOKEN` publishing mechanism from ADR-010; the rest of ADR-010
+  stands.

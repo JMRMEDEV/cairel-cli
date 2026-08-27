@@ -144,3 +144,10 @@ master → derive bump from last commit message → `npm version <type> --no-git
   it, `npx jest --listTests` resolves the config, and `npm test` is 256/256. Pushed to master;
   the test gate should now pass on the next workflow run. This validates the test-gate design —
   it caught a real repo-hygiene bug before any publish.
+- **2026-08-27 12:39** — SUPERSEDED (publishing mechanism). The `NPM_TOKEN` /
+  `NODE_AUTH_TOKEN` guidance in this task is retired by **TASK-027 / REL-02 / ADR-011**,
+  which migrates the publish step to **npm Trusted Publishing (OIDC)** — tokenless. No
+  `NPM_TOKEN` secret is used anymore; the workflow declares `id-token: write` and the npm
+  CLI (Node 22, npm ≥ 11.5.1) auto-detects the OIDC environment. All other TASK-026
+  behavior (tag-based release, commit-range bump, test gate, safe-by-default, loop guard)
+  is preserved. See TASK-027 and ADR-011 for the current publish/auth flow.

@@ -3,7 +3,13 @@
 # Automated semantic-version release for the `cairel` npm package.
 #
 # Adapted from the shared munin-* `release-package.yml` pattern (REL-01 / TASK-026,
-# see ADR-010). Key differences from munin, all intentional:
+# see ADR-010) and migrated to npm Trusted Publishing via OIDC (REL-02 / TASK-027,
+# see ADR-011). Publishing is TOKENLESS: there is NO `NPM_TOKEN` secret. The npm CLI
+# (>= 11.5.1, bundled with Node 22) auto-detects the GitHub Actions OIDC environment
+# and mints a short-lived, workflow-scoped credential at publish time. This also
+# auto-generates provenance attestations for the public repo + public package.
+#
+# Key differences from munin, all intentional:
 #   - munin uses Yarn 4 + Corepack + GitHub Packages; cairel uses plain npm and the
 #     PUBLIC npm registry (package name: `cairel`).
 #   - cairel runs a real test suite (256 Jest tests) + a prebuild manifest generator,
@@ -26,8 +32,11 @@
 #     NOT pushed (only computed and logged).
 #
 # TO GO LIVE (human actions — NONE of this is done by authoring this file):
-#   1. Add an `NPM_TOKEN` repository secret (npm automation token with publish rights
-#      to the `cairel` package). See docs/PUBLISH.md.
+#   1. Configure the Trusted Publisher on npmjs.com for the `cairel` package:
+#      Packages → cairel → Settings → Trusted Publisher → GitHub Actions →
+#      org/user `JMRMEDEV`, repo `cairel-cli`, workflow filename `release.yml`
+#      (exact, case-sensitive), allowed action `npm publish`. No secret is stored
+#      anywhere. See docs/PUBLISH.md. (Publishing fails with ENEEDAUTH until done.)
 #   2. Trigger the workflow via the Actions tab using "Run workflow" and set
 #      `dry_run: false`.
 #   3. (Optional, higher risk) To let a plain push to master publish for real, remove
@@ -48,9 +57,12 @@ on:
         required: false
         default: true
 
-# Least-privilege by default. `contents: write` is only needed to push the tag and
-# create the GitHub Release when NOT in dry-run mode.
+# Least-privilege by default. `id-token: write` is REQUIRED for npm Trusted Publishing
+# (OIDC): it lets the runner mint the short-lived token npm uses to authenticate the
+# publish. `contents: write` is only needed to push the tag and create the GitHub
+# Release when NOT in dry-run mode.
 permissions:
+  id-token: write
   contents: write
 
 concurrency:
@@ -110,10 +122,24 @@ jobs:
           fetch-depth: 0
 
       - name: Setup Node.js
+        # Node 22 ships an npm >= 11.5.1, which is required for Trusted Publishing
+        # (OIDC). We still upgrade npm below to be safe. registry-url must point at
+        # the public npm registry so the CLI knows where to publish/authenticate.
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           registry-url: https://registry.npmjs.org
+
+      - name: Ensure npm >= 11.5.1 (Trusted Publishing / OIDC requirement)
+        # Belt-and-suspenders: guarantee the bundled npm meets the minimum even if the
+        # runner image lags. No token involved — this only upgrades the CLI.
+        run: |
+          npm i -g npm@latest
+          echo "npm version: $(npm -v)"
+          # Fail fast with a clear message if npm is still too old for OIDC. Without
+          # this, an old npm silently skips the OIDC exchange and fails later with a
+          # confusing generic ENEEDAUTH at publish time.
+          node -e "const s=require('child_process').execSync('npm -v').toString().trim();const [a,b,c]=s.split('.').map(Number);if(a<11||(a===11&&(b<5||(b===5&&c<1)))){console.error('npm '+s+' is below 11.5.1 required for Trusted Publishing (OIDC).');process.exit(1);}console.log('npm '+s+' OK for OIDC.');"
 
       - name: Install dependencies
         # No lockfile is committed, so `npm install` (not `npm ci`).
@@ -181,17 +207,19 @@ jobs:
           echo "New version: $NEW_VERSION"
           echo "version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Publish to npm
+      - name: Publish to npm (Trusted Publishing / OIDC — no token)
         if: steps.bump.outputs.type != 'none'
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           set -euo pipefail
+          # No NODE_AUTH_TOKEN / NPM_TOKEN: the npm CLI auto-detects the GitHub Actions
+          # OIDC environment (via id-token: write) and authenticates tokenlessly.
+          # Provenance is generated automatically for the public repo + package, so we
+          # do NOT pass --provenance.
           if [ "${{ needs.resolve.outputs.dry_run }}" = "true" ]; then
             echo "DRY RUN — running 'npm publish --dry-run' (nothing is published)."
             npm publish --access public --dry-run
           else
-            echo "LIVE — publishing ${{ steps.version.outputs.version }} to the public npm registry."
+            echo "LIVE — publishing ${{ steps.version.outputs.version }} to the public npm registry via OIDC."
             npm publish --access public
           fi
 

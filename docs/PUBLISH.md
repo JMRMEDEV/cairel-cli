@@ -4,9 +4,12 @@
 
 Releases are driven by the GitHub Actions workflow at
 [`.github/workflows/release.yml`](../.github/workflows/release.yml) (see
-[ADR-010](../planning/docs/architecture/decisions.md) / REL-01 / TASK-026). It derives
-the next semantic version from the Conventional Commit messages since the last `v*`
-tag and publishes the `cairel` package to the public npm registry.
+[ADR-010](../planning/docs/architecture/decisions.md) / REL-01 / TASK-026 for the
+pipeline, and [ADR-011](../planning/docs/architecture/decisions.md) / REL-02 /
+TASK-027 for the tokenless OIDC publishing). It derives the next semantic version
+from the Conventional Commit messages since the last `v*` tag and publishes the
+`cairel` package to the public npm registry **using npm Trusted Publishing (OIDC) —
+there is no `NPM_TOKEN` secret**.
 
 ### How it works
 
@@ -21,8 +24,11 @@ tag and publishes the `cairel` package to the public npm registry.
    - `fix:` / `perf:` → **patch**
    - otherwise → **no release**
 4. **Release** — bumps `package.json`, creates an annotated tag `vX.Y.Z`, publishes to
-   npm with `--access public`, then pushes the **tag** (never a commit to the protected
-   `master` branch) and cuts a GitHub Release with generated notes.
+   npm with `--access public` **via OIDC (no token)** — the npm CLI auto-detects the
+   GitHub Actions OIDC environment and mints a short-lived, workflow-scoped credential.
+   Provenance attestations are generated automatically (public repo + public package).
+   It then pushes the **tag** (never a commit to the protected `master` branch) and cuts
+   a GitHub Release with generated notes.
 5. **Loop guard** — a `chore(release):` head commit is skipped so the release cannot
    retrigger itself.
 
@@ -39,15 +45,36 @@ in:
 
 ### Going live (human actions required)
 
-These steps are intentionally NOT automated and must be performed by a maintainer:
+These steps are intentionally NOT automated and must be performed by a maintainer.
+Publishing is **tokenless** — you configure a Trusted Publisher on npmjs.com instead
+of storing a secret.
 
-1. **Add the `NPM_TOKEN` repo secret.** Create an npm **automation** token with publish
-   rights to the `cairel` package (npm → Access Tokens → Generate → Automation), then add
-   it under **Settings → Secrets and variables → Actions → New repository secret** named
-   `NPM_TOKEN`. The workflow references it only as `${{ secrets.NPM_TOKEN }}`; it is never
-   printed or committed.
+1. **Configure the Trusted Publisher on npmjs.com.** Sign in to npmjs.com as an owner
+   of the `cairel` package, then go to:
+
+   **Packages → `cairel` → Settings → Trusted Publisher → GitHub Actions**
+
+   Fill in **exactly** (values are case-sensitive):
+
+   | Field | Value |
+   |-------|-------|
+   | Organization or user | `JMRMEDEV` |
+   | Repository | `cairel-cli` |
+   | Workflow filename | `release.yml` |
+   | Allowed action | `npm publish` |
+
+   > The workflow filename is just the file's basename (`release.yml`), **not** the
+   > full path. It must match the file in `.github/workflows/` exactly — renaming the
+   > workflow breaks publishing until you update this config.
+
+   No token is created or stored anywhere. The GitHub Actions runner authenticates via
+   OIDC using the `id-token: write` permission already declared in the workflow.
+
 2. **Run a real release.** Actions tab → *Release* → **Run workflow** → set
-   `dry_run: false`.
+   `dry_run: false`. The npm CLI (≥ 11.5.1, bundled with Node 22 / upgraded in-job)
+   detects the OIDC environment and publishes without a token. Provenance is generated
+   automatically.
+
 3. **(Optional, higher risk)** To let a normal push to `master` publish automatically,
    remove the push→dry-run override in the `resolve` job (search the workflow for
    `HUMAN: flip live`). This is deliberately off by default.
@@ -55,6 +82,36 @@ These steps are intentionally NOT automated and must be performed by a maintaine
 > First real run should be validated by triggering `workflow_dispatch` with
 > `dry_run: true` and confirming the logs show the intended version bump and a successful
 > `npm publish --dry-run`.
+
+#### Troubleshooting: `ENEEDAUTH` on publish
+
+npm **does not validate the Trusted Publisher configuration at save time** — a typo only
+surfaces as an `ENEEDAUTH` / authentication error when the workflow actually tries to
+publish. If a live run fails to authenticate, re-check on npmjs.com that:
+
+- The **Organization or user** is exactly `JMRMEDEV` (case-sensitive).
+- The **Repository** is exactly `cairel-cli` (no owner prefix, case-sensitive).
+- The **Workflow filename** is exactly `release.yml` (basename only — no
+  `.github/workflows/` path, case-sensitive).
+- The **Allowed action** is `npm publish`.
+- The workflow actually declares `permissions: id-token: write` (it does).
+- The job runs on a **GitHub-hosted** runner (`ubuntu-latest`) — self-hosted runners are
+  not supported for Trusted Publishing.
+- npm in the job is **≥ 11.5.1** and Node is **≥ 22.14.0** (the workflow uses Node 22 and
+  runs `npm i -g npm@latest`; the publish log echoes `npm -v`).
+- `package.json` `repository.url` matches the GitHub repo
+  (`https://github.com/JMRMEDEV/cairel-cli.git`).
+
+#### Hardening (recommended once OIDC works)
+
+After a successful tokenless publish, lock the package down:
+
+1. On npmjs.com: **Packages → `cairel` → Settings → Publishing access** → select
+   **"Require two-factor authentication and disallow tokens"**. This makes Trusted
+   Publishing (OIDC) the only automated path in and blocks token-based publishes
+   entirely.
+2. **Revoke any leftover automation/granular tokens** that previously had publish rights
+   to `cairel` (npm → Access Tokens) so there is no lingering long-lived credential.
 
 ---
 
