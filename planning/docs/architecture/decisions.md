@@ -95,12 +95,63 @@ Adopt a **directives model** with user-selectable enforcement levels:
 - The generator must route output to different platform locations based on enforcement level
 - Platforms that don't support a given enforcement level fall back to the nearest supported one (e.g., Claude Code has no contextual layer → contextual directives become enforced in CLAUDE.md)
 
-## ADR-009: Future Vision — carm Package Manager
+## ADR-009: Future Vision — carm as Cross-Vendor Consolidation Layer
 
-**Status**: Proposed  
-**Date**: 2026-01-14
+**Status**: Proposed (reframed 2026-08-27)  
+**Date**: 2026-01-14 (original), 2026-08-27 (reframe)
 
-Post v2.0: npm-like package manager for AI rules and agents. Community contributions, versioning, dependency management. See `docs/FUTURE.md`.
+### Context
+
+The original framing positioned carm as "an npm-like package manager for AI rules and
+agents." That framing under-specified the *why* and risked building yet another
+capability store. The market has since made the real opportunity clearer: multiple
+vendors already ship store-like surfaces for agent capabilities (Kiro powers, Claude
+Skills, Cursor rules, Copilot skills, MCP server registries), but each **locks content to
+its own format**. The unowned, valuable layer is the neutral cross-vendor one — and
+vendors are structurally disinclined to build it because interop works against lock-in.
+
+cairel already owns the hard part (the ADR-008 hybrid-directives transform: one authored
+directive → enforced/contextual/available, routed per platform).
+
+### Decision
+
+Reframe carm as a **cross-vendor consolidation layer**, not another store — "author or
+install a directive once, correctly shaped for whichever tools you use." Key positions:
+
+1. **Consolidation, not competition.** carm distributes on top of the proven cairel
+   transform; it consolidates the *portable subset* (markdown guidance + enforcement
+   level) and is explicit that vendor-specific capabilities (skills with code/tool
+   bindings) may not port losslessly.
+
+2. **Community-maintained adapters answer protocol churn.** The maintenance burden of
+   tracking five vendors' evolving formats is distributed to the ecosystem (npm-style):
+   format churn becomes small distributed PRs and the shared reason the community exists.
+   Caveat: this only works past critical mass, so early adoption/survival is the real risk.
+
+3. **Validation gate before the registry.** The whole thesis rests on one unproven
+   hypothesis — *people want to publish and consume cross-vendor directives from a shared
+   source.* The smallest test (a Git-backed source + `carm add`, strangers publishing and
+   installing cross-tool) must succeed **before** any registry backend, dependency
+   resolution, or monetization is scheduled.
+
+4. **Monetization: mostly free, npm-shaped.** Free/neutral public core funded by
+   **donations**; **paid on-demand custom directive creation** (productized curation);
+   **paid private instances / private registries** (the npm public-free/private-paid
+   model). Dropped: speculative Pro/Enterprise tier ladders, analytics, SLAs as first
+   moves.
+
+5. **Trust infra already partly built.** The tokenless OIDC + provenance model from
+   ADR-011 is the right foundation for a carm registry's publishing trust.
+
+### Consequences
+
+- carm work is **gated** on the portability-demand validation; nothing registry-scale is
+  committed until the MVP proves the hypothesis.
+- Success metrics are adoption-first (external publishers, cross-tool installs by
+  non-authors; community adapter PRs) rather than feature counts.
+- Full rationale, package/config shapes, sequenced roadmap, and metrics live in
+  `docs/FUTURE.md` (reframed 2026-08-27). A superseding ADR will be added once the
+  validation-gate MVP is scheduled.
 
 ## ADR-010: Automated Release — Tag-Based, Adapted from munin
 
