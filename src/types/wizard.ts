@@ -13,6 +13,7 @@ export type EnvVarStrategy = 'yes-with-prod-protection' | 'yes-without-protectio
 export type VersioningStrategy = 'semantic' | 'calver' | 'none';
 
 export interface QuickSetupAnswers {
+  mode: 'quick';
   projectType: ProjectType;
   language: Language;
   framework: Framework;
@@ -20,11 +21,23 @@ export interface QuickSetupAnswers {
   aiTool: AITool;
   platforms: Platform[];
   mcpServers: string[];
-  additionalRules?: string[];
+  additionalSkills?: string[];
   generateAgent?: boolean;
+  selectedRules?: string[];
 }
 
-export interface DetailedSetupAnswers extends QuickSetupAnswers {
+export interface DetailedSetupAnswers {
+  mode: 'detailed';
+  projectType: ProjectType;
+  language: Language;
+  framework: Framework;
+  useGit: boolean;
+  aiTool: AITool;
+  platforms: Platform[];
+  mcpServers: string[];
+  additionalSkills?: string[];
+  generateAgent?: boolean;
+  selectedRules?: string[];
   testingFramework: TestingFramework;
   linter: Linter;
   uiLibrary?: UILibrary;
@@ -33,15 +46,43 @@ export interface DetailedSetupAnswers extends QuickSetupAnswers {
   versioningStrategy: VersioningStrategy;
 }
 
-export interface MCPServer {
-  name: string;
-  path: string;
-}
-
 export interface CustomModeAnswers {
+  mode: 'custom';
   aiTool: AITool;
   platforms: Platform[];
   selectedRules: string[];
   mcpServers: string[];
   generateAgent?: boolean;
+}
+
+export type WizardAnswers = QuickSetupAnswers | DetailedSetupAnswers | CustomModeAnswers;
+
+// Type guards
+export function isCustomMode(answers: WizardAnswers): answers is CustomModeAnswers {
+  return answers.mode === 'custom';
+}
+
+export function isDetailedMode(answers: WizardAnswers): answers is DetailedSetupAnswers {
+  return answers.mode === 'detailed';
+}
+
+export function isQuickMode(answers: WizardAnswers): answers is QuickSetupAnswers {
+  return answers.mode === 'quick';
+}
+
+export function isProjectSetup(answers: WizardAnswers): answers is QuickSetupAnswers | DetailedSetupAnswers {
+  return answers.mode === 'quick' || answers.mode === 'detailed';
+}
+
+export interface MCPServer {
+  name: string;
+  path: string;
+}
+
+/** Thrown when the user cancels a prompt (Ctrl+C or declines to proceed). */
+export class UserCancelledError extends Error {
+  constructor(message = 'User cancelled the operation') {
+    super(message);
+    this.name = 'UserCancelledError';
+  }
 }

@@ -54,8 +54,8 @@ if (process.argv.length === 2) {
       { name: 'Initialize AI configuration (cairel init)', value: 'init' },
       { name: 'Bootstrap project documentation (cairel bootstrap)', value: 'bootstrap' },
       { name: 'Update existing configuration (cairel update)', value: 'update' },
-      { name: 'Validate rules (cairel validate)', value: 'validate' },
-      { name: 'List available presets (cairel list)', value: 'list' },
+      { name: 'Validate configuration (cairel validate)', value: 'validate' },
+      { name: 'List available skills (cairel list)', value: 'list' },
       { name: 'Show help (cairel --help)', value: 'help' },
     ],
   })

@@ -14,7 +14,7 @@
     "@chakra-ui/*",{{/if}}
     "web_fetch"
   ],
-  "resources": ["{{RESOURCES_PATH}}"],
+  "resources": ["{{RESOURCES_PATH}}"]{{#if IS_AMAZON_Q}},
   "toolsSettings": {
     "fs_read": {
       "allowedPaths": [
@@ -96,5 +96,5 @@
         "*--force*"
       ]
     }
-  }
+  }{{/if}}
 }

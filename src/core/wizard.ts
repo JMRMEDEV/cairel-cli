@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import ora from 'ora';
 import { promises as fs } from 'fs';
 import { join } from 'path';
-import { WizardMode, QuickSetupAnswers, DetailedSetupAnswers, CustomModeAnswers, Framework, AITool, Platform, TestingFramework, Linter, UILibrary, PackageManager, EnvVarStrategy, VersioningStrategy } from '../types/wizard';
+import { WizardMode, QuickSetupAnswers, DetailedSetupAnswers, CustomModeAnswers, Framework, AITool, Platform, TestingFramework, Linter, UILibrary, PackageManager, EnvVarStrategy, VersioningStrategy, WizardAnswers, UserCancelledError } from '../types/wizard';
 import { detectMCPServers } from '../utils/mcp-detector';
 import { selectRules } from './rules-selector';
 
@@ -31,7 +31,7 @@ async function getOptionalRules(answers: Partial<QuickSetupAnswers>): Promise<Op
   }));
 }
 
-export async function runWizard(): Promise<QuickSetupAnswers | DetailedSetupAnswers | CustomModeAnswers> {
+export async function runWizard(): Promise<WizardAnswers> {
   console.log(chalk.bold.blue('\n🚀 Cairel - AI Development Initialization\n'));
 
   const mode = await select<WizardMode>({
@@ -57,8 +57,7 @@ export async function runWizard(): Promise<QuickSetupAnswers | DetailedSetupAnsw
   if (wantsReview) {
     const selectedRules = await reviewAndSelectRules(answers);
     if (!selectedRules) {
-      console.log(chalk.yellow('\n❌ Configuration cancelled'));
-      process.exit(0);
+      throw new UserCancelledError('Configuration cancelled during review');
     }
     (answers as any).selectedRules = selectedRules;
   }
@@ -141,6 +140,7 @@ async function runQuickSetup(): Promise<QuickSetupAnswers> {
   }
 
   const result: QuickSetupAnswers = {
+    mode: 'quick',
     projectType,
     language,
     framework,
@@ -153,7 +153,7 @@ async function runQuickSetup(): Promise<QuickSetupAnswers> {
 
   const optionalRules = await getOptionalRules(result);
   if (optionalRules.length > 0) {
-    result.additionalRules = await checkbox({
+    result.additionalSkills = await checkbox({
       message: 'Select additional skills (optional):',
       choices: optionalRules.map(r => ({
         name: `${r.title} - ${r.description}`,
@@ -217,6 +217,7 @@ async function runDetailedSetup(): Promise<DetailedSetupAnswers> {
 
   const detailed: DetailedSetupAnswers = {
     ...quickAnswers,
+    mode: 'detailed',
     testingFramework,
     linter,
     envVarStrategy,
@@ -344,6 +345,7 @@ async function runCustomSetup(): Promise<CustomModeAnswers> {
   }
 
   const result: CustomModeAnswers = {
+    mode: 'custom',
     aiTool,
     platforms,
     selectedRules,
@@ -359,8 +361,7 @@ async function runCustomSetup(): Promise<CustomModeAnswers> {
   if (wantsReview) {
     const reviewedRules = await reviewAndSelectRulesCustom(result.selectedRules, manifest.rules);
     if (!reviewedRules) {
-      console.log(chalk.yellow('\n❌ Configuration cancelled'));
-      process.exit(0);
+      throw new UserCancelledError('Configuration cancelled during review');
     }
     result.selectedRules = reviewedRules;
   }

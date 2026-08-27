@@ -65,6 +65,7 @@ describe('File Generation Integration', () => {
       framework: 'react',
       useGit: true,
       aiTool: 'kiro-cli',
+      mode: 'quick',
       platforms: ['kiro'],
       mcpServers: ['amazon-q-history'],
     };
@@ -130,6 +131,7 @@ describe('File Generation Integration', () => {
       framework: 'none',
       useGit: false,
       aiTool: 'amazon-q',
+      mode: 'quick',
       platforms: ['amazon-q'],
       mcpServers: [],
     };

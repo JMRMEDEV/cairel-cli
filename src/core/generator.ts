@@ -1,10 +1,11 @@
 import { promises as fs } from 'fs';
 import { join, dirname } from 'path';
+import { homedir } from 'os';
 import Handlebars from 'handlebars';
 import chalk from 'chalk';
 import ora from 'ora';
 import { select, checkbox, confirm } from '@inquirer/prompts';
-import { QuickSetupAnswers, DetailedSetupAnswers, CustomModeAnswers, Platform } from '../types/wizard';
+import { QuickSetupAnswers, DetailedSetupAnswers, CustomModeAnswers, Platform, WizardAnswers, isCustomMode, isProjectSetup, isDetailedMode } from '../types/wizard';
 import { selectRules } from './rules-selector';
 
 interface PlatformPaths {
@@ -26,16 +27,16 @@ function getPlatformPaths(platform: Platform, targetDir: string): PlatformPaths 
 }
 
 export async function generateFiles(
-  answers: QuickSetupAnswers | DetailedSetupAnswers | CustomModeAnswers,
+  answers: WizardAnswers,
   targetDir: string = process.cwd()
 ): Promise<void> {
   const spinner = ora('Generating configuration...').start();
 
   try {
     const platforms: Platform[] = answers.platforms || [answers.aiTool === 'amazon-q' ? 'amazon-q' : 'kiro'];
-    const rules = 'selectedRules' in answers
+    const rules = isCustomMode(answers)
       ? answers.selectedRules
-      : await selectRules(answers);
+      : (answers.selectedRules ?? await selectRules(answers));
 
     for (const platform of platforms) {
       const paths = getPlatformPaths(platform, targetDir);
@@ -103,7 +104,7 @@ async function copySkillFolders(rules: string[], targetDir: string): Promise<voi
           await fs.copyFile(src, join(targetRefs, ref));
         }
       } catch {
-        // No references/ directory, skip
+        // No references/ directory — expected for most skills
       }
     } catch (error) {
       console.warn(chalk.yellow(`Warning: Could not copy skill ${ruleName}`));
@@ -122,13 +123,13 @@ async function copyRulesFlat(rules: string[], targetDir: string): Promise<void> 
       const content = await fs.readFile(sourcePath, 'utf-8');
       await fs.writeFile(targetPath, content, 'utf-8');
     } catch (error) {
-      console.warn(chalk.yellow(`Warning: Could not copy rule ${ruleName}`));
+      console.warn(chalk.yellow(`Warning: Could not copy skill ${ruleName}`));
     }
   }
 }
 
 async function generateAgent(
-  answers: QuickSetupAnswers | DetailedSetupAnswers | CustomModeAnswers,
+  answers: WizardAnswers,
   targetDir: string,
   platform: Platform
 ): Promise<string> {
@@ -151,7 +152,7 @@ async function patchExistingAgents(agentsDir: string, platform: Platform): Promi
   try {
     await fs.access(agentsDir);
   } catch {
-    return; // No agents directory
+    return; // No agents directory — nothing to patch
   }
 
   const files = await fs.readdir(agentsDir);
@@ -174,7 +175,7 @@ async function patchExistingAgents(agentsDir: string, platform: Platform): Promi
         hasSkills: resources.some((r: string) => r.includes('skill://') || r.includes('skills')),
       });
     } catch {
-      // Skip invalid JSON
+      // Skip files that aren't valid JSON (e.g. .DS_Store, malformed)
     }
   }
 
@@ -247,9 +248,9 @@ function getSkillsDir(platform: Platform): string {
   }
 }
 
-function buildTemplateVars(answers: QuickSetupAnswers | DetailedSetupAnswers | CustomModeAnswers, platform: Platform = 'kiro'): Record<string, any> {
+function buildTemplateVars(answers: WizardAnswers, platform: Platform = 'kiro'): Record<string, any> {
   // Handle custom mode
-  if ('selectedRules' in answers) {
+  if (isCustomMode(answers)) {
     const mcpServersJson = buildMcpServersJson(answers.mcpServers);
     
     return {
@@ -265,7 +266,7 @@ function buildTemplateVars(answers: QuickSetupAnswers | DetailedSetupAnswers | C
       
       HAS_MCP_SERVERS: answers.mcpServers.length > 0,
       MCP_SERVERS_JSON: mcpServersJson,
-      MCP_SERVERS_PATH: join(require('os').homedir(), 'mcp-servers'),
+      MCP_SERVERS_PATH: join(homedir(), 'mcp-servers'),
       
       USE_GIT: false, USE_ENV_VARS: false, ENV_PROD_PROTECTION: false,
       USE_TESTING: false, TESTING_FRAMEWORK: 'none',
@@ -273,55 +274,60 @@ function buildTemplateVars(answers: QuickSetupAnswers | DetailedSetupAnswers | C
       RESOURCES_PATH: getResourcesPath(platform),
       RULES_PATH: getSkillsDir(platform),
       AGENTS_PATH: platform === 'amazon-q' ? '.amazonq/cli-agents' : '.kiro/agents',
+      IS_AMAZON_Q: platform === 'amazon-q',
     };
   }
   
-  const detailed = answers as DetailedSetupAnswers;
-  const mcpServersJson = buildMcpServersJson((answers as QuickSetupAnswers).mcpServers);
+  // Quick or detailed mode — answers is QuickSetupAnswers | DetailedSetupAnswers
+  const mcpServersJson = buildMcpServersJson(answers.mcpServers);
+  const packageManager = isDetailedMode(answers) ? (answers.packageManager || 'npm') : 'npm';
+  const envVarStrategy = isDetailedMode(answers) ? answers.envVarStrategy : 'no';
+  const testingFramework = isDetailedMode(answers) ? answers.testingFramework : 'none';
   
   return {
     AGENT_NAME: 'dev-agent',
-    AGENT_DESCRIPTION: generateDescription(answers as QuickSetupAnswers),
-    AGENT_PROMPT: generatePrompt(answers as QuickSetupAnswers),
+    AGENT_DESCRIPTION: generateDescription(answers),
+    AGENT_PROMPT: generatePrompt(answers),
     
     // Language & Framework
-    TYPESCRIPT: (answers as QuickSetupAnswers).language === 'typescript',
-    JAVASCRIPT: (answers as QuickSetupAnswers).language === 'javascript',
-    PYTHON: (answers as QuickSetupAnswers).language === 'python',
-    LUA: (answers as QuickSetupAnswers).language === 'lua',
-    REACT: (answers as QuickSetupAnswers).framework === 'react',
-    REACT_NATIVE: (answers as QuickSetupAnswers).framework === 'react-native',
-    NEXT_JS: (answers as QuickSetupAnswers).framework === 'next-js',
+    TYPESCRIPT: answers.language === 'typescript',
+    JAVASCRIPT: answers.language === 'javascript',
+    PYTHON: answers.language === 'python',
+    LUA: answers.language === 'lua',
+    REACT: answers.framework === 'react',
+    REACT_NATIVE: answers.framework === 'react-native',
+    NEXT_JS: answers.framework === 'next-js',
     
     // Package Manager
-    PACKAGE_MANAGER: detailed.packageManager || 'npm',
-    PACKAGE_MANAGER_NPM: detailed.packageManager === 'npm' || !detailed.packageManager,
-    PACKAGE_MANAGER_YARN: detailed.packageManager === 'yarn',
-    PACKAGE_MANAGER_PNPM: detailed.packageManager === 'pnpm',
+    PACKAGE_MANAGER: packageManager,
+    PACKAGE_MANAGER_NPM: packageManager === 'npm',
+    PACKAGE_MANAGER_YARN: packageManager === 'yarn',
+    PACKAGE_MANAGER_PNPM: packageManager === 'pnpm',
     
     // MCP Servers
-    HAS_MCP_SERVERS: (answers as QuickSetupAnswers).mcpServers.length > 0,
+    HAS_MCP_SERVERS: answers.mcpServers.length > 0,
     MCP_SERVERS_JSON: mcpServersJson,
-    MCP_SERVERS_PATH: join(require('os').homedir(), 'mcp-servers'),
+    MCP_SERVERS_PATH: join(homedir(), 'mcp-servers'),
     
     // Features
-    USE_GIT: (answers as QuickSetupAnswers).useGit,
-    USE_ENV_VARS: detailed.envVarStrategy !== 'no',
-    ENV_PROD_PROTECTION: detailed.envVarStrategy === 'yes-with-prod-protection',
-    USE_TESTING: detailed.testingFramework !== 'none',
-    TESTING_FRAMEWORK: detailed.testingFramework || 'none',
+    USE_GIT: answers.useGit,
+    USE_ENV_VARS: envVarStrategy !== 'no',
+    ENV_PROD_PROTECTION: envVarStrategy === 'yes-with-prod-protection',
+    USE_TESTING: testingFramework !== 'none',
+    TESTING_FRAMEWORK: testingFramework,
     
     // Paths
     RESOURCES_PATH: getResourcesPath(platform),
     RULES_PATH: getSkillsDir(platform),
     AGENTS_PATH: platform === 'amazon-q' ? '.amazonq/cli-agents' : '.kiro/agents',
+    IS_AMAZON_Q: platform === 'amazon-q',
   };
 }
 
 function buildMcpServersJson(mcpServers: string[]): string {
   if (mcpServers.length === 0) return '';
   
-  const mcpPath = join(require('os').homedir(), 'mcp-servers');
+  const mcpPath = join(homedir(), 'mcp-servers');
   const servers = mcpServers.map((server, index) => {
     const isLast = index === mcpServers.length - 1;
     return `"${server}": {
@@ -334,7 +340,7 @@ function buildMcpServersJson(mcpServers: string[]): string {
   return `{\n    ${servers}\n  }`;
 }
 
-function generateDescription(answers: QuickSetupAnswers): string {
+function generateDescription(answers: QuickSetupAnswers | DetailedSetupAnswers): string {
   const type = answers.projectType === 'ui' ? 'Frontend' : 
                answers.projectType === 'backend' ? 'Backend' :
                answers.projectType === 'fullstack' ? 'Full-stack' : 'Development';
@@ -345,7 +351,7 @@ function generateDescription(answers: QuickSetupAnswers): string {
   return `${type} development agent for ${lang}${framework}`;
 }
 
-function generatePrompt(answers: QuickSetupAnswers): string {
+function generatePrompt(answers: QuickSetupAnswers | DetailedSetupAnswers): string {
   const type = answers.projectType === 'ui' ? 'frontend developer' :
                answers.projectType === 'backend' ? 'backend developer' :
                answers.projectType === 'fullstack' ? 'full-stack developer' :

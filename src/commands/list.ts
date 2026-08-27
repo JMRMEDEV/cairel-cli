@@ -1,4 +1,4 @@
-import { Command } from 'commander';
+import { Command, Option } from 'commander';
 import chalk from 'chalk';
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -18,14 +18,15 @@ interface RulesManifest {
 
 export const listCommand = new Command('list')
   .description('List available skills and presets')
-  .option('--rules', 'List only skills')
+  .option('--skills', 'List only skills')
+  .addOption(new Option('--rules', 'List only skills (alias for --skills)').hideHelp())
   .option('--agents', 'List only agents')
   .option('--category <category>', 'Filter by category')
   .action((options) => {
-    const showRules = !options.agents;
-    const showAgents = options.agents && !options.rules;
+    const showSkills = options.skills || options.rules;
+    const showAgents = options.agents && !showSkills;
 
-    if (showRules) {
+    if (!showAgents) {
       displayRules(options.category);
     }
 

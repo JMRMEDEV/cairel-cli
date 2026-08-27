@@ -22,7 +22,7 @@ Skills follow the open [Agent Skills](https://agentskills.io) standard — write
 - ❌ No standardization across teams
 
 **The Solution**: Cairel provides:
-- ✅ **23 curated Agent Skills** following the open [agentskills.io](https://agentskills.io) standard
+- ✅ **24 curated Agent Skills** following the open [agentskills.io](https://agentskills.io) standard
 - ✅ **Interactive wizard** for project-specific configuration
 - ✅ **Multi-platform support** — Kiro, GitHub Copilot, Claude Code, Amazon Q Developer
 - ✅ **Automatic MCP server detection** and setup
@@ -134,7 +134,7 @@ Cairel creates Agent Skills in your project following the [agentskills.io](https
 - Ideal for complex projects
 
 **Custom Mode**
-- Select specific skills from all 23 available
+- Select specific skills from all 24 available
 - Full control over your configuration
 - Great for specialized workflows
 
@@ -154,7 +154,7 @@ Cairel automatically detects installed MCP servers:
 - cypress (E2E testing)
 - chakra-ui (component reference)
 
-### 📦 23 Curated Agent Skills
+### 📦 24 Curated Agent Skills
 
 **General** (8 skills)
 - Context retrieval & token optimization
@@ -170,8 +170,9 @@ Cairel automatically detects installed MCP servers:
 - React props destructuring
 - Absolute imports
 
-**Git** (1 skill)
+**Git** (2 skills)
 - Git management & commit standards
+- Conventional Commits specification
 
 **UI** (6 skills)
 - Visual verification
@@ -182,6 +183,15 @@ Cairel automatically detects installed MCP servers:
 
 **Backend** (1 skill)
 - Multi-environment management
+
+**Testing** (1 skill)
+- Temporary test file cleanup protocol
+
+**Go** (1 skill)
+- Go style & best practices
+
+**Lua** (1 skill)
+- Lua library semantic versioning
 
 ---
 

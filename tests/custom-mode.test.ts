@@ -154,8 +154,7 @@ describe('Custom Mode Tests', () => {
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce(['context-retrieval', 'implementation-approval']);
 
-      await expect(runWizard()).rejects.toThrow('process.exit');
-      expect(mockExit).toHaveBeenCalledWith(0);
+      await expect(runWizard()).rejects.toThrow('Configuration cancelled during review');
     });
   });
 
@@ -255,8 +254,7 @@ describe('Custom Mode Tests', () => {
         .mockResolvedValueOnce(true)   // wantsReview
         .mockResolvedValueOnce(false); // confirmed = no
 
-      await expect(runWizard()).rejects.toThrow('process.exit');
-      expect(mockExit).toHaveBeenCalledWith(0);
+      await expect(runWizard()).rejects.toThrow('Configuration cancelled during review');
     });
   });
 

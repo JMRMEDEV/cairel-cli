@@ -186,7 +186,10 @@ export class Validator {
         }
       }
     } catch (error) {
-      // Return empty map on error
+      // Directory not accessible or read error — return empty results
+      if (process.env['DEBUG']) {
+        console.warn(`[validator] Could not read skills directory ${dirPath}:`, error);
+      }
     }
 
     return results;
@@ -313,7 +316,9 @@ export class Validator {
         results.set(path.relative(dirPath, file), result);
       }
     } catch (error) {
-      // Return empty map on error
+      if (process.env['DEBUG']) {
+        console.warn(`[validator] Could not read rules directory ${dirPath}:`, error);
+      }
     }
 
     return results;
@@ -333,7 +338,9 @@ export class Validator {
         results.set(path.relative(dirPath, file), result);
       }
     } catch (error) {
-      // Return empty map on error
+      if (process.env['DEBUG']) {
+        console.warn(`[validator] Could not read agents directory ${dirPath}:`, error);
+      }
     }
 
     return results;

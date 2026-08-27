@@ -5,6 +5,7 @@ describe('Rules Selector', () => {
   describe('UI TypeScript React with Git', () => {
     it('should select correct rules', async () => {
       const answers: QuickSetupAnswers = {
+        mode: 'quick',
         projectType: 'ui',
         language: 'typescript',
         framework: 'react',
@@ -46,6 +47,7 @@ describe('Rules Selector', () => {
   describe('Backend Python without Git', () => {
     it('should select only always-include rules', async () => {
       const answers: QuickSetupAnswers = {
+        mode: 'quick',
         projectType: 'backend',
         language: 'python',
         framework: 'fastapi',
@@ -77,9 +79,10 @@ describe('Rules Selector', () => {
     });
   });
 
-  describe('Additional rules', () => {
-    it('should include user-selected additional rules', async () => {
+  describe('Additional skills', () => {
+    it('should include user-selected additional skills', async () => {
       const answers: QuickSetupAnswers = {
+        mode: 'quick',
         projectType: 'backend',
         language: 'python',
         framework: 'none',
@@ -87,7 +90,7 @@ describe('Rules Selector', () => {
         aiTool: 'kiro-cli',
       platforms: ['kiro'],
         mcpServers: [],
-        additionalRules: ['absolute-imports'],
+        additionalSkills: ['absolute-imports'],
       };
 
       const rules = await selectRules(answers);
@@ -98,7 +101,7 @@ describe('Rules Selector', () => {
       expect(rules).toContain('development-workflow-meta');
       expect(rules).toContain('absolute-imports');
       
-      // Should have always-include + matching rules + additional rules
+      // Should have always-include + matching rules + additional skills
       expect(rules.length).toBeGreaterThanOrEqual(3); // At least the ones we checked
       expect(rules.length).toBeLessThan(10); // But not all rules
     });

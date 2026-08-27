@@ -41,13 +41,19 @@ Implementation tasks derived from user stories. Each task maps to one or more st
 | [TASK-008](./TASK-008.md) | Add constraint generation for Amazon Q | P2 | 🔲 | CON-06 |
 | [TASK-009](./TASK-009.md) | Add constraint validation to cairel validate | P2 | 🔲 | CON-08 |
 
+### P1 — Technical Debt
+
+| Task | Title | Priority | Status | Stories |
+|------|-------|----------|--------|---------|
+| [TASK-010](./TASK-010.md) | Code quality and technical debt cleanup | P1 | 🔲 | — |
+
 ---
 
 ## Summary
 
 | Category | Total | ✅ Done | 🔲 Open |
 |----------|-------|---------|---------|
-| Tasks | 9 | 2 | 7 |
+| Tasks | 10 | 2 | 8 |
 | Bugs | 0 | 0 | 0 |
 
 **Remaining MVP work**:
@@ -58,5 +64,6 @@ Implementation tasks derived from user stories. Each task maps to one or more st
 - TASK-007: Add Cursor as a supported platform (P1)
 - TASK-008: Add constraint generation for Amazon Q (P2)
 - TASK-009: Add constraint validation to cairel validate (P2)
+- TASK-010: Code quality and technical debt cleanup (P1)
 
-**Last Updated**: April 28, 2026
+**Last Updated**: August 26, 2026

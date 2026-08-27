@@ -8,7 +8,8 @@
   },
   "type": "module",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "node --test tests/handlers.test.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",

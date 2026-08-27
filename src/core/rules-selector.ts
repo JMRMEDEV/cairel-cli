@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 import { join } from 'path';
-import { QuickSetupAnswers, DetailedSetupAnswers } from '../types/wizard';
+import { QuickSetupAnswers, DetailedSetupAnswers, isDetailedMode } from '../types/wizard';
 
 interface RuleConditions {
   languages?: string[];
@@ -26,6 +26,11 @@ interface RulesManifest {
 
 let manifestCache: RulesManifest | null = null;
 
+/** Clear the cached manifest. Useful for testing. */
+export function clearCache(): void {
+  manifestCache = null;
+}
+
 async function loadManifest(): Promise<RulesManifest> {
   if (manifestCache) return manifestCache;
 
@@ -45,7 +50,6 @@ function matchesConditions(
   // Rules without conditions are never auto-included
   if (!rule.conditions) return false;
 
-  const detailed = answers as DetailedSetupAnswers;
   const conditions = rule.conditions;
 
   // Check language
@@ -70,29 +74,33 @@ function matchesConditions(
 
   // Check env vars (only in detailed mode)
   if (conditions.requiresEnvVars !== undefined) {
-    const hasEnvVars = detailed.envVarStrategy && detailed.envVarStrategy !== 'no';
-    if (conditions.requiresEnvVars !== hasEnvVars) {
+    if (isDetailedMode(answers)) {
+      const hasEnvVars = answers.envVarStrategy !== 'no';
+      if (conditions.requiresEnvVars !== hasEnvVars) {
+        return false;
+      }
+    } else {
       return false;
     }
   }
 
   // Check versioning strategy (only in detailed mode)
   if (conditions.versioningStrategy) {
-    if (!detailed.versioningStrategy || !conditions.versioningStrategy.includes(detailed.versioningStrategy)) {
+    if (!isDetailedMode(answers) || !conditions.versioningStrategy.includes(answers.versioningStrategy)) {
       return false;
     }
   }
 
   // Check UI library (only in detailed mode)
   if (conditions.uiLibrary) {
-    if (!detailed.uiLibrary || !conditions.uiLibrary.includes(detailed.uiLibrary)) {
+    if (!isDetailedMode(answers) || !answers.uiLibrary || !conditions.uiLibrary.includes(answers.uiLibrary)) {
       return false;
     }
   }
 
   // Check linter (only in detailed mode)
   if (conditions.linter) {
-    if (!detailed.linter || !conditions.linter.includes(detailed.linter)) {
+    if (!isDetailedMode(answers) || !conditions.linter.includes(answers.linter)) {
       return false;
     }
   }
@@ -110,9 +118,9 @@ export async function selectRules(answers: QuickSetupAnswers | DetailedSetupAnsw
     }
   }
 
-  // Add user-selected additional rules
-  if (answers.additionalRules && answers.additionalRules.length > 0) {
-    selectedRules.push(...answers.additionalRules);
+  // Add user-selected additional skills
+  if (answers.additionalSkills && answers.additionalSkills.length > 0) {
+    selectedRules.push(...answers.additionalSkills);
   }
 
   return selectedRules;
