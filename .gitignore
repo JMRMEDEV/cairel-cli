@@ -12,6 +12,8 @@ tests/**/*.js
 tests/**/*.d.ts
 tests/**/*.js.map
 tests/**/*.d.ts.map
+# ...but keep the hand-written Jest setup file (referenced by jest.config.js)
+!tests/setup.js
 
 # Amazon Q History (keep only config.json)
 .amazon-q-history/*
