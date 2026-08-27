@@ -133,3 +133,14 @@ master → derive bump from last commit message → `npm version <type> --no-git
   release, public npm publish gated on green build+test). Updated `docs/PUBLISH.md` and added
   ADR-010. Verified: YAML parses, `npm run build` exit 0, `npm test` 256/256. No commits/tags/
   pushes; no token added. Live publish left as a documented human action.
+- **2026-08-27 12:25** — CI follow-up. First `Release` workflow run (dry-run on push) failed
+  at the `npm test` step: `Module <rootDir>/tests/setup.js in the setupFiles option was not
+  found`. Root cause: `jest.config.js` references `tests/setup.js`, but `.gitignore` rule
+  `tests/**/*.js` (meant for compiled test output) also ignored the hand-written setup file,
+  so it was never committed — CI's clean checkout lacked it. Tests passed locally only because
+  the file existed on disk. Fix (commit `2f1e861` "fix(ci): track tests/setup.js so jest runs
+  in CI"): added `!tests/setup.js` negation to `.gitignore` and force-added the file (12 lines;
+  suppresses expected ExitPromptError noise from mocked prompts). Verified `git ls-files` tracks
+  it, `npx jest --listTests` resolves the config, and `npm test` is 256/256. Pushed to master;
+  the test gate should now pass on the next workflow run. This validates the test-gate design —
+  it caught a real repo-hygiene bug before any publish.
