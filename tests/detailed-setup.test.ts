@@ -64,7 +64,8 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce('chakra-ui')
         .mockResolvedValueOnce('npm')
         .mockResolvedValueOnce('yes-with-prod-protection')
-        .mockResolvedValueOnce('semantic');
+        .mockResolvedValueOnce('semantic')
+        .mockResolvedValueOnce('accept'); // enforcement step
       mockConfirm.mockResolvedValueOnce(false); // wantsReview
 
       const result = await runWizard() as DetailedSetupAnswers;
@@ -85,7 +86,8 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce('gluestack-ui')
         .mockResolvedValueOnce('pnpm')
         .mockResolvedValueOnce('yes-without-protection')
-        .mockResolvedValueOnce('calver');
+        .mockResolvedValueOnce('calver')
+        .mockResolvedValueOnce('accept'); // enforcement step
       mockConfirm.mockResolvedValueOnce(false);
 
       const result = await runWizard() as DetailedSetupAnswers;
@@ -103,7 +105,8 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce('eslint')
         .mockResolvedValueOnce('yarn')     // no uiLibrary for backend
         .mockResolvedValueOnce('no')
-        .mockResolvedValueOnce('none');
+        .mockResolvedValueOnce('none')
+        .mockResolvedValueOnce('accept'); // enforcement step
       mockConfirm.mockResolvedValueOnce(false);
 
       const result = await runWizard() as DetailedSetupAnswers;
@@ -121,7 +124,8 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce('pytest')
         .mockResolvedValueOnce('ruff')
         .mockResolvedValueOnce('yes-with-prod-protection')  // no uiLibrary, no packageManager
-        .mockResolvedValueOnce('semantic');
+        .mockResolvedValueOnce('semantic')
+        .mockResolvedValueOnce('accept'); // enforcement step
       mockConfirm.mockResolvedValueOnce(false);
 
       const result = await runWizard() as DetailedSetupAnswers;
@@ -137,7 +141,8 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce('none')
         .mockResolvedValueOnce('none')
         .mockResolvedValueOnce('no')
-        .mockResolvedValueOnce('none');
+        .mockResolvedValueOnce('none')
+        .mockResolvedValueOnce('accept'); // enforcement step
       mockConfirm.mockResolvedValueOnce(false);
 
       const result = await runWizard() as DetailedSetupAnswers;
@@ -156,7 +161,8 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce('tailwind-css')
         .mockResolvedValueOnce('pnpm')
         .mockResolvedValueOnce('no')
-        .mockResolvedValueOnce('none');
+        .mockResolvedValueOnce('none')
+        .mockResolvedValueOnce('accept'); // enforcement step
       mockConfirm.mockResolvedValueOnce(false);
 
       const result = await runWizard() as DetailedSetupAnswers;
@@ -172,7 +178,8 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce('material-ui')
         .mockResolvedValueOnce('yarn')
         .mockResolvedValueOnce('yes-without-protection')
-        .mockResolvedValueOnce('calver');
+        .mockResolvedValueOnce('calver')
+        .mockResolvedValueOnce('accept'); // enforcement step
       mockConfirm.mockResolvedValueOnce(false);
 
       const result = await runWizard() as DetailedSetupAnswers;
@@ -190,7 +197,8 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce('eslint')
         .mockResolvedValueOnce('npm')
         .mockResolvedValueOnce('yes-with-prod-protection')
-        .mockResolvedValueOnce('semantic');
+        .mockResolvedValueOnce('semantic')
+        .mockResolvedValueOnce('accept'); // enforcement step
       mockConfirm.mockResolvedValueOnce(false);
 
       const result = await runWizard() as DetailedSetupAnswers;
@@ -205,7 +213,8 @@ describe('Detailed Setup Mode', () => {
         .mockResolvedValueOnce('none')
         .mockResolvedValueOnce('npm')
         .mockResolvedValueOnce('yes-without-protection')
-        .mockResolvedValueOnce('none');
+        .mockResolvedValueOnce('none')
+        .mockResolvedValueOnce('accept'); // enforcement step
       mockConfirm.mockResolvedValueOnce(false);
 
       const result = await runWizard() as DetailedSetupAnswers;

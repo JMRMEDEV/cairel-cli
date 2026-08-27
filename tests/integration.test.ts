@@ -72,11 +72,11 @@ describe('File Generation Integration', () => {
 
     await generateFiles(answers, testDir);
 
-    // Check directories exist
-    const skillsDir = join(testDir, '.kiro', 'skills');
+    // Check directories exist — enforcement-aware routing
+    const steeringDir = join(testDir, '.kiro', 'steering');
     const agentsDir = join(testDir, '.kiro', 'agents');
 
-    expect(await fs.stat(skillsDir)).toBeTruthy();
+    expect(await fs.stat(steeringDir)).toBeTruthy();
     expect(await fs.stat(agentsDir)).toBeTruthy();
 
     // Check agent file exists and has correct content
@@ -92,36 +92,32 @@ describe('File Generation Integration', () => {
     expect(agent.prompt).toContain('typescript');
     expect(agent.prompt).toContain('react');
 
-    // Check skill folders exist
-    const skills = await fs.readdir(skillsDir);
+    // Check steering files exist (enforced + contextual directives)
+    const steeringFiles = await fs.readdir(steeringDir);
     
-    // Always included
-    expect(skills).toContain('context-retrieval');
-    expect(skills).toContain('implementation-approval');
+    // Enforced directives in steering
+    expect(steeringFiles).toContain('typescript-validation.md');
+    expect(steeringFiles).toContain('package-manager-safety.md');
+    expect(steeringFiles).toContain('git-management.md');
+    expect(steeringFiles).toContain('implementation-approval.md');
     
-    // TypeScript specific
-    expect(skills).toContain('typescript-validation');
-    expect(skills).toContain('package-manager-safety');
-    
-    // React specific
-    expect(skills).toContain('react-props-destructuring');
-    expect(skills).toContain('component-structure');
-    
-    // Git
-    expect(skills).toContain('git-management');
-    
-    // UI specific
-    expect(skills).toContain('visual-verification');
-    expect(skills).toContain('mock-data-strategy');
+    // Contextual directives in steering
+    expect(steeringFiles).toContain('context-retrieval.md');
+    expect(steeringFiles).toContain('react-props-destructuring.md');
+    expect(steeringFiles).toContain('component-structure.md');
+    expect(steeringFiles).toContain('visual-verification.md');
+    expect(steeringFiles).toContain('mock-data-strategy.md');
 
-    // Each skill should have SKILL.md
-    const tsSkillPath = join(skillsDir, 'typescript-validation', 'SKILL.md');
-    const tsContent = await fs.readFile(tsSkillPath, 'utf-8');
-    expect(tsContent).toContain('TypeScript Compilation Validation');
+    // Enforced directives have inclusion: always
+    const tsContent = await fs.readFile(join(steeringDir, 'typescript-validation.md'), 'utf-8');
+    expect(tsContent).toContain('inclusion: always');
     expect(tsContent).toContain('npx tsc --noEmit');
+
+    // Contextual directives have inclusion: auto
+    const contextContent = await fs.readFile(join(steeringDir, 'context-retrieval.md'), 'utf-8');
+    expect(contextContent).toContain('inclusion: auto');
     
-    expect(skills.length).toBeGreaterThanOrEqual(10);
-    expect(skills.length).toBeLessThan(20);
+    expect(steeringFiles.length).toBeGreaterThanOrEqual(9);
   });
 
   it('should generate files for Amazon Q', async () => {

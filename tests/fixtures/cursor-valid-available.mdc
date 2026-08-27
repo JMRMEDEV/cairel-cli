@@ -1,0 +1,9 @@
+---
+description: "Optional icon usage guidance, available on manual invocation."
+alwaysApply: false
+globs: "src/**/*.tsx"
+---
+
+# Icon Usage
+
+Use the icon library consistently.

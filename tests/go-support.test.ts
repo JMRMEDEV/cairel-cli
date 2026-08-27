@@ -1,7 +1,7 @@
-import { selectRules } from '../src/core/rules-selector';
+import { selectDirectives } from '../src/core/directives-selector';
 
 describe('Go Language Support', () => {
-  test('selects Go style rule for Go backend project', async () => {
+  test('selects Go style directive for Go backend project', async () => {
     const answers = {
       projectType: 'backend',
       language: 'go',
@@ -13,15 +13,15 @@ describe('Go Language Support', () => {
       additionalRules: [],
     };
 
-    const rules = await selectRules(answers);
+    const directives = await selectDirectives(answers);
 
-    expect(rules).toContain('go-style-conventions');
-    expect(rules).toContain('context-retrieval');
-    expect(rules).toContain('implementation-approval');
-    expect(rules).toContain('git-management');
+    expect(directives).toContain('go-style-conventions');
+    expect(directives).toContain('context-retrieval');
+    expect(directives).toContain('implementation-approval');
+    expect(directives).toContain('git-management');
   });
 
-  test('selects Go style rule for Go CLI project', async () => {
+  test('selects Go style directive for Go CLI project', async () => {
     const answers = {
       projectType: 'cli',
       language: 'go',
@@ -33,11 +33,11 @@ describe('Go Language Support', () => {
       additionalRules: [],
     };
 
-    const rules = await selectRules(answers);
+    const directives = await selectDirectives(answers);
 
-    expect(rules).toContain('go-style-conventions');
-    expect(rules).toContain('context-retrieval');
-    expect(rules).toContain('implementation-approval');
-    expect(rules.length).toBeGreaterThanOrEqual(3);
+    expect(directives).toContain('go-style-conventions');
+    expect(directives).toContain('context-retrieval');
+    expect(directives).toContain('implementation-approval');
+    expect(directives.length).toBeGreaterThanOrEqual(3);
   });
 });

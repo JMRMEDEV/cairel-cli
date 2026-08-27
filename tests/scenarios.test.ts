@@ -1,4 +1,4 @@
-import { selectRules } from '../src/core/rules-selector';
+import { selectDirectives } from '../src/core/directives-selector';
 import { QuickSetupAnswers, DetailedSetupAnswers } from '../src/types/wizard';
 
 describe('Comprehensive Scenario Testing', () => {
@@ -14,7 +14,7 @@ describe('Comprehensive Scenario Testing', () => {
     };
 
     it('TypeScript + React', async () => {
-      const rules = await selectRules({ ...baseAnswers, language: 'typescript' as const });
+      const rules = await selectDirectives({ ...baseAnswers, language: 'typescript' as const });
       
       expect(rules).toContain('typescript-validation');
       expect(rules).toContain('component-structure');
@@ -23,7 +23,7 @@ describe('Comprehensive Scenario Testing', () => {
     });
 
     it('JavaScript + React', async () => {
-      const rules = await selectRules({ ...baseAnswers, language: 'javascript' as const });
+      const rules = await selectDirectives({ ...baseAnswers, language: 'javascript' as const });
       
       expect(rules).not.toContain('typescript-validation');
       expect(rules).toContain('component-structure');
@@ -32,7 +32,7 @@ describe('Comprehensive Scenario Testing', () => {
     });
 
     it('Python (no React rules)', async () => {
-      const rules = await selectRules({ ...baseAnswers, language: 'python' as const, framework: 'none' as const });
+      const rules = await selectDirectives({ ...baseAnswers, language: 'python' as const, framework: 'none' as const });
       
       expect(rules).not.toContain('typescript-validation');
       expect(rules).not.toContain('component-structure');
@@ -53,28 +53,28 @@ describe('Comprehensive Scenario Testing', () => {
     };
 
     it('React', async () => {
-      const rules = await selectRules({ ...baseAnswers, framework: 'react' as const });
+      const rules = await selectDirectives({ ...baseAnswers, framework: 'react' as const });
       
       expect(rules).toContain('react-props-destructuring');
       expect(rules).toContain('component-structure');
     });
 
     it('React Native', async () => {
-      const rules = await selectRules({ ...baseAnswers, framework: 'react-native' as const });
+      const rules = await selectDirectives({ ...baseAnswers, framework: 'react-native' as const });
       
       expect(rules).toContain('react-props-destructuring');
       expect(rules).toContain('component-structure');
     });
 
     it('Next.js', async () => {
-      const rules = await selectRules({ ...baseAnswers, framework: 'next-js' as const });
+      const rules = await selectDirectives({ ...baseAnswers, framework: 'next-js' as const });
       
       expect(rules).toContain('react-props-destructuring');
       expect(rules).toContain('component-structure');
     });
 
     it('Vue (no React rules)', async () => {
-      const rules = await selectRules({ ...baseAnswers, framework: 'vue' as const });
+      const rules = await selectDirectives({ ...baseAnswers, framework: 'vue' as const });
       
       expect(rules).not.toContain('react-props-destructuring');
       expect(rules).not.toContain('component-structure');
@@ -93,28 +93,28 @@ describe('Comprehensive Scenario Testing', () => {
     };
 
     it('UI project', async () => {
-      const rules = await selectRules({ ...baseAnswers, projectType: 'ui' as const });
+      const rules = await selectDirectives({ ...baseAnswers, projectType: 'ui' as const });
       
       expect(rules).toContain('visual-verification');
       expect(rules).toContain('mock-data-strategy');
     });
 
     it('Backend project', async () => {
-      const rules = await selectRules({ ...baseAnswers, projectType: 'backend' as const });
+      const rules = await selectDirectives({ ...baseAnswers, projectType: 'backend' as const });
       
       expect(rules).not.toContain('visual-verification');
       expect(rules).not.toContain('mock-data-strategy');
     });
 
     it('Fullstack project', async () => {
-      const rules = await selectRules({ ...baseAnswers, projectType: 'fullstack' as const });
+      const rules = await selectDirectives({ ...baseAnswers, projectType: 'fullstack' as const });
       
       expect(rules).toContain('visual-verification');
       expect(rules).toContain('mock-data-strategy');
     });
 
     it('CLI project', async () => {
-      const rules = await selectRules({ ...baseAnswers, projectType: 'cli' as const });
+      const rules = await selectDirectives({ ...baseAnswers, projectType: 'cli' as const });
       
       expect(rules).not.toContain('visual-verification');
       expect(rules).not.toContain('mock-data-strategy');
@@ -133,12 +133,12 @@ describe('Comprehensive Scenario Testing', () => {
     };
 
     it('With Git', async () => {
-      const rules = await selectRules({ ...baseAnswers, useGit: true });
+      const rules = await selectDirectives({ ...baseAnswers, useGit: true });
       expect(rules).toContain('git-management');
     });
 
     it('Without Git', async () => {
-      const rules = await selectRules({ ...baseAnswers, useGit: false });
+      const rules = await selectDirectives({ ...baseAnswers, useGit: false });
       expect(rules).not.toContain('git-management');
     });
   });
@@ -160,53 +160,53 @@ describe('Comprehensive Scenario Testing', () => {
     };
 
     it('With ESLint', async () => {
-      const rules = await selectRules({ ...baseAnswers, linter: 'eslint' as const });
+      const rules = await selectDirectives({ ...baseAnswers, linter: 'eslint' as const });
       expect(rules).toContain('eslint-configuration');
     });
 
     it('Without ESLint', async () => {
-      const rules = await selectRules({ ...baseAnswers, linter: 'none' as const });
+      const rules = await selectDirectives({ ...baseAnswers, linter: 'none' as const });
       expect(rules).not.toContain('eslint-configuration');
     });
 
     it('With Semantic Versioning', async () => {
-      const rules = await selectRules({ ...baseAnswers, versioningStrategy: 'semantic' as const });
+      const rules = await selectDirectives({ ...baseAnswers, versioningStrategy: 'semantic' as const });
       expect(rules).toContain('semantic-versioning');
     });
 
     it('Without Semantic Versioning', async () => {
-      const rules = await selectRules({ ...baseAnswers, versioningStrategy: 'none' as const });
+      const rules = await selectDirectives({ ...baseAnswers, versioningStrategy: 'none' as const });
       expect(rules).not.toContain('semantic-versioning');
     });
 
     it('With Chakra UI', async () => {
-      const rules = await selectRules({ ...baseAnswers, uiLibrary: 'chakra-ui' as const });
+      const rules = await selectDirectives({ ...baseAnswers, uiLibrary: 'chakra-ui' as const });
       expect(rules).toContain('chakra-ui-v3-integration');
     });
 
     it('With GlueStack UI', async () => {
-      const rules = await selectRules({ ...baseAnswers, uiLibrary: 'gluestack-ui' as const });
+      const rules = await selectDirectives({ ...baseAnswers, uiLibrary: 'gluestack-ui' as const });
       expect(rules).toContain('gluestack-ui-v1-themed');
     });
 
     it('Without UI Library', async () => {
-      const rules = await selectRules({ ...baseAnswers, uiLibrary: 'none' as const });
+      const rules = await selectDirectives({ ...baseAnswers, uiLibrary: 'none' as const });
       expect(rules).not.toContain('chakra-ui-v3-integration');
       expect(rules).not.toContain('gluestack-ui-v1-themed');
     });
 
     it('With Environment Variables (protected)', async () => {
-      const rules = await selectRules({ ...baseAnswers, envVarStrategy: 'yes-with-prod-protection' as const });
+      const rules = await selectDirectives({ ...baseAnswers, envVarStrategy: 'yes-with-prod-protection' as const });
       expect(rules).toContain('multi-environment-management');
     });
 
     it('With Environment Variables (unprotected)', async () => {
-      const rules = await selectRules({ ...baseAnswers, envVarStrategy: 'yes-without-protection' as const });
+      const rules = await selectDirectives({ ...baseAnswers, envVarStrategy: 'yes-without-protection' as const });
       expect(rules).toContain('multi-environment-management');
     });
 
     it('Without Environment Variables', async () => {
-      const rules = await selectRules({ ...baseAnswers, envVarStrategy: 'no' as const });
+      const rules = await selectDirectives({ ...baseAnswers, envVarStrategy: 'no' as const });
       expect(rules).not.toContain('multi-environment-management');
     });
   });
@@ -230,7 +230,7 @@ describe('Comprehensive Scenario Testing', () => {
         versioningStrategy: 'semantic',
       };
 
-      const rules = await selectRules(answers);
+      const rules = await selectDirectives(answers);
 
       // Should have comprehensive rule set
       expect(rules).toContain('context-retrieval');
@@ -260,7 +260,7 @@ describe('Comprehensive Scenario Testing', () => {
         mcpServers: [],
       };
 
-      const rules = await selectRules(answers);
+      const rules = await selectDirectives(answers);
 
       // Should have minimal rule set
       expect(rules).toContain('context-retrieval');
@@ -291,7 +291,7 @@ describe('Comprehensive Scenario Testing', () => {
         versioningStrategy: 'semantic',
       };
 
-      const rules = await selectRules(answers);
+      const rules = await selectDirectives(answers);
 
       expect(rules).toContain('typescript-validation');
       expect(rules).toContain('react-props-destructuring');

@@ -1,0 +1,8 @@
+---
+description: "Enforce absolute imports across the codebase."
+alwaysApply: true
+---
+
+# Absolute Imports
+
+Use absolute imports.

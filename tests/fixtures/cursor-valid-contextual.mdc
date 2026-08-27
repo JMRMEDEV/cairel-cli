@@ -1,0 +1,10 @@
+---
+description: "Apply component structure conventions when editing React files."
+globs:
+  - "src/**/*.tsx"
+  - "src/**/*.jsx"
+---
+
+# Component Structure
+
+One component per file.

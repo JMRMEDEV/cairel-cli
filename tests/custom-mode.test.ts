@@ -45,6 +45,11 @@ describe('Custom Mode Tests', () => {
         .mockResolvedValueOnce(['kiro'])       // platforms
         .mockResolvedValueOnce(['context-retrieval', 'implementation-approval', 'typescript-validation']) // rules
         .mockResolvedValueOnce(['amazon-q-history']); // mcpServers
+      // Enforcement: per-directive select for 3 directives
+      mockSelect
+        .mockResolvedValueOnce('contextual')   // context-retrieval
+        .mockResolvedValueOnce('enforced')     // implementation-approval
+        .mockResolvedValueOnce('enforced');    // typescript-validation
       mockConfirm
         .mockResolvedValueOnce(true)           // generateAgent
         .mockResolvedValueOnce(false);         // wantsReview
@@ -63,6 +68,10 @@ describe('Custom Mode Tests', () => {
       mockCheckbox
         .mockResolvedValueOnce(['amazon-q'])   // platforms
         .mockResolvedValueOnce(['context-retrieval', 'implementation-approval']); // rules, no MCP prompt
+      // Enforcement: per-directive select for 2 directives
+      mockSelect
+        .mockResolvedValueOnce('contextual')   // context-retrieval
+        .mockResolvedValueOnce('enforced');    // implementation-approval
       mockConfirm
         .mockResolvedValueOnce(true)           // generateAgent
         .mockResolvedValueOnce(false);         // wantsReview
@@ -82,6 +91,13 @@ describe('Custom Mode Tests', () => {
           'typescript-validation', 'component-structure', 'git-management',
         ])
         .mockResolvedValueOnce([]); // mcpServers
+      // Enforcement: per-directive select for 5 directives
+      mockSelect
+        .mockResolvedValueOnce('contextual')   // context-retrieval
+        .mockResolvedValueOnce('enforced')     // implementation-approval
+        .mockResolvedValueOnce('enforced')     // typescript-validation
+        .mockResolvedValueOnce('contextual')   // component-structure
+        .mockResolvedValueOnce('enforced');    // git-management
       mockConfirm
         .mockResolvedValueOnce(true)
         .mockResolvedValueOnce(false);
@@ -171,7 +187,8 @@ describe('Custom Mode Tests', () => {
         .mockResolvedValueOnce('chakra-ui')
         .mockResolvedValueOnce('pnpm')
         .mockResolvedValueOnce('yes-with-prod-protection')
-        .mockResolvedValueOnce('semantic');
+        .mockResolvedValueOnce('semantic')
+        .mockResolvedValueOnce('accept'); // enforcement step
       mockConfirm
         .mockResolvedValueOnce(true)   // useGit
         .mockResolvedValueOnce(true)   // generateAgent
@@ -197,7 +214,8 @@ describe('Custom Mode Tests', () => {
         .mockResolvedValueOnce('gluestack-ui')
         .mockResolvedValueOnce('yarn')
         .mockResolvedValueOnce('no')
-        .mockResolvedValueOnce('none');
+        .mockResolvedValueOnce('none')
+        .mockResolvedValueOnce('accept'); // enforcement step
       mockConfirm
         .mockResolvedValueOnce(true)   // useGit
         .mockResolvedValueOnce(true)   // generateAgent
@@ -226,7 +244,14 @@ describe('Custom Mode Tests', () => {
         .mockResolvedValueOnce([
           'context-retrieval', 'implementation-approval',
           'typescript-validation', 'git-management',
-        ])
+        ]);
+      // Enforcement: per-directive select for 4 directives
+      mockSelect
+        .mockResolvedValueOnce('contextual')   // context-retrieval
+        .mockResolvedValueOnce('enforced')     // implementation-approval
+        .mockResolvedValueOnce('enforced')     // typescript-validation
+        .mockResolvedValueOnce('enforced');    // git-management
+      mockCheckbox
         .mockResolvedValueOnce([])     // mcpServers
         .mockResolvedValueOnce(['context-retrieval', 'implementation-approval']); // finalRules
       mockConfirm
@@ -246,7 +271,12 @@ describe('Custom Mode Tests', () => {
       mockSelect.mockResolvedValueOnce('custom');
       mockCheckbox
         .mockResolvedValueOnce(['kiro'])
-        .mockResolvedValueOnce(['context-retrieval', 'implementation-approval'])
+        .mockResolvedValueOnce(['context-retrieval', 'implementation-approval']);
+      // Enforcement: per-directive select for 2 directives
+      mockSelect
+        .mockResolvedValueOnce('contextual')   // context-retrieval
+        .mockResolvedValueOnce('enforced');    // implementation-approval
+      mockCheckbox
         .mockResolvedValueOnce([])
         .mockResolvedValueOnce(['context-retrieval']);
       mockConfirm
@@ -260,18 +290,23 @@ describe('Custom Mode Tests', () => {
 
   describe('Edge Cases', () => {
     test('custom mode with all rules selected', async () => {
+      const allRules = [
+        'context-retrieval', 'implementation-approval', 'package-manager-safety',
+        'typescript-validation', 'component-structure', 'git-management',
+        'visual-verification', 'multi-environment-management', 'semantic-versioning',
+        'react-props-destructuring', 'mock-data-strategy', 'icon-usage-patterns',
+        'absolute-imports', 'chakra-ui-v3-integration', 'gluestack-ui-v1-themed',
+        'eslint-configuration', 'package-json-management',
+      ];
       mockSelect.mockResolvedValueOnce('custom');
       mockCheckbox
         .mockResolvedValueOnce(['kiro', 'amazon-q'])
-        .mockResolvedValueOnce([
-          'context-retrieval', 'implementation-approval', 'package-manager-safety',
-          'typescript-validation', 'component-structure', 'git-management',
-          'visual-verification', 'multi-environment-management', 'semantic-versioning',
-          'react-props-destructuring', 'mock-data-strategy', 'icon-usage-patterns',
-          'absolute-imports', 'chakra-ui-v3-integration', 'gluestack-ui-v1-themed',
-          'eslint-configuration', 'package-json-management',
-        ])
+        .mockResolvedValueOnce(allRules)
         .mockResolvedValueOnce(['amazon-q-history']);
+      // Enforcement: per-directive select for all 17 directives
+      for (let i = 0; i < allRules.length; i++) {
+        mockSelect.mockResolvedValueOnce('contextual');
+      }
       mockConfirm
         .mockResolvedValueOnce(true)
         .mockResolvedValueOnce(false);

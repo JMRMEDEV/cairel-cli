@@ -1,0 +1,8 @@
+---
+description: "Always apply TypeScript validation to catch type errors early."
+alwaysApply: true
+---
+
+# TypeScript Validation
+
+Run tsc after every change.
