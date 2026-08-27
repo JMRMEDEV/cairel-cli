@@ -67,19 +67,20 @@ DIR-07   | P1 | MVP      | Add Cursor as a supported platform                   
 DIR-08   | P2 | MVP      | Validate directives per enforcement level              | directives   | cli
 DIR-09   | P1 | MVP      | Enforced directive content is concise extract          | directives   | cli
 DIR-10   | P2 | MVP      | Update command respects enforcement levels             | directives   | cli
+REL-01   | P2 | MVP      | Automated semver release from Conventional Commits     | release      | cli
 ```
 
 ## Counts
 
 | Filter | Count |
 |--------|-------|
-| Total | 55 |
+| Total | 56 |
 | Done | 22 |
-| MVP | 23 |
+| MVP | 24 |
 | Post-MVP | 10 |
 | P0 | 22 |
 | P1 | 19 |
-| P2 | 9 |
+| P2 | 10 |
 | P3 | 8 |
 
 ### By Domain
@@ -95,9 +96,10 @@ DIR-10   | P2 | MVP      | Update command respects enforcement levels           
 | constraints | 7 |
 | carm | 4 |
 | enhancements | 5 |
+| release | 1 |
 
 ### By Subproject (stories touching each)
 | Subproject | Total | Done | MVP |
 |------------|-------|------|-----|
-| cli | 40 | 22 | 9 |
+| cli | 41 | 22 | 10 |
 | mcp | 5 | 0 | 5 |
