@@ -28,7 +28,10 @@ describe('Update Command', () => {
         encoding: 'utf-8',
       });
 
-      expect(result).toContain('No existing configuration found');
+      // Note: 'No existing configuration found' is emitted via ora spinner.fail(),
+      // which writes to stderr. execSync's default return captures stdout only, so we
+      // assert against the stdout message the command emits next.
+      expect(result).toContain('Run "cairel init"');
       expect(result).toContain('cairel init');
     });
 
@@ -114,7 +117,7 @@ describe('Update Command', () => {
         });
       } catch (error: any) {
         expect(error.stdout || '').toContain('What would you like to update');
-        expect(error.stdout || '').toContain('Skills only');
+        expect(error.stdout || '').toContain('Directives only');
         expect(error.stdout || '').toContain('Agents only');
         expect(error.stdout || '').toContain('Both');
       }
