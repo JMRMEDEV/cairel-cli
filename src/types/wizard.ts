@@ -4,13 +4,20 @@ export type ProjectType = 'ui' | 'backend' | 'cli' | 'library' | 'fullstack';
 export type Language = 'typescript' | 'javascript' | 'python' | 'go' | 'lua';
 export type Framework = 'react' | 'react-native' | 'next-js' | 'vue' | 'express' | 'fastify' | 'nest-js' | 'nestjs' | 'flask' | 'django' | 'fastapi' | 'gin' | 'echo' | 'fiber' | 'chi' | 'none';
 export type AITool = 'kiro-cli' | 'amazon-q' | 'both';
-export type Platform = 'kiro' | 'claude-code' | 'github-copilot' | 'amazon-q';
+export type Platform = 'kiro' | 'cursor' | 'claude-code' | 'github-copilot' | 'amazon-q';
 export type PackageManager = 'npm' | 'yarn' | 'pnpm';
 export type TestingFramework = 'jest' | 'vitest' | 'pytest' | 'testing (built-in)' | 'testify' | 'none';
 export type Linter = 'eslint' | 'ruff' | 'luacheck' | 'golangci-lint' | 'none';
 export type UILibrary = 'chakra-ui' | 'gluestack-ui' | 'tailwind-css' | 'material-ui' | 'none';
 export type EnvVarStrategy = 'yes-with-prod-protection' | 'yes-without-protection' | 'no';
 export type VersioningStrategy = 'semantic' | 'calver' | 'none';
+export type EnforcementLevel = 'enforced' | 'contextual' | 'available';
+
+/**
+ * Map from directive ID to its enforcement level.
+ * Used to override manifest defaults when the user customizes enforcement.
+ */
+export type EnforcementOverrides = Record<string, EnforcementLevel>;
 
 export interface QuickSetupAnswers {
   mode: 'quick';
@@ -24,6 +31,7 @@ export interface QuickSetupAnswers {
   additionalSkills?: string[];
   generateAgent?: boolean;
   selectedRules?: string[];
+  enforcementOverrides?: EnforcementOverrides;
 }
 
 export interface DetailedSetupAnswers {
@@ -44,6 +52,7 @@ export interface DetailedSetupAnswers {
   packageManager?: PackageManager;
   envVarStrategy: EnvVarStrategy;
   versioningStrategy: VersioningStrategy;
+  enforcementOverrides?: EnforcementOverrides;
 }
 
 export interface CustomModeAnswers {
@@ -53,6 +62,7 @@ export interface CustomModeAnswers {
   selectedRules: string[];
   mcpServers: string[];
   generateAgent?: boolean;
+  enforcementOverrides?: EnforcementOverrides;
 }
 
 export type WizardAnswers = QuickSetupAnswers | DetailedSetupAnswers | CustomModeAnswers;

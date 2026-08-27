@@ -5,29 +5,31 @@ import { promises as fs } from 'fs';
 import { join } from 'path';
 import { WizardMode, QuickSetupAnswers, DetailedSetupAnswers, CustomModeAnswers, Framework, AITool, Platform, TestingFramework, Linter, UILibrary, PackageManager, EnvVarStrategy, VersioningStrategy, WizardAnswers, UserCancelledError } from '../types/wizard';
 import { detectMCPServers } from '../utils/mcp-detector';
-import { selectRules } from './rules-selector';
+import { selectDirectives } from './directives-selector';
+import { selectEnforcement } from './enforcement-selector';
+import { loadManifestPublic } from './directives-selector';
 
 function getTerminalPageSize(): number {
   return Math.min((process.stdout.rows || 24) - 3, 15);
 }
 
-interface OptionalRule {
+interface OptionalDirective {
   id: string;
   title: string;
   description: string;
 }
 
-async function getOptionalRules(answers: Partial<QuickSetupAnswers>): Promise<OptionalRule[]> {
-  const manifestPath = join(__dirname, '..', '..', 'curated-presets', 'rules-manifest.json');
+async function getOptionalDirectives(answers: Partial<QuickSetupAnswers>): Promise<OptionalDirective[]> {
+  const manifestPath = join(__dirname, '..', '..', 'curated-presets', 'directives-manifest.json');
   const content = await fs.readFile(manifestPath, 'utf-8');
   const manifest = JSON.parse(content);
   
-  const unclassified = manifest.rules.filter((r: any) => !r.alwaysInclude && !r.conditions);
+  const unclassified = manifest.directives.filter((r: any) => !r.alwaysInclude && !r.conditions);
   
   return unclassified.map((r: any) => ({
     id: r.id,
     title: r.id.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()),
-    description: `Additional rule from ${r.category} category`,
+    description: `Additional directive from ${r.category} category`,
   }));
 }
 
@@ -39,7 +41,7 @@ export async function runWizard(): Promise<WizardAnswers> {
     choices: [
       { name: 'Quick Setup (High-level, recommended)', value: 'quick' },
       { name: 'Detailed Setup (Granular control)', value: 'detailed' },
-      { name: 'Custom (Select specific skills)', value: 'custom' },
+      { name: 'Custom (Select specific directives)', value: 'custom' },
     ],
   });
 
@@ -48,9 +50,17 @@ export async function runWizard(): Promise<WizardAnswers> {
   }
 
   const answers = mode === 'quick' ? await runQuickSetup() : await runDetailedSetup();
-  
+
+  // Resolve directives to determine which are selected
+  const resolvedDirectives = answers.selectedRules ?? await selectDirectives(answers);
+
+  // Enforcement selection step
+  const manifest = await loadManifestPublic();
+  const enforcementOverrides = await selectEnforcement(mode, resolvedDirectives, manifest);
+  answers.enforcementOverrides = enforcementOverrides;
+
   const wantsReview = await confirm({
-    message: 'Would you like to review and customize the skills before generating files?',
+    message: 'Would you like to review and customize the directives before generating files?',
     default: false,
   });
 
@@ -107,6 +117,7 @@ async function runQuickSetup(): Promise<QuickSetupAnswers> {
     message: 'Which platforms will you use? (select all that apply)',
     choices: [
       { name: 'Kiro', value: 'kiro' as const, checked: true },
+      { name: 'Cursor', value: 'cursor' as const },
       { name: 'Claude Code', value: 'claude-code' as const },
       { name: 'GitHub Copilot', value: 'github-copilot' as const },
       { name: 'Amazon Q Developer', value: 'amazon-q' as const },
@@ -134,7 +145,7 @@ async function runQuickSetup(): Promise<QuickSetupAnswers> {
   let generateAgent = false;
   if (supportsAgents) {
     generateAgent = await confirm({
-      message: 'Generate a default agent based on your selected skills?',
+      message: 'Generate a default agent based on your selected directives?',
       default: true,
     });
   }
@@ -151,11 +162,11 @@ async function runQuickSetup(): Promise<QuickSetupAnswers> {
     generateAgent,
   };
 
-  const optionalRules = await getOptionalRules(result);
-  if (optionalRules.length > 0) {
+  const optionalDirectives = await getOptionalDirectives(result);
+  if (optionalDirectives.length > 0) {
     result.additionalSkills = await checkbox({
-      message: 'Select additional skills (optional):',
-      choices: optionalRules.map(r => ({
+      message: 'Select additional directives (optional):',
+      choices: optionalDirectives.map(r => ({
         name: `${r.title} - ${r.description}`,
         value: r.id,
       })),
@@ -275,14 +286,14 @@ function getLinterChoices(language: string): string[] {
 }
 
 async function runCustomSetup(): Promise<CustomModeAnswers> {
-  console.log(chalk.yellow('\n📝 Custom Mode: Select specific rules for your project\n'));
+  console.log(chalk.yellow('\n📝 Custom Mode: Select specific directives for your project\n'));
 
-  const manifestPath = join(__dirname, '..', '..', 'curated-presets', 'rules-manifest.json');
+  const manifestPath = join(__dirname, '..', '..', 'curated-presets', 'directives-manifest.json');
   const content = await fs.readFile(manifestPath, 'utf-8');
   const manifest = JSON.parse(content);
 
   const rulesByCategory: Record<string, any[]> = {};
-  manifest.rules.forEach((rule: any) => {
+  manifest.directives.forEach((rule: any) => {
     const category = rule.category || 'other';
     if (!rulesByCategory[category]) {
       rulesByCategory[category] = [];
@@ -294,6 +305,7 @@ async function runCustomSetup(): Promise<CustomModeAnswers> {
     message: 'Which platforms will you use? (select all that apply)',
     choices: [
       { name: 'Kiro', value: 'kiro' as const, checked: true },
+      { name: 'Cursor', value: 'cursor' as const },
       { name: 'Claude Code', value: 'claude-code' as const },
       { name: 'GitHub Copilot', value: 'github-copilot' as const },
       { name: 'Amazon Q Developer', value: 'amazon-q' as const },
@@ -313,12 +325,15 @@ async function runCustomSetup(): Promise<CustomModeAnswers> {
   ]);
 
   const selectedRules = await checkbox({
-    message: 'Select rules to include:',
+    message: 'Select directives to include:',
     choices: ruleChoices,
     pageSize: getTerminalPageSize(),
     loop: false,
     required: true,
   });
+
+  // Enforcement selection: per-directive in custom mode
+  const enforcementOverrides = await selectEnforcement('custom', selectedRules, manifest);
 
   const spinner = ora('Detecting MCP servers...').start();
   const detectedServers = detectMCPServers();
@@ -339,7 +354,7 @@ async function runCustomSetup(): Promise<CustomModeAnswers> {
   let generateAgent = false;
   if (supportsAgents) {
     generateAgent = await confirm({
-      message: 'Generate a default agent based on your selected skills?',
+      message: 'Generate a default agent based on your selected directives?',
       default: true,
     });
   }
@@ -351,15 +366,16 @@ async function runCustomSetup(): Promise<CustomModeAnswers> {
     selectedRules,
     mcpServers,
     generateAgent,
+    enforcementOverrides,
   };
 
   const wantsReview = await confirm({
-    message: 'Would you like to review and customize the skills before generating files?',
+    message: 'Would you like to review and customize the directives before generating files?',
     default: false,
   });
 
   if (wantsReview) {
-    const reviewedRules = await reviewAndSelectRulesCustom(result.selectedRules, manifest.rules);
+    const reviewedRules = await reviewAndSelectRulesCustom(result.selectedRules, manifest.directives);
     if (!reviewedRules) {
       throw new UserCancelledError('Configuration cancelled during review');
     }
@@ -370,16 +386,16 @@ async function runCustomSetup(): Promise<CustomModeAnswers> {
 }
 
 async function reviewAndSelectRules(answers: QuickSetupAnswers | DetailedSetupAnswers): Promise<string[] | null> {
-  console.log(chalk.bold.cyan('\n📋 Review & Customize Rules\n'));
+  console.log(chalk.bold.cyan('\n📋 Review & Customize Directives\n'));
 
-  const selectedRules = await selectRules(answers);
+  const selectedRules = await selectDirectives(answers);
   
-  const manifestPath = join(__dirname, '..', '..', 'curated-presets', 'rules-manifest.json');
+  const manifestPath = join(__dirname, '..', '..', 'curated-presets', 'directives-manifest.json');
   const content = await fs.readFile(manifestPath, 'utf-8');
   const manifest = JSON.parse(content);
 
   const ruleChoices = selectedRules.map(ruleId => {
-    const rule = manifest.rules.find((r: any) => r.id === ruleId);
+    const rule = manifest.directives.find((r: any) => r.id === ruleId);
     const description = rule?.description || 'No description';
     return {
       name: `${ruleId.replace(/-/g, ' ')} - ${description}`,
@@ -389,7 +405,7 @@ async function reviewAndSelectRules(answers: QuickSetupAnswers | DetailedSetupAn
   });
 
   const finalRules = await checkbox({
-    message: 'Select rules to include (uncheck to exclude):',
+    message: 'Select directives to include (uncheck to exclude):',
     choices: ruleChoices,
     pageSize: getTerminalPageSize(),
     loop: false,
@@ -397,7 +413,7 @@ async function reviewAndSelectRules(answers: QuickSetupAnswers | DetailedSetupAn
   });
 
   const confirmed = await confirm({
-    message: `Proceed with ${finalRules.length} rule(s)?`,
+    message: `Proceed with ${finalRules.length} directive(s)?`,
     default: true,
   });
 
@@ -405,7 +421,7 @@ async function reviewAndSelectRules(answers: QuickSetupAnswers | DetailedSetupAn
 }
 
 async function reviewAndSelectRulesCustom(selectedRules: string[], allRules: any[]): Promise<string[] | null> {
-  console.log(chalk.bold.cyan('\n📋 Review & Customize Rules\n'));
+  console.log(chalk.bold.cyan('\n📋 Review & Customize Directives\n'));
 
   const ruleChoices = selectedRules.map(ruleId => {
     const rule = allRules.find((r: any) => r.id === ruleId);
@@ -418,7 +434,7 @@ async function reviewAndSelectRulesCustom(selectedRules: string[], allRules: any
   });
 
   const finalRules = await checkbox({
-    message: 'Select rules to include (uncheck to exclude):',
+    message: 'Select directives to include (uncheck to exclude):',
     choices: ruleChoices,
     pageSize: getTerminalPageSize(),
     loop: false,
@@ -426,7 +442,7 @@ async function reviewAndSelectRulesCustom(selectedRules: string[], allRules: any
   });
 
   const confirmed = await confirm({
-    message: `Proceed with ${finalRules.length} rule(s)?`,
+    message: `Proceed with ${finalRules.length} directive(s)?`,
     default: true,
   });
 

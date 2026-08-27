@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
-interface Rule {
+interface Directive {
   id: string;
   title: string;
   description: string;
@@ -12,22 +12,23 @@ interface Rule {
   conditions?: Record<string, string[] | boolean>;
 }
 
-interface RulesManifest {
-  rules: Rule[];
+interface DirectivesManifest {
+  directives: Directive[];
 }
 
 export const listCommand = new Command('list')
-  .description('List available skills and presets')
-  .option('--skills', 'List only skills')
-  .addOption(new Option('--rules', 'List only skills (alias for --skills)').hideHelp())
+  .description('List available directives and presets')
+  .option('--directives', 'List only directives')
+  .addOption(new Option('--skills', 'List only directives (alias for --directives)').hideHelp())
+  .addOption(new Option('--rules', 'List only directives (alias for --directives)').hideHelp())
   .option('--agents', 'List only agents')
   .option('--category <category>', 'Filter by category')
   .action((options) => {
-    const showSkills = options.skills || options.rules;
-    const showAgents = options.agents && !showSkills;
+    const showDirectives = options.directives || options.skills || options.rules;
+    const showAgents = options.agents && !showDirectives;
 
     if (!showAgents) {
-      displayRules(options.category);
+      displayDirectives(options.category);
     }
 
     if (showAgents) {
@@ -35,49 +36,49 @@ export const listCommand = new Command('list')
     }
   });
 
-function displayRules(categoryFilter?: string): void {
-  const manifestPath = join(__dirname, '../../curated-presets/rules-manifest.json');
-  const manifest: RulesManifest = JSON.parse(readFileSync(manifestPath, 'utf-8'));
+function displayDirectives(categoryFilter?: string): void {
+  const manifestPath = join(__dirname, '../../curated-presets/directives-manifest.json');
+  const manifest: DirectivesManifest = JSON.parse(readFileSync(manifestPath, 'utf-8'));
 
-  let rules = manifest.rules;
+  let directives = manifest.directives;
 
   if (categoryFilter) {
-    rules = rules.filter((rule) => rule.category === categoryFilter);
-    if (rules.length === 0) {
-      console.log(chalk.yellow(`⚠️  No skills found for category: ${categoryFilter}`));
+    directives = directives.filter((directive) => directive.category === categoryFilter);
+    if (directives.length === 0) {
+      console.log(chalk.yellow(`⚠️  No directives found for category: ${categoryFilter}`));
       return;
     }
   }
 
-  const rulesByCategory = rules.reduce((acc, rule) => {
-    if (!acc[rule.category]) {
-      acc[rule.category] = [];
+  const directivesByCategory = directives.reduce((acc, directive) => {
+    if (!acc[directive.category]) {
+      acc[directive.category] = [];
     }
-    acc[rule.category]!.push(rule);
+    acc[directive.category]!.push(directive);
     return acc;
-  }, {} as Record<string, Rule[]>);
+  }, {} as Record<string, Directive[]>);
 
-  console.log(chalk.bold.blue('\n📋 Available Skills\n'));
+  console.log(chalk.bold.blue('\n📋 Available Directives\n'));
 
-  for (const [category, categoryRules] of Object.entries(rulesByCategory)) {
+  for (const [category, categoryDirectives] of Object.entries(directivesByCategory)) {
     const separator = '━'.repeat(80);
     console.log(chalk.gray(separator));
-    console.log(chalk.bold.cyan(`${category.toUpperCase()} (${categoryRules.length} skills)`));
+    console.log(chalk.bold.cyan(`${category.toUpperCase()} (${categoryDirectives.length} directives)`));
     console.log(chalk.gray(separator));
     console.log();
 
-    for (const rule of categoryRules) {
-      const icon = rule.alwaysInclude ? chalk.green('✓') : chalk.yellow('⚙');
-      const badge = rule.alwaysInclude
+    for (const directive of categoryDirectives) {
+      const icon = directive.alwaysInclude ? chalk.green('✓') : chalk.yellow('⚙');
+      const badge = directive.alwaysInclude
         ? chalk.green('[Always Included]')
         : chalk.yellow('[Conditional]');
 
-      console.log(`${icon} ${chalk.bold(rule.id)} ${badge}`);
-      console.log(`  ${chalk.white(rule.title)}`);
-      console.log(`  ${chalk.gray(rule.description)}`);
+      console.log(`${icon} ${chalk.bold(directive.id)} ${badge}`);
+      console.log(`  ${chalk.white(directive.title)}`);
+      console.log(`  ${chalk.gray(directive.description)}`);
 
-      if (rule.conditions && Object.keys(rule.conditions).length > 0) {
-        const conditionStr = Object.entries(rule.conditions)
+      if (directive.conditions && Object.keys(directive.conditions).length > 0) {
+        const conditionStr = Object.entries(directive.conditions)
           .map(([key, values]) => {
             if (typeof values === 'boolean') {
               return `${key}=${values}`;
@@ -92,7 +93,7 @@ function displayRules(categoryFilter?: string): void {
     }
   }
 
-  console.log(chalk.gray(`Total: ${rules.length} rules\n`));
+  console.log(chalk.gray(`Total: ${directives.length} directives\n`));
 }
 
 function displayAgents(): void {

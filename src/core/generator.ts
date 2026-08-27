@@ -6,7 +6,8 @@ import chalk from 'chalk';
 import ora from 'ora';
 import { select, checkbox, confirm } from '@inquirer/prompts';
 import { QuickSetupAnswers, DetailedSetupAnswers, CustomModeAnswers, Platform, WizardAnswers, isCustomMode, isProjectSetup, isDetailedMode } from '../types/wizard';
-import { selectRules } from './rules-selector';
+import { selectDirectives, loadManifestPublic } from './directives-selector';
+import { generateDirectives, DirectiveInfo, GenerationResult } from './directive-generator';
 
 interface PlatformPaths {
   skillsDir: string;
@@ -17,6 +18,8 @@ function getPlatformPaths(platform: Platform, targetDir: string): PlatformPaths 
   switch (platform) {
     case 'kiro':
       return { skillsDir: join(targetDir, '.kiro', 'skills'), agentsDir: join(targetDir, '.kiro', 'agents') };
+    case 'cursor':
+      return { skillsDir: join(targetDir, '.cursor', 'rules'), agentsDir: join(targetDir, '.cursor', 'rules') };
     case 'claude-code':
       return { skillsDir: join(targetDir, '.claude', 'skills'), agentsDir: join(targetDir, '.claude', 'skills') };
     case 'github-copilot':
@@ -34,97 +37,64 @@ export async function generateFiles(
 
   try {
     const platforms: Platform[] = answers.platforms || [answers.aiTool === 'amazon-q' ? 'amazon-q' : 'kiro'];
-    const rules = isCustomMode(answers)
+    const ruleIds = isCustomMode(answers)
       ? answers.selectedRules
-      : (answers.selectedRules ?? await selectRules(answers));
+      : (answers.selectedRules ?? await selectDirectives(answers));
+
+    // Load manifest to get enforcement levels and metadata for selected directives
+    const manifest = await loadManifestPublic();
+    const directiveInfos: DirectiveInfo[] = ruleIds.map(id => {
+      const def = manifest.directives.find(d => d.id === id);
+      // Use user-selected enforcement overrides if present, otherwise fall back to manifest
+      const enforcement = answers.enforcementOverrides?.[id] ?? def?.enforcement ?? 'contextual';
+      return {
+        id,
+        enforcement,
+        description: def?.description ?? '',
+        title: def?.title ?? id,
+      };
+    });
+
+    const allWarnings: GenerationResult['warnings'] = [];
 
     for (const platform of platforms) {
-      const paths = getPlatformPaths(platform, targetDir);
-      await fs.mkdir(paths.skillsDir, { recursive: true });
-
-      if (platform === 'amazon-q') {
-        // Legacy flat format for Amazon Q
-        await copyRulesFlat(rules, paths.skillsDir);
-      } else {
-        // Skills folder format for all other platforms
-        await copySkillFolders(rules, paths.skillsDir);
-      }
+      // Generate directives with enforcement-aware routing
+      const genResult = await generateDirectives(directiveInfos, platform, targetDir);
+      allWarnings.push(...genResult.warnings);
 
       // Generate agent only for platforms that use them, and only if user opted in
       const wantsAgent = answers.generateAgent !== false;
       if (wantsAgent && (platform === 'kiro' || platform === 'amazon-q')) {
+        const paths = getPlatformPaths(platform, targetDir);
         await fs.mkdir(paths.agentsDir, { recursive: true });
         await generateAgent(answers, paths.agentsDir, platform);
       } else if (platform === 'kiro' || platform === 'amazon-q') {
-        // If not generating a new agent, check for existing agents to patch
+        const paths = getPlatformPaths(platform, targetDir);
         await patchExistingAgents(paths.agentsDir, platform);
       }
     }
 
     spinner.succeed(chalk.green('Configuration generated successfully!'));
 
+    // Print warnings
+    if (allWarnings.length > 0) {
+      console.log(chalk.yellow('\n⚠️  Warnings:'));
+      for (const warn of allWarnings) {
+        console.log(chalk.yellow(`  - ${warn.message}`));
+      }
+    }
+
     // Show summary
     console.log(chalk.bold('\n📁 Generated files:'));
     for (const platform of platforms) {
-      const paths = getPlatformPaths(platform, targetDir);
-      console.log(chalk.cyan(`  ${paths.skillsDir}/`));
-      if (platform === 'amazon-q') {
-        rules.forEach(rule => console.log(chalk.gray(`    - ${rule}.md`)));
-      } else {
-        rules.forEach(rule => console.log(chalk.gray(`    - ${rule}/SKILL.md`)));
+      console.log(chalk.cyan(`  Platform: ${platform}`));
+      for (const info of directiveInfos) {
+        console.log(chalk.gray(`    - ${info.id} (${info.enforcement})`));
       }
     }
   } catch (error) {
     spinner.fail(chalk.red('Failed to generate configuration'));
     throw error;
-  }
-}
-
-async function copySkillFolders(rules: string[], targetDir: string): Promise<void> {
-  const sourceBase = join(__dirname, '..', '..', 'curated-presets', 'skills');
-
-  for (const ruleName of rules) {
-    const sourceSkill = join(sourceBase, ruleName, 'SKILL.md');
-    const targetSkillDir = join(targetDir, ruleName);
-    const targetSkill = join(targetSkillDir, 'SKILL.md');
-
-    try {
-      await fs.mkdir(targetSkillDir, { recursive: true });
-      const content = await fs.readFile(sourceSkill, 'utf-8');
-      await fs.writeFile(targetSkill, content, 'utf-8');
-
-      // Copy references/ if exists
-      const refsDir = join(sourceBase, ruleName, 'references');
-      try {
-        const refs = await fs.readdir(refsDir);
-        const targetRefs = join(targetSkillDir, 'references');
-        await fs.mkdir(targetRefs, { recursive: true });
-        for (const ref of refs) {
-          const src = join(refsDir, ref);
-          await fs.copyFile(src, join(targetRefs, ref));
-        }
-      } catch {
-        // No references/ directory — expected for most skills
-      }
-    } catch (error) {
-      console.warn(chalk.yellow(`Warning: Could not copy skill ${ruleName}`));
-    }
-  }
-}
-
-async function copyRulesFlat(rules: string[], targetDir: string): Promise<void> {
-  const sourceBase = join(__dirname, '..', '..', 'curated-presets', 'skills');
-
-  for (const ruleName of rules) {
-    const sourcePath = join(sourceBase, ruleName, 'SKILL.md');
-    const targetPath = join(targetDir, `${ruleName}.md`);
-
-    try {
-      const content = await fs.readFile(sourcePath, 'utf-8');
-      await fs.writeFile(targetPath, content, 'utf-8');
-    } catch (error) {
-      console.warn(chalk.yellow(`Warning: Could not copy skill ${ruleName}`));
-    }
   }
 }
 
@@ -234,6 +204,7 @@ async function patchExistingAgents(agentsDir: string, platform: Platform): Promi
 function getResourcesPath(platform: Platform): string {
   switch (platform) {
     case 'kiro': return 'skill://.kiro/skills/*/SKILL.md';
+    case 'cursor': return 'file://.cursor/rules/*-directive.mdc';
     case 'amazon-q': return 'file://.amazonq/rules/*.md';
     default: return '';
   }
@@ -242,6 +213,7 @@ function getResourcesPath(platform: Platform): string {
 function getSkillsDir(platform: Platform): string {
   switch (platform) {
     case 'kiro': return '.kiro/skills';
+    case 'cursor': return '.cursor/rules';
     case 'claude-code': return '.claude/skills';
     case 'github-copilot': return '.github/skills';
     case 'amazon-q': return '.amazonq/rules';

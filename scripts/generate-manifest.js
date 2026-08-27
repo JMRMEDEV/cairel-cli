@@ -4,8 +4,8 @@ const fs = require('fs').promises;
 const path = require('path');
 const yaml = require('js-yaml');
 
-const SKILLS_BASE = path.join(__dirname, '..', 'curated-presets', 'skills');
-const MANIFEST_PATH = path.join(__dirname, '..', 'curated-presets', 'rules-manifest.json');
+const DIRECTIVES_BASE = path.join(__dirname, '..', 'curated-presets', 'directives');
+const MANIFEST_PATH = path.join(__dirname, '..', 'curated-presets', 'directives-manifest.json');
 
 async function parseSkillFrontmatter(skillDir) {
   const skillPath = path.join(skillDir, 'SKILL.md');
@@ -20,12 +20,13 @@ async function parseSkillFrontmatter(skillDir) {
   
   const meta = frontmatter.metadata || {};
   
-  const rule = {
+  const directive = {
     id: frontmatter.name,
     title: meta['cairel-title'] || frontmatter.name,
     description: frontmatter.description || '',
     category: meta['cairel-category'] || 'general',
-    alwaysInclude: meta['cairel-always-include'] || false
+    alwaysInclude: meta['cairel-always-include'] || false,
+    enforcement: meta['cairel-enforcement'] || 'contextual'
   };
   
   const conditions = meta['cairel-conditions'];
@@ -36,42 +37,42 @@ async function parseSkillFrontmatter(skillDir) {
       const camelKey = key.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
       camelConditions[camelKey] = value;
     }
-    rule.conditions = camelConditions;
+    directive.conditions = camelConditions;
   }
   
-  return rule;
+  return directive;
 }
 
-async function scanSkills() {
-  const rules = [];
-  const entries = await fs.readdir(SKILLS_BASE, { withFileTypes: true });
+async function scanDirectives() {
+  const directives = [];
+  const entries = await fs.readdir(DIRECTIVES_BASE, { withFileTypes: true });
   
   for (const entry of entries) {
     if (!entry.isDirectory()) continue;
     
-    const skillDir = path.join(SKILLS_BASE, entry.name);
-    const skillFile = path.join(skillDir, 'SKILL.md');
+    const directiveDir = path.join(DIRECTIVES_BASE, entry.name);
+    const skillFile = path.join(directiveDir, 'SKILL.md');
     
     try {
       await fs.access(skillFile);
-      const rule = await parseSkillFrontmatter(skillDir);
-      if (rule) rules.push(rule);
+      const directive = await parseSkillFrontmatter(directiveDir);
+      if (directive) directives.push(directive);
     } catch {
       // No SKILL.md in this directory, skip
     }
   }
   
-  return rules;
+  return directives;
 }
 
 async function generateManifest() {
-  console.log('🔍 Scanning skills...');
+  console.log('🔍 Scanning directives...');
   
-  const rules = await scanSkills();
+  const directives = await scanDirectives();
   
-  console.log(`✓ Found ${rules.length} skills`);
+  console.log(`✓ Found ${directives.length} directives`);
   
-  const manifest = { rules };
+  const manifest = { directives };
   
   await fs.writeFile(
     MANIFEST_PATH,

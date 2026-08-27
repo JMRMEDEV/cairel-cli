@@ -16,12 +16,12 @@ const program = new Command();
 
 program
   .name('cairel')
-  .description('CLI tool for initializing AI-driven development projects')
+  .description('CLI tool for initializing AI-driven development projects with directives')
   .version(packageJson.version);
 
 program
   .command('init')
-  .description('Initialize AI configuration (agents + skills)')
+  .description('Initialize AI configuration (agents + directives)')
   .action(initCommand);
 
 program
@@ -55,7 +55,7 @@ if (process.argv.length === 2) {
       { name: 'Bootstrap project documentation (cairel bootstrap)', value: 'bootstrap' },
       { name: 'Update existing configuration (cairel update)', value: 'update' },
       { name: 'Validate configuration (cairel validate)', value: 'validate' },
-      { name: 'List available skills (cairel list)', value: 'list' },
+      { name: 'List available directives (cairel list)', value: 'list' },
       { name: 'Show help (cairel --help)', value: 'help' },
     ],
   })

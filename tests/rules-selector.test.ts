@@ -1,9 +1,9 @@
-import { selectRules } from '../src/core/rules-selector';
+import { selectDirectives } from '../src/core/directives-selector';
 import { QuickSetupAnswers } from '../src/types/wizard';
 
-describe('Rules Selector', () => {
+describe('Directives Selector', () => {
   describe('UI TypeScript React with Git', () => {
-    it('should select correct rules', async () => {
+    it('should select correct directives', async () => {
       const answers: QuickSetupAnswers = {
         mode: 'quick',
         projectType: 'ui',
@@ -15,7 +15,7 @@ describe('Rules Selector', () => {
         mcpServers: ['amazon-q-history'],
       };
 
-      const rules = await selectRules(answers);
+      const rules = await selectDirectives(answers);
 
       // Always included
       expect(rules).toContain('context-retrieval');
@@ -45,7 +45,7 @@ describe('Rules Selector', () => {
   });
 
   describe('Backend Python without Git', () => {
-    it('should select only always-include rules', async () => {
+    it('should select only always-include directives', async () => {
       const answers: QuickSetupAnswers = {
         mode: 'quick',
         projectType: 'backend',
@@ -57,7 +57,7 @@ describe('Rules Selector', () => {
         mcpServers: [],
       };
 
-      const rules = await selectRules(answers);
+      const rules = await selectDirectives(answers);
 
       // Always-included rules
       expect(rules).toContain('context-retrieval');
@@ -79,8 +79,8 @@ describe('Rules Selector', () => {
     });
   });
 
-  describe('Additional skills', () => {
-    it('should include user-selected additional skills', async () => {
+  describe('Additional directives', () => {
+    it('should include user-selected additional directives', async () => {
       const answers: QuickSetupAnswers = {
         mode: 'quick',
         projectType: 'backend',
@@ -93,7 +93,7 @@ describe('Rules Selector', () => {
         additionalSkills: ['absolute-imports'],
       };
 
-      const rules = await selectRules(answers);
+      const rules = await selectDirectives(answers);
 
       expect(rules).toContain('context-retrieval');
       expect(rules).toContain('implementation-approval');
