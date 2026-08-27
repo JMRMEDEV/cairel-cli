@@ -10,10 +10,10 @@ Implementation tasks derived from user stories. Each task maps to one or more st
 ## Tags
 
 - **subproject**: `cli`, `mcp`
-- **domain**: `wizard`, `generation`, `validation`, `commands`, `skills`, `constraints`, `planning`
+- **domain**: `wizard`, `generation`, `validation`, `commands`, `directives`, `planning`
 - **priority**: `P0`, `P1`, `P2`
 - **scope**: `MVP`, `Post-MVP`
-- **type**: `infra`, `feature`
+- **type**: `infra`, `feature`, `refactor`
 
 ## Task Index
 
@@ -25,45 +25,62 @@ Implementation tasks derived from user stories. Each task maps to one or more st
 | [TASK-002](./TASK-002.md) | Create planner and dev agent configs | P0 | ✅ | PLAN-01, PLAN-02 |
 | [TASK-003](./TASK-003.md) | Implement cairel-planning MCP server | P0 | 🔲 | PLAN-03 |
 
-### P1 MVP — Constraint Generation
+### P0 MVP — Hybrid Directives (ADR-008)
 
 | Task | Title | Priority | Status | Stories |
 |------|-------|----------|--------|---------|
-| [TASK-004](./TASK-004.md) | Audit curated skills and author CONSTRAINTS.md companions | P1 | 🔲 | CON-01 |
-| [TASK-005](./TASK-005.md) | Add constraint generation to the Kiro platform | P1 | 🔲 | CON-02 |
-| [TASK-006](./TASK-006.md) | Add constraint generation for Claude Code and GitHub Copilot | P1 | 🔲 | CON-03, CON-04 |
-| [TASK-007](./TASK-007.md) | Add Cursor as a supported platform | P1 | 🔲 | CON-05, CON-07 |
+| [TASK-011](./TASK-011.md) | Rename skills to directives across codebase | P0 | 🔲 | DIR-01 |
+| [TASK-012](./TASK-012.md) | Add enforcement level to directives manifest | P0 | 🔲 | DIR-02, DIR-09 |
+| [TASK-013](./TASK-013.md) | Enforcement-aware file generator | P0 | 🔲 | DIR-04, DIR-05, DIR-06 |
 
-### P2 MVP — Constraint Extras
+### P1 MVP — Directives UX & Platforms
 
 | Task | Title | Priority | Status | Stories |
 |------|-------|----------|--------|---------|
-| [TASK-008](./TASK-008.md) | Add constraint generation for Amazon Q | P2 | 🔲 | CON-06 |
-| [TASK-009](./TASK-009.md) | Add constraint validation to cairel validate | P2 | 🔲 | CON-08 |
+| [TASK-014](./TASK-014.md) | Wizard enforcement selection step | P1 | 🔲 | DIR-03 |
+| [TASK-015](./TASK-015.md) | Add Cursor as supported platform | P1 | 🔲 | DIR-07 |
+
+### P2 MVP — Directives Extras
+
+| Task | Title | Priority | Status | Stories |
+|------|-------|----------|--------|---------|
+| [TASK-016](./TASK-016.md) | Validate directives per enforcement level | P2 | 🔲 | DIR-08 |
+| [TASK-017](./TASK-017.md) | Update command with enforcement-level awareness | P2 | 🔲 | DIR-10 |
 
 ### P1 — Technical Debt
 
 | Task | Title | Priority | Status | Stories |
 |------|-------|----------|--------|---------|
-| [TASK-010](./TASK-010.md) | Code quality and technical debt cleanup | P1 | 🔲 | — |
+| [TASK-010](./TASK-010.md) | Code quality and technical debt cleanup | P1 | ✅ | — |
+
+### ~~Superseded~~ (by ADR-008 Hybrid Directives)
+
+| Task | Title | Status | Superseded by |
+|------|-------|--------|---------------|
+| ~~TASK-004~~ | ~~Audit curated skills and author CONSTRAINTS.md~~ | ❌ | TASK-012 |
+| ~~TASK-005~~ | ~~Add constraint generation to Kiro~~ | ❌ | TASK-013 |
+| ~~TASK-006~~ | ~~Add constraint generation for Claude Code / Copilot~~ | ❌ | TASK-013 |
+| ~~TASK-007~~ | ~~Add Cursor as supported platform~~ | ❌ | TASK-015 |
+| ~~TASK-008~~ | ~~Add constraint generation for Amazon Q~~ | ❌ | TASK-013 |
+| ~~TASK-009~~ | ~~Add constraint validation~~ | ❌ | TASK-016 |
 
 ---
 
 ## Summary
 
-| Category | Total | ✅ Done | 🔲 Open |
-|----------|-------|---------|---------|
-| Tasks | 10 | 2 | 8 |
-| Bugs | 0 | 0 | 0 |
+| Category | Total | ✅ Done | 🔲 Open | ❌ Superseded |
+|----------|-------|---------|---------|--------------|
+| Tasks | 17 | 3 | 7 | 6 |
+| Bugs | 0 | 0 | 0 | 0 |
 
-**Remaining MVP work**:
-- TASK-003: Implement cairel-planning MCP server (P0)
-- TASK-004: Audit curated skills and author CONSTRAINTS.md companions (P1)
-- TASK-005: Add constraint generation to the Kiro platform (P1)
-- TASK-006: Add constraint generation for Claude Code and GitHub Copilot (P1)
-- TASK-007: Add Cursor as a supported platform (P1)
-- TASK-008: Add constraint generation for Amazon Q (P2)
-- TASK-009: Add constraint validation to cairel validate (P2)
-- TASK-010: Code quality and technical debt cleanup (P1)
+**Active MVP work** (priority order):
+1. TASK-011: Rename skills to directives (P0) — blocks everything
+2. TASK-012: Add enforcement level to manifest (P0)
+3. TASK-013: Enforcement-aware file generator (P0)
+4. TASK-003: Implement cairel-planning MCP server (P0)
+5. TASK-014: Wizard enforcement selection step (P1)
+6. TASK-015: Add Cursor as supported platform (P1)
+7. TASK-016: Validate directives per enforcement level (P2)
+8. TASK-017: Update command enforcement awareness (P2)
 
-**Last Updated**: August 26, 2026
+**Last Updated**: August 27, 2026

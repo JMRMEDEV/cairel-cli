@@ -57,19 +57,29 @@ CON-05   | P1 | MVP      | Generate always-loaded constraints for Cursor        
 CON-06   | P2 | MVP      | Generate constraints for Amazon Q                      | constraints  | cli
 CON-07   | P1 | MVP      | Add Cursor as a supported platform                     | generation   | cli
 CON-08   | P2 | MVP      | Validate constraint files                              | validation   | cli
+DIR-01   | P0 | MVP      | Rename skills to directives in manifest and content    | directives   | cli
+DIR-02   | P0 | MVP      | Add enforcement level to directive manifest            | directives   | cli
+DIR-03   | P1 | MVP      | Wizard enforcement selection step                      | directives   | cli
+DIR-04   | P0 | MVP      | Generate enforced directives per platform              | directives   | cli
+DIR-05   | P1 | MVP      | Generate contextual directives per platform            | directives   | cli
+DIR-06   | P2 | MVP      | Generate available directives per platform             | directives   | cli
+DIR-07   | P1 | MVP      | Add Cursor as a supported platform                     | directives   | cli
+DIR-08   | P2 | MVP      | Validate directives per enforcement level              | directives   | cli
+DIR-09   | P1 | MVP      | Enforced directive content is concise extract          | directives   | cli
+DIR-10   | P2 | MVP      | Update command respects enforcement levels             | directives   | cli
 ```
 
 ## Counts
 
 | Filter | Count |
 |--------|-------|
-| Total | 45 |
+| Total | 55 |
 | Done | 22 |
-| MVP | 13 |
+| MVP | 23 |
 | Post-MVP | 10 |
-| P0 | 19 |
-| P1 | 15 |
-| P2 | 6 |
+| P0 | 22 |
+| P1 | 19 |
+| P2 | 9 |
 | P3 | 8 |
 
 ### By Domain
@@ -78,6 +88,7 @@ CON-08   | P2 | MVP      | Validate constraint files                            
 | wizard | 6 |
 | generation | 8 |
 | validation | 5 |
+| directives | 10 |
 | commands | 5 |
 | skills | 4 |
 | planning | 5 |
