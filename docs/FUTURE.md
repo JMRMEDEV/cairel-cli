@@ -1,543 +1,237 @@
-# carm - AI Rule Manager (Future Vision)
+# carm — AI Directive Manager (Future Vision)
 
-**Status**: Conceptual - Post v1.0  
-**Inspiration**: npm, but for AI development rules and agents
+**Status**: Conceptual — Post v2.0
+**Inspiration**: npm's distribution + trust model, applied to a problem npm never had:
+**cross-vendor** AI directives.
 
----
-
-## Problem Statement
-
-As AI-driven development matures, developers will need:
-- Shareable, versioned rules and agents
-- Community-contributed best practices
-- Dependency management for rule sets
-- Update notifications for improved rules
-- Cross-tool compatibility
-
-**Current State**: Manual copy/paste or cairel init (one-time setup)  
-**Future State**: Dynamic rule ecosystem with package management
+> This is a living strategy document. It captures *why* carm should exist and *what to
+> validate before building it* — not a commitment to build the full system. Read the
+> "Validation Gate" section before treating anything below as a roadmap.
 
 ---
 
-## Vision
+## Thesis: carm is a consolidation layer, not another store
 
-### carm (Cairel Rule Manager)
+The AI-tooling market is **not** short on capability stores. It has too many, and they
+are **silos**:
 
-A package manager for AI development rules, agents, and configurations that enables:
-- **Discovery**: Search and browse community rules
-- **Installation**: Install rule packages with dependencies
-- **Versioning**: Semantic versioning for rules
-- **Updates**: Keep rules current with latest best practices
-- **Publishing**: Share your rules with the community
-- **Compatibility**: Cross-tool support (kiro-cli, Amazon Q, etc.)
+- Kiro has steering + "powers"
+- Claude Code has Skills (and an emerging skills/marketplace surface)
+- Cursor has `.cursor/rules` (and a community informally sharing them)
+- GitHub Copilot has instructions + skills
+- Amazon Q has rules
+- MCP already spawned its own server registries
+
+Every vendor is incentivized to make their store **lock content to their format**. A Kiro
+power is not a Claude skill is not a Cursor rule. That fragmentation is the opportunity.
+
+**carm's bet:** the valuable, unowned layer is the *neutral, cross-vendor* one —
+"author or install a directive once, and get it correctly shaped for whichever tools you
+actually use." Vendors won't build this (interop works against lock-in), so the
+consolidation layer has to come from outside. cairel already owns the hard part: the
+**hybrid-directives transform** (one authored directive → enforced / contextual /
+available, routed per platform, see ADR-008). carm is *distribution on top of a proven
+transform*, not a new store competing with the vendors'.
+
+Positioning in one line:
+> **npm-for-portable-AI-directives** — the free, neutral layer that consolidates what the
+> vendor stores keep fragmented.
 
 ---
 
-## Architecture
+## Why the maintenance burden becomes a strength, not a liability
 
-### Registry
+The obvious objection to a consolidation layer: *"you now inherit the churn of five
+vendors' formats — every protocol change breaks you."* We felt this firsthand while
+building cairel (npm token model changed mid-flight; enforcement docs shift constantly).
 
-**Central Registry** (similar to npm registry):
+The answer is the same one that makes npm itself viable: **community-maintained
+adapters.** The registry team does not maintain every package; the ecosystem does.
+
+- Cursor users maintain the Cursor adapter; Kiro users maintain Kiro's; etc.
+- Format churn becomes a stream of small, distributed PRs instead of a solo treadmill.
+- Evolving tech/protocols stop being a *risk* and become the *reason the community
+  exists* — the shared incentive to keep the neutral layer current.
+
+**Honest caveat:** community maintenance only kicks in *after* there is a community.
+Early on, the maintainer(s) carry adapter upkeep alone. The strategic problem is
+therefore **surviving to critical mass**, not whether the model works long-term.
+
+---
+
+## Scope reality: consolidate the *portable subset*, be honest about the rest
+
+Not everything ports losslessly. A Claude Skill can bundle executable scripts and
+resources; a Kiro steering file is markdown + frontmatter; a Cursor rule is `.mdc`.
+
+- The **portable subset** — guidance/constraints as markdown + an enforcement level —
+  ports cleanly today. That is exactly what cairel already generates across five platforms.
+- The **powerful, vendor-specific content** (skills with code, tool bindings) may not be
+  losslessly convertible.
+
+carm should be upfront that it consolidates the portable subset and clearly marks
+vendor-specific capabilities as non-portable, rather than pretending everything converts.
+That honesty bounds the pitch correctly and builds trust.
+
+---
+
+## Validation Gate (do this BEFORE building the registry)
+
+Everything below this line — registry backend, dependency resolution, private instances —
+is **premature until one hypothesis is validated**:
+
+> **People want to publish and consume cross-vendor AI directives from a shared source.**
+
+Donations, paid custom-directive work, and private instances *all* presuppose this. If it
+is false — if everyone only ever wants their own bespoke rules — there is no commons to
+consolidate and the whole model has nothing to stand on.
+
+**Smallest test that proves it** (the real "carm MVP"):
+- cairel, but able to pull directives from a **shared remote source** instead of only
+  bundled presets: `carm add <directive>` fetches and installs it, correctly shaped for
+  the user's tools.
+- No registry backend required at first — a Git-backed source (e.g. a GitHub repo/org of
+  directives) is enough to test the behavior.
+- Success signal: **strangers publish directives, and other strangers install them across
+  different tools, and it works.** If that happens, the rest of this document is justified.
+  If it does not, stop here — the engine is the product and presets are disposable.
+
+Only after this gate should the registry/monetization work below be scheduled.
+
+---
+
+## Monetization (npm-shaped, mostly free)
+
+The core must be **free and neutral** — the moment the base layer is paywalled, a
+vendor's free importer beats it. Sustainability comes from three sources that do **not**
+compromise neutrality and do **not** fight each other:
+
+1. **Donations for the overall solution.** Funds the free public commons (core CLI,
+   public registry, community adapters). Keeps the neutral layer neutral.
+2. **Paid on-demand custom directive creation.** Productized curation expertise — teams
+   pay to have bespoke, high-quality directives authored for their stack. Revenue from day
+   one; scales with maintainer time (consulting, productized).
+3. **Paid private instances / private registries.** The npm model: public is free, private
+   is paid. Teams keep proprietary internal directives (company standards, internal tooling
+   conventions) off the public registry. Demand-pulled enterprise wedge; scales without
+   maintainer time.
+
+Flywheel: free public core → adoption → community maintains adapters → community/content
+creates demand → private instances + custom work fund sustainability. None of it requires
+the big-bang registry to exist first.
+
+Explicitly **dropped** from the earlier vision: speculative Pro/Enterprise tier ladders,
+analytics dashboards, and SLA products. Those are end-state details, not first moves.
+
+---
+
+## Package & config shapes (reference — unchanged in spirit)
+
+Retained from the original concept because the shapes are still sound; treat as
+illustrative, not committed.
+
+### Package types
+
 ```
-https://registry.cairel.dev/
+@cairel/typescript-directives     # official (core team)
+@community/nextjs-best-practices   # verified community
+@username/my-directives            # any authenticated user
+@cairel/general-dev-agent          # agent packages
+@cairel/fullstack-bundle           # bundles
 ```
 
-**Package Structure**:
+### Example package manifest
+
 ```json
 {
-  "name": "@cairel/typescript-rules",
+  "name": "@cairel/typescript-directives",
   "version": "2.1.0",
-  "description": "TypeScript development rules",
-  "author": "cairel-core",
+  "description": "TypeScript development directives",
   "license": "MIT",
-  "keywords": ["typescript", "validation", "best-practices"],
-  "ai-tools": ["kiro-cli", "amazon-q-developer"],
+  "ai-tools": ["kiro", "cursor", "claude-code", "github-copilot", "amazon-q"],
   "dependencies": {
-    "@cairel/git-rules": "^1.0.0",
-    "@cairel/context-rules": "^1.2.0"
+    "@cairel/git-directives": "^1.0.0"
   },
-  "files": [
-    "rules/typescript-validation.md",
-    "rules/component-structure.md"
-  ],
-  "repository": "https://github.com/cairel/typescript-rules"
+  "files": ["directives/typescript-validation/SKILL.md"],
+  "repository": "https://github.com/cairel/typescript-directives"
 }
 ```
 
-### Package Types
-
-**1. Rule Packages**
-```
-@cairel/typescript-rules
-@cairel/react-native-rules
-@community/nextjs-best-practices
-```
-
-**2. Agent Packages**
-```
-@cairel/general-dev-agent
-@cairel/ui-specialist-agent
-@community/backend-expert-agent
-```
-
-**3. Bundle Packages**
-```
-@cairel/fullstack-bundle
-@cairel/mobile-dev-bundle
-@community/enterprise-bundle
-```
-
-**4. MCP Server Packages**
-```
-@cairel/mcp-amazon-q-history
-@cairel/mcp-web-scraper
-@community/mcp-custom-tool
-```
-
----
-
-## Commands
-
-### Installation
-
-```bash
-# Install rule package
-carm install @cairel/typescript-rules
-
-# Install specific version
-carm install @cairel/typescript-rules@2.1.0
-
-# Install with dependencies
-carm install @cairel/fullstack-bundle
-
-# Install globally (user-wide)
-carm install -g @cairel/general-dev-agent
-
-# Install from GitHub
-carm install github:username/custom-rules
-```
-
-### Search & Discovery
-
-```bash
-# Search for packages
-carm search "react native"
-
-# Show package info
-carm info @cairel/typescript-rules
-
-# List installed packages
-carm list
-
-# List outdated packages
-carm outdated
-```
-
-### Updates
-
-```bash
-# Update all packages
-carm update
-
-# Update specific package
-carm update @cairel/typescript-rules
-
-# Update to latest major version
-carm update @cairel/typescript-rules@latest
-```
-
-### Publishing
-
-```bash
-# Login to registry
-carm login
-
-# Publish package
-carm publish
-
-# Unpublish package
-carm unpublish @username/package-name
-
-# Deprecate version
-carm deprecate @username/package-name@1.0.0 "Use 2.0.0 instead"
-```
-
-### Configuration
-
-```bash
-# Initialize carm.json
-carm init
-
-# Set registry
-carm config set registry https://custom-registry.com
-
-# Set auth token
-carm config set token <token>
-```
-
----
-
-## Configuration File
-
-### carm.json
+### Project config (carm.json)
 
 ```json
 {
   "name": "my-project",
-  "version": "1.0.0",
-  "ai-tools": ["kiro-cli"],
+  "ai-tools": ["kiro", "cursor"],
   "dependencies": {
-    "@cairel/typescript-rules": "^2.1.0",
-    "@cairel/git-rules": "^1.0.0",
-    "@cairel/ui-verification": "^1.5.0",
-    "@community/custom-rules": "^0.3.0"
-  },
-  "devDependencies": {
-    "@cairel/testing-rules": "^1.2.0"
-  },
-  "agents": {
-    "general-dev": "@cairel/general-dev-agent@^1.0.0",
-    "ui-specialist": "@cairel/ui-specialist-agent@^2.0.0"
-  },
-  "mcpServers": {
-    "amazon-q-history": "@cairel/mcp-amazon-q-history@^1.0.0",
-    "web-scraper": "@cairel/mcp-web-scraper@^2.1.0"
-  },
-  "config": {
-    "rulesPath": ".kiro/steering",
-    "agentsPath": ".kiro/agents",
-    "mcpPath": ".kiro/settings"
+    "@cairel/typescript-directives": "^2.1.0",
+    "@community/custom-directives": "^0.3.0"
   }
 }
 ```
 
----
-
-## Package Structure
-
-### Rule Package
-
-```
-@cairel/typescript-rules/
-├── package.json
-├── README.md
-├── LICENSE
-├── rules/
-│   ├── typescript-validation.md
-│   ├── component-structure.md
-│   └── type-safety.md
-├── templates/
-│   └── typescript-config.hbs
-└── schemas/
-    └── rule-schema.json
-```
-
-### Agent Package
-
-```
-@cairel/ui-specialist-agent/
-├── package.json
-├── README.md
-├── LICENSE
-├── agents/
-│   └── ui-specialist.json
-├── templates/
-│   └── agent-template.hbs
-└── dependencies.json
-```
-
-### Bundle Package
-
-```
-@cairel/fullstack-bundle/
-├── package.json
-├── README.md
-├── LICENSE
-└── dependencies.json  # Lists all included packages
-```
-
----
-
-## Versioning Strategy
-
-### Semantic Versioning
-
-**Rules**: `MAJOR.MINOR.PATCH`
-- **MAJOR**: Breaking changes (rule format changes, removed rules)
-- **MINOR**: New rules, enhancements (backward compatible)
-- **PATCH**: Bug fixes, typos, clarifications
-
-**Agents**: `MAJOR.MINOR.PATCH`
-- **MAJOR**: Breaking changes (config format, tool changes)
-- **MINOR**: New features, MCP servers (backward compatible)
-- **PATCH**: Bug fixes, config tweaks
-
-### Compatibility Matrix
-
-```json
-{
-  "@cairel/typescript-rules": {
-    "2.1.0": {
-      "kiro-cli": ">=1.0.0",
-      "amazon-q-developer": ">=2.0.0"
-    }
-  }
-}
-```
-
----
-
-## Community Contributions
-
-### Publishing Guidelines
-
-**1. Namespace Rules**
-- `@cairel/*` - Official packages (core team only)
-- `@community/*` - Verified community packages
-- `@username/*` - User packages
-
-**2. Quality Standards**
-- Follow standardized rule format
-- Include comprehensive examples
-- Provide tests/validation
-- Document AI tool compatibility
-- Maintain semantic versioning
-
-**3. Review Process**
-- Submit to community registry
-- Automated validation
-- Community review (for @community namespace)
-- Approval and publication
-
-### Contribution Workflow
+### Illustrative commands
 
 ```bash
-# 1. Create package
-mkdir my-custom-rules
-cd my-custom-rules
-carm init
-
-# 2. Add rules
-# Create rules following standard format
-
-# 3. Test locally
-carm validate
-
-# 4. Publish
-carm login
+carm add @cairel/typescript-directives     # install, shaped per the project's tools
+carm search "react native"
 carm publish
+carm update
 ```
 
 ---
 
-## Integration with cairel
+## Trust infrastructure — already partly built
 
-### Backward Compatibility
+A registry needs a trust model. cairel's release pipeline already established the
+relevant primitives (REL-01/REL-02, ADR-010/ADR-011): **tokenless OIDC publishing** and
+**automatic provenance attestations**. The same posture (short-lived credentials,
+provenance, no long-lived secrets) is the right foundation for a carm registry — so the
+publishing-trust groundwork is not hypothetical, it is the model cairel itself ships on.
 
-**cairel v1.0** (current):
-- One-time initialization
-- Curated presets only
-- No updates after init
-
-**cairel v2.0** (with carm):
-- Dynamic rule management
-- Community packages
-- Continuous updates
-- Dependency resolution
-
-### Migration Path
-
-```bash
-# Existing project with cairel v1.0
-cairel init
-
-# Upgrade to carm
-carm migrate
-
-# Now can install additional packages
-carm install @community/custom-rules
-```
+Registry security (signing/checksums, namespace access control, malicious-content
+reporting) remains post-validation work.
 
 ---
 
-## Technical Implementation
+## Sequenced roadmap (gated)
 
-### Registry Backend
+1. **Validate portability demand** (the MVP above; Git-backed source, `carm add`).
+   *Gate: strangers publish + install cross-tool successfully.*
+2. **Public registry MVP** — only if step 1 succeeds. Search, install, publish;
+   community-maintained adapters; provenance via the OIDC model already in use.
+3. **Private instances** — the paid wedge, once public adoption is real.
+4. **Advanced** — dependency resolution, bundles, compatibility matrices.
 
-**Technology Stack**:
-- **API**: Node.js + Express
-- **Database**: PostgreSQL (metadata) + S3 (packages)
-- **CDN**: CloudFront for package distribution
-- **Auth**: OAuth2 + API tokens
-
-**Endpoints**:
-```
-GET  /packages                    # Search packages
-GET  /packages/:name              # Package info
-GET  /packages/:name/:version     # Specific version
-POST /packages                    # Publish package
-PUT  /packages/:name              # Update package
-DELETE /packages/:name/:version   # Unpublish version
-```
-
-### CLI Client
-
-**Technology Stack**:
-- **Language**: TypeScript
-- **HTTP Client**: axios
-- **Package Manager**: npm (for inspiration)
-- **Validation**: zod + ajv
-
-**Core Modules**:
-```typescript
-// src/registry/client.ts
-class RegistryClient {
-  async search(query: string): Promise<Package[]>
-  async install(packageName: string, version?: string): Promise<void>
-  async publish(packagePath: string): Promise<void>
-  async update(packageName?: string): Promise<void>
-}
-
-// src/resolver/dependency.ts
-class DependencyResolver {
-  async resolve(dependencies: Dependencies): Promise<ResolvedTree>
-  async checkCompatibility(packages: Package[]): Promise<CompatibilityReport>
-}
-
-// src/installer/package.ts
-class PackageInstaller {
-  async install(package: Package, target: string): Promise<void>
-  async uninstall(packageName: string): Promise<void>
-  async update(packageName: string, version: string): Promise<void>
-}
-```
+Enterprise SLA/self-hosting stays out of scope until there is demonstrated pull.
 
 ---
 
-## Security Considerations
+## Success metrics (adoption-first, not feature-first)
 
-### Package Verification
-
-**1. Signature Verification**
-- All packages signed with GPG keys
-- Verify signature before installation
-- Warn on unsigned packages
-
-**2. Checksum Validation**
-- SHA-256 checksums for all files
-- Verify integrity after download
-- Reject tampered packages
-
-**3. Malicious Code Detection**
-- Automated scanning for suspicious patterns
-- Community reporting system
-- Quarantine flagged packages
-
-### Access Control
-
-**1. Publishing**
-- Authenticated users only
-- Email verification required
-- 2FA for @cairel namespace
-
-**2. Namespaces**
-- `@cairel/*` - Core team only
-- `@community/*` - Verified contributors
-- `@username/*` - Any authenticated user
-
-**3. Deprecation**
-- Package owners can deprecate versions
-- Automated warnings on install
-- Migration guides required
-
----
-
-## Monetization (Optional)
-
-### Free Tier
-- All core packages free
-- Community packages free
-- Unlimited installs
-
-### Pro Tier (Future)
-- Private packages
-- Team collaboration
-- Priority support
-- Advanced analytics
-
-### Enterprise Tier (Future)
-- Self-hosted registry
-- Custom namespaces
-- SLA guarantees
-- Dedicated support
-
----
-
-## Roadmap
-
-### Phase 1: MVP (6 months)
-- [ ] Registry backend
-- [ ] CLI client
-- [ ] Core packages (@cairel/*)
-- [ ] Basic search and install
-- [ ] Documentation
-
-### Phase 2: Community (3 months)
-- [ ] User authentication
-- [ ] Publishing workflow
-- [ ] Community packages
-- [ ] Review system
-- [ ] Quality badges
-
-### Phase 3: Advanced (6 months)
-- [ ] Dependency resolution
-- [ ] Compatibility checking
-- [ ] Update notifications
-- [ ] Bundle packages
-- [ ] Analytics dashboard
-
-### Phase 4: Enterprise (Future)
-- [ ] Self-hosted registry
-- [ ] Private packages
-- [ ] Team features
-- [ ] Advanced security
-- [ ] SLA support
-
----
-
-## Success Metrics
-
-### Adoption
-- Number of published packages
-- Number of installs
-- Active users
-- Community contributors
-
-### Quality
-- Average package rating
-- Issue resolution time
-- Update frequency
-- Compatibility score
-
-### Ecosystem
-- AI tool integrations
-- Framework support
-- Language coverage
-- Community engagement
+- **Validation phase:** number of *external* publishers, number of cross-tool installs by
+  people who are not the author. This is the only metric that matters early.
+- **Growth phase:** community adapter PRs (proxy for the maintenance model working),
+  published packages, active installs.
+- **Sustainability phase:** donations, custom-directive engagements, private-instance
+  subscribers.
 
 ---
 
 ## Conclusion
 
-carm represents the natural evolution of cairel from a one-time initialization tool to a dynamic ecosystem for AI-driven development best practices. By enabling community contributions, versioning, and dependency management, we can create a sustainable, growing repository of AI development knowledge.
+carm is worth building **if and only if** the portability-demand hypothesis holds. Its
+edge is not "another skills store" — it is the **neutral cross-vendor consolidation layer**
+that vendors are structurally disinclined to build, powered by a transform cairel already
+owns, maintained by a community that turns protocol churn from a liability into shared
+purpose, and sustained by an npm-shaped model (free core + paid custom work + private
+instances).
 
-**Next Steps**:
-1. Complete cairel v1.0
-2. Gather community feedback
-3. Design registry architecture
-4. Build MVP
-5. Launch beta program
+Build the smallest thing that tests the hypothesis first. Everything else follows from
+whether strangers actually share and reuse directives across tools.
 
 ---
 
-**Document Status**: Living document - will evolve based on community needs and feedback.
+**Document Status**: Living strategy document. Reframed 2026-08-27 from the original
+big-bang-registry concept to a consolidation-layer thesis with a validation gate. See
+ADR-009 (and the future ADR that will supersede it once the MVP is scheduled).
