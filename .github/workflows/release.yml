@@ -1,0 +1,212 @@
+# .github/workflows/release.yml
+#
+# Automated semantic-version release for the `cairel` npm package.
+#
+# Adapted from the shared munin-* `release-package.yml` pattern (REL-01 / TASK-026,
+# see ADR-010). Key differences from munin, all intentional:
+#   - munin uses Yarn 4 + Corepack + GitHub Packages; cairel uses plain npm and the
+#     PUBLIC npm registry (package name: `cairel`).
+#   - cairel runs a real test suite (256 Jest tests) + a prebuild manifest generator,
+#     so build AND test must pass before any bump/publish.
+#   - `master` is branch-protected (PRs required), so we DO NOT commit a
+#     `chore: release` back to the branch. Instead we bump package.json in the runner,
+#     create an annotated git TAG `vX.Y.Z`, push the TAG only, and cut a GitHub Release.
+#   - Bump detection scans the whole commit RANGE since the last `v*` tag (not just the
+#     tip commit) and picks the HIGHEST applicable bump.
+#
+# ============================================================================
+# SAFE-BY-DEFAULT — READ BEFORE ENABLING
+# ============================================================================
+# This workflow will NOT publish to npm or push a tag for real until a human
+# explicitly opts in. Every mutating step is gated behind `dry_run`:
+#   - `workflow_dispatch` exposes a `dry_run` input that DEFAULTS TO true.
+#   - `push` events force dry-run mode (see the `resolve` job) so a normal merge to
+#     master can never publish for real on its own.
+#   - When dry_run is true: npm publish runs with `--dry-run`, and the tag/Release is
+#     NOT pushed (only computed and logged).
+#
+# TO GO LIVE (human actions — NONE of this is done by authoring this file):
+#   1. Add an `NPM_TOKEN` repository secret (npm automation token with publish rights
+#      to the `cairel` package). See docs/PUBLISH.md.
+#   2. Trigger the workflow via the Actions tab using "Run workflow" and set
+#      `dry_run: false`.
+#   3. (Optional, higher risk) To let a plain push to master publish for real, remove
+#      the push->dry-run override in the `resolve` job below. This is intentionally
+#      NOT the default. Search for: "HUMAN: flip live".
+# ============================================================================
+
+name: Release
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (no tag push, no real npm publish). Set to false to publish for real."
+        type: boolean
+        required: false
+        default: true
+
+# Least-privilege by default. `contents: write` is only needed to push the tag and
+# create the GitHub Release when NOT in dry-run mode.
+permissions:
+  contents: write
+
+concurrency:
+  # Never run two releases at once; a newer run supersedes an in-flight one.
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # --------------------------------------------------------------------------
+  # resolve: decide whether this run is a dry run and whether the loop guard trips.
+  # Kept as a tiny separate job so the gating logic is explicit and auditable.
+  # --------------------------------------------------------------------------
+  resolve:
+    runs-on: ubuntu-latest
+    outputs:
+      dry_run: ${{ steps.mode.outputs.dry_run }}
+      skip: ${{ steps.guard.outputs.skip }}
+    steps:
+      - name: Resolve dry-run mode
+        id: mode
+        run: |
+          # workflow_dispatch: honor the human's input (defaults true).
+          # push (or anything else): FORCE dry-run so a normal merge cannot publish.
+          # HUMAN: flip live — to allow push-to-master real publishes, change the
+          # push branch below to emit "false". Left as "true" on purpose.
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "dry_run=${{ inputs.dry_run }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "dry_run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Loop guard
+        id: guard
+        run: |
+          # Prevent the release from retriggering itself. We do NOT commit back to
+          # master, so the main risk is a maintainer landing a "chore(release):"
+          # commit manually. Skip those defensively. Tag pushes don't hit this
+          # workflow (we only trigger on branch pushes), but we guard regardless.
+          MSG="${{ github.event.head_commit.message }}"
+          if echo "$MSG" | grep -qiE "^chore\(release\)|^chore: release"; then
+            echo "Head commit is a release commit; skipping to avoid a loop."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  release:
+    needs: resolve
+    if: needs.resolve.outputs.skip != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history + tags)
+        uses: actions/checkout@v4
+        with:
+          # Full history and tags are required so we can find the last v* tag and
+          # scan the commit range since then.
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        # No lockfile is committed, so `npm install` (not `npm ci`).
+        run: npm install
+
+      - name: Build
+        # `prebuild` auto-runs `generate-manifest` before `tsc`.
+        run: npm run build
+
+      - name: Test
+        # All 256 Jest tests must pass. This gates the bump/publish below.
+        run: npm test
+
+      - name: Determine version bump (commit range since last v* tag)
+        id: bump
+        run: |
+          set -euo pipefail
+          # Find the most recent v* tag reachable from HEAD. If none, fall back to
+          # scanning just the last commit (matches munin's simpler behavior for a
+          # fresh repo).
+          LAST_TAG="$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || true)"
+          if [ -n "$LAST_TAG" ]; then
+            RANGE="${LAST_TAG}..HEAD"
+            echo "Scanning commit range: $RANGE (last tag: $LAST_TAG)"
+          else
+            RANGE="HEAD~1..HEAD"
+            echo "No v* tag found; falling back to last commit only: $RANGE"
+          fi
+
+          # Collect full commit messages (subject + body) in the range.
+          COMMITS="$(git log --pretty=format:'%s%n%b%n----' "$RANGE" 2>/dev/null || git log -1 --pretty=format:'%s%n%b')"
+
+          # Pick the HIGHEST applicable bump across the range.
+          #   feat!: / feat(scope)!: / "BREAKING CHANGE" -> major
+          #   feat:                                      -> minor
+          #   fix: / perf:                               -> patch
+          #   otherwise                                  -> none
+          TYPE="none"
+          if echo "$COMMITS" | grep -qE "^(feat|fix|perf|refactor|chore|docs|build|ci|style|test)(\(.+\))?!:" \
+             || echo "$COMMITS" | grep -qE "BREAKING CHANGE"; then
+            TYPE="major"
+          elif echo "$COMMITS" | grep -qE "^feat(\(.+\))?:"; then
+            TYPE="minor"
+          elif echo "$COMMITS" | grep -qE "^(fix|perf)(\(.+\))?:"; then
+            TYPE="patch"
+          fi
+
+          echo "Resolved bump type: $TYPE"
+          echo "type=$TYPE" >> "$GITHUB_OUTPUT"
+
+      - name: No release needed
+        if: steps.bump.outputs.type == 'none'
+        run: echo "No feat/fix/perf/breaking commits in range — nothing to release."
+
+      - name: Bump version + create tag (local only)
+        id: version
+        if: steps.bump.outputs.type != 'none'
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # `npm version` updates package.json AND creates the annotated tag vX.Y.Z
+          # locally. We push the TAG (not a branch commit) later, only when live.
+          NEW_VERSION="$(npm version ${{ steps.bump.outputs.type }} -m 'chore(release): %s')"
+          echo "New version: $NEW_VERSION"
+          echo "version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Publish to npm
+        if: steps.bump.outputs.type != 'none'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ "${{ needs.resolve.outputs.dry_run }}" = "true" ]; then
+            echo "DRY RUN — running 'npm publish --dry-run' (nothing is published)."
+            npm publish --access public --dry-run
+          else
+            echo "LIVE — publishing ${{ steps.version.outputs.version }} to the public npm registry."
+            npm publish --access public
+          fi
+
+      - name: Push tag + GitHub Release
+        if: steps.bump.outputs.type != 'none'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.version.outputs.version }}"
+          if [ "${{ needs.resolve.outputs.dry_run }}" = "true" ]; then
+            echo "DRY RUN — NOT pushing tag $VERSION and NOT creating a GitHub Release."
+            echo "Would run: git push origin $VERSION && gh release create $VERSION --generate-notes"
+          else
+            # Push ONLY the tag (never a commit to the protected master branch).
+            git push origin "$VERSION"
+            gh release create "$VERSION" --generate-notes --title "$VERSION"
+          fi

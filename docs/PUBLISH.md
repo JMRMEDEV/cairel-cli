@@ -1,4 +1,67 @@
-# npm Publication Checklist
+# Publishing cairel
+
+## Automated Release (primary) 🤖
+
+Releases are driven by the GitHub Actions workflow at
+[`.github/workflows/release.yml`](../.github/workflows/release.yml) (see
+[ADR-010](../planning/docs/architecture/decisions.md) / REL-01 / TASK-026). It derives
+the next semantic version from the Conventional Commit messages since the last `v*`
+tag and publishes the `cairel` package to the public npm registry.
+
+### How it works
+
+1. **Trigger** — push to `master`, or manual `workflow_dispatch` from the Actions tab.
+2. **Verify** — installs deps (`npm install`), runs `npm run build` (which auto-runs the
+   prebuild manifest generator) and `npm test` (256 tests). A red build/test blocks the
+   release.
+3. **Bump detection** — scans the commit RANGE since the last `v*` tag (falls back to the
+   last commit if there are no tags) and picks the HIGHEST applicable bump:
+   - `feat!:` / `<type>!:` / `BREAKING CHANGE` → **major**
+   - `feat:` → **minor**
+   - `fix:` / `perf:` → **patch**
+   - otherwise → **no release**
+4. **Release** — bumps `package.json`, creates an annotated tag `vX.Y.Z`, publishes to
+   npm with `--access public`, then pushes the **tag** (never a commit to the protected
+   `master` branch) and cuts a GitHub Release with generated notes.
+5. **Loop guard** — a `chore(release):` head commit is skipped so the release cannot
+   retrigger itself.
+
+### Safe-by-default ⚠️
+
+The workflow will **not** publish for real or push a tag until a human explicitly opts
+in:
+
+- `workflow_dispatch` has a `dry_run` input that **defaults to `true`**.
+- A plain `push` to `master` is **forced into dry-run mode** — merging a PR can never
+  publish on its own.
+- In dry-run mode, `npm publish` runs with `--dry-run` and the tag/Release are computed
+  and logged but **not pushed**.
+
+### Going live (human actions required)
+
+These steps are intentionally NOT automated and must be performed by a maintainer:
+
+1. **Add the `NPM_TOKEN` repo secret.** Create an npm **automation** token with publish
+   rights to the `cairel` package (npm → Access Tokens → Generate → Automation), then add
+   it under **Settings → Secrets and variables → Actions → New repository secret** named
+   `NPM_TOKEN`. The workflow references it only as `${{ secrets.NPM_TOKEN }}`; it is never
+   printed or committed.
+2. **Run a real release.** Actions tab → *Release* → **Run workflow** → set
+   `dry_run: false`.
+3. **(Optional, higher risk)** To let a normal push to `master` publish automatically,
+   remove the push→dry-run override in the `resolve` job (search the workflow for
+   `HUMAN: flip live`). This is deliberately off by default.
+
+> First real run should be validated by triggering `workflow_dispatch` with
+> `dry_run: true` and confirming the logs show the intended version bump and a successful
+> `npm publish --dry-run`.
+
+---
+
+## Manual Release (documented fallback) 🛠️
+
+Use these steps only if the automated workflow is unavailable (e.g. Actions outage, or
+publishing from a local machine).
 
 ## Pre-Publication Verification ✅
 

@@ -60,14 +60,14 @@ master → derive bump from last commit message → `npm version <type> --no-git
 
 ## Acceptance Criteria
 
-- [ ] `.github/workflows/release.yml` exists and is valid YAML
-- [ ] Bump type derived from Conventional Commits across the commit range
-- [ ] Build + full test suite run and gate the publish
-- [ ] Publishes to public npm with `NPM_TOKEN` + `--access public`
-- [ ] Uses git tag + release (no protected-branch commit-back) OR a documented bypass
-- [ ] Release action cannot retrigger itself
-- [ ] `docs/PUBLISH.md` updated; `NPM_TOKEN` secret documented
-- [ ] ADR-010 added
+- [x] `.github/workflows/release.yml` exists and is valid YAML
+- [x] Bump type derived from Conventional Commits across the commit range
+- [x] Build + full test suite run and gate the publish
+- [x] Publishes to public npm with `NPM_TOKEN` + `--access public`
+- [x] Uses git tag + release (no protected-branch commit-back) OR a documented bypass
+- [x] Release action cannot retrigger itself
+- [x] `docs/PUBLISH.md` updated; `NPM_TOKEN` secret documented
+- [x] ADR-010 added
 
 ## Notes / Risks
 
@@ -78,8 +78,58 @@ master → derive bump from last commit message → `npm version <type> --no-git
 - Interacts with existing branch protection on `master` (observed during 2026-08-27
   push: "changes must be made through a pull request").
 
+## Status: ✅ COMPLETE (2026-08-27)
+
+### What was done
+
+1. Added `.github/workflows/release.yml` — an adapted munin-style automated release
+   workflow:
+   - Triggers: `push` to `master` + `workflow_dispatch` (with a `dry_run` input).
+   - `resolve` job: computes dry-run mode (dispatch honors input; push is forced to
+     dry-run) and runs the loop guard (skips `chore(release):` head commits).
+   - `release` job: checkout with `fetch-depth: 0`, `setup-node@v4` (node 20,
+     `registry-url: https://registry.npmjs.org`), `npm install`, `npm run build`,
+     `npm test`.
+   - Bump detection scans the commit range since the last `v*` tag (fallback
+     `HEAD~1..HEAD`) and picks the HIGHEST bump: `!`/BREAKING→major, feat→minor,
+     fix|perf→patch, else none.
+   - Release: `npm version <type>`, then `npm publish --access public` (with
+     `NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}`), then push the **tag** only and cut a
+     GitHub Release. Never commits back to protected `master`.
+2. Rewrote `docs/PUBLISH.md`: automated flow is now primary (trigger/verify/bump/release,
+   safe-by-default section, go-live steps, `NPM_TOKEN` secret setup); the old checklist
+   is retained under "Manual Release (documented fallback)".
+3. Added ADR-010 to `planning/docs/architecture/decisions.md` documenting the tag-based
+   automated release adapted from munin and the rationale for each adaptation.
+
+### Verification
+
+- YAML syntax: `npx js-yaml .github/workflows/release.yml` → "YAML OK: parses cleanly".
+- Build: `npm run build` → exit 0 (`tsc`, prebuild manifest gen ran).
+- Tests: `npm test` → 20 suites, **256/256 passed**.
+- No commits, tags, or pushes were made; no token was added. All changes left in the
+  working tree for human review.
+
+### Deferred (human action required — NOT done here)
+
+- **Enabling live publish is a human action.** A maintainer must: (1) add the
+  `NPM_TOKEN` repository secret (npm automation token), and (2) trigger the workflow via
+  `workflow_dispatch` with `dry_run: false`. Optionally, (3) remove the push→dry-run
+  override (marked `HUMAN: flip live` in the workflow) to allow push-to-master real
+  publishes. None of these were performed — the workflow is safe-by-default and will only
+  dry-run until a human flips it live.
+- Keeping the committed `package.json` version in sync with pushed tags may need a
+  follow-up convention (documented in ADR-010 consequences).
+
 ## Comments
 
 - **2026-08-27 12:07** — Created from the munin version-bump feasibility assessment.
   Adopt the munin pattern with adaptations (npm/public registry, test gate, commit-range
   bump detection, tag-based release to respect branch protection).
+- **2026-08-27 12:12** — Started implementation. Read TASK-026, REL-01, and the munin
+  reference workflow; confirmed branch `master`, existing `v*` tags, no `.github/workflows`.
+- **2026-08-27 12:20** — Complete. Authored `.github/workflows/release.yml` (safe-by-default,
+  dry_run defaults true, forced dry-run on push, loop guard, commit-range bump, tag-based
+  release, public npm publish gated on green build+test). Updated `docs/PUBLISH.md` and added
+  ADR-010. Verified: YAML parses, `npm run build` exit 0, `npm test` 256/256. No commits/tags/
+  pushes; no token added. Live publish left as a documented human action.
